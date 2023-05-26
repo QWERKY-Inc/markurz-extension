@@ -18,8 +18,6 @@ const messagesFromReactAppListener = (
     headlines,
   };
 
-  // document.title = "bonjour";
-
   sendResponse(response);
 };
 
