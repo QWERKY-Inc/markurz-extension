@@ -6,8 +6,6 @@ on:
       - 'v*'
   workflow_dispatch:
 
-permissions: write-all
-
 jobs:
   build:
     name: Publish web extension testing
@@ -22,10 +20,12 @@ jobs:
         run: |
           yarn install --immutable --immutable-cache --check-cache
           yarn build
+      - name: Zip Folder
+        run: zip -r build.zip build
       - name: Upload & release for testing
         uses: mnao305/chrome-extension-upload@v4.0.1
         with:
-          file-path: build
+          file-path: build.zip
           extension-id: hogefuga(extension id)
           client-id: ${{ secrets.CLIENT_ID }}
           client-secret: ${{ secrets.CLIENT_SECRET }}
