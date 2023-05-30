@@ -3,7 +3,7 @@ name: Publish Testing
 on:
   push:
     tags:
-      - 'v*'
+      - 'v((?![a-zA-Z]).)*'
   workflow_dispatch:
 
 jobs:
