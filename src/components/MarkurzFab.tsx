@@ -23,7 +23,7 @@ const MarkurzFab = () => {
       const positionLeft = rect.left + scrollLeft + rect.width;
 
       setHighlightedText(selectedText);
-      setDivPosition({ top: positionTop, left: positionLeft + 50 });
+      setDivPosition({ top: positionTop, left: positionLeft + 20 });
       setShowDiv(true);
     } else {
       setHighlightedText("");
