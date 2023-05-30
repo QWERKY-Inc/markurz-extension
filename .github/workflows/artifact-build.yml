@@ -1,0 +1,28 @@
+name: Publish Testing
+
+on:
+  push:
+    tags:
+      - 'v.*[a-zA-Z]+'
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build Web Extension and store artifact
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 18
+      - name: Build
+        run: |
+          yarn install --immutable --immutable-cache --check-cache
+          yarn build
+      - name: Zip Folder
+        run: zip -r build.zip build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build.zip

@@ -3,7 +3,7 @@ name: Publish Testing
 on:
   push:
     tags:
-      - 'v*'
+      - 'v((?![a-zA-Z]).)*'
   workflow_dispatch:
 
 jobs:
@@ -15,16 +15,18 @@ jobs:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: 12
+          node-version: 18
       - name: Build
         run: |
           yarn install --immutable --immutable-cache --check-cache
           yarn build
+      - name: Zip Folder
+        run: zip -r build.zip build
       - name: Upload & release for testing
         uses: mnao305/chrome-extension-upload@v4.0.1
         with:
-          file-path: dist/file.zip
-          extension-id: hogefuga(extension id)
+          file-path: build.zip
+          extension-id: lnbfijiimlnnpjmfgmfdmdmlobadcloo
           client-id: ${{ secrets.CLIENT_ID }}
           client-secret: ${{ secrets.CLIENT_SECRET }}
           refresh-token: ${{ secrets.REFRESH_TOKEN }}
