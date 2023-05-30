@@ -6,6 +6,8 @@ on:
       - 'v*'
   workflow_dispatch:
 
+permissions: read-all|write-all
+
 jobs:
   build:
     name: Publish web extension testing
