@@ -4,10 +4,10 @@ import MarkurzFab from "src/components/MarkurzFab";
 function App() {
   // const [title, setTitle] = React.useState("");
 
-  function setDocTitle() {
-    // console.log("current title", document.title);
-    // document.title = "My lame title!";
-  }
+  // function setDocTitle() {
+  // console.log("current title", document.title);
+  // document.title = "My lame title!";
+  // }
 
   // React.useEffect(() => {
   //   /**
