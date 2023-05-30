@@ -47,7 +47,7 @@
     ]
   },
   "devDependencies": {
-    "@types/chrome": "^0.0.236",
+    "@types/chrome": "^0.0.237",
     "prettier": "^2.8.8"
   }
 }
