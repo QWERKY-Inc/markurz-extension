@@ -24,7 +24,7 @@
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["./static/js/content.js", "./static/js/background.js"]
+      "js": ["./static/js/content.js", "./static/js/background.js", "./static/js/main.js"]
     }
   ]
 }

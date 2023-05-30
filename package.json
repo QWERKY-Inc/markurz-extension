@@ -1,5 +1,5 @@
 {
-  "name": "chrome-extension",
+  "name": "markurz-chrome-extension",
   "version": "0.1.0",
   "private": true,
   "dependencies": {

@@ -1,4 +1,4 @@
-document.title = "Deepform!";
+// document.title = "Deepform!";
 
 var word = /[Dd]eepform/,
   queue = [document.body],
