@@ -13,11 +13,7 @@
     "default_popup": "index.html",
     "default_title": "Markurz"
   },
-  "permissions": [
-    "activeTab",
-    "scripting",
-    "tabs"
-  ],
+  "permissions": [],
   "host_permissions": [
     "*://*/*"
   ],
