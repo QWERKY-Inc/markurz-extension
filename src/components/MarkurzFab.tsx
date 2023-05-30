@@ -1,4 +1,4 @@
-import { Drawer, Fab } from "@mui/material";
+import { Drawer, Fab, Stack, Typography } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
 
@@ -23,7 +23,7 @@ const MarkurzFab = () => {
       const positionLeft = rect.left + scrollLeft + rect.width;
 
       setHighlightedText(selectedText);
-      setDivPosition({ top: positionTop, left: positionLeft + 20 });
+      setDivPosition({ top: positionTop, left: positionLeft + 30 });
       setShowDiv(true);
     } else {
       setHighlightedText("");
@@ -50,7 +50,11 @@ const MarkurzFab = () => {
   return (
     <>
       <Drawer open={showDrawer} anchor="right" onClose={handleDrawerClose}>
-        stuff
+        <Stack spacing={2} p={2}>
+          <Typography variant="h2" component="p">
+            {highlightedText}
+          </Typography>
+        </Stack>
       </Drawer>
       <Fab
         aria-label="create-task"
