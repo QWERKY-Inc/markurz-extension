@@ -26,9 +26,9 @@ jobs:
           yarn build
       - name: Setup XCode (macos only)
         if: matrix.platform == 'macos-latest'
-        uses: actions/setup-xcode@v1
+        uses: maxim-lobanov/setup-xcode@v1
         with:
-          xcode-version: 14.x
+          xcode-version: latest
       - name: Build with XCode (macos only)
         if: matrix.platform == 'macos-latest'
         run: |
