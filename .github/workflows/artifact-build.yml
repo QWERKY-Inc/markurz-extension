@@ -2,12 +2,11 @@ name: Artifact Build
 
 on:
   push:
-    tags:
-      - 'v.*[a-zA-Z]+'
   workflow_dispatch:
 
 jobs:
   build:
+    if: github.event.commits[0].message ~= ^[mM][kK][zZ].*
     name: Build Web Extension and store artifact
     runs-on: ubuntu-latest
 
