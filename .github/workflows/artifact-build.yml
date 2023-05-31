@@ -8,7 +8,12 @@ jobs:
   build:
     if: startsWith(github.event.commits[0].message, 'MKZ-')
     name: Build Web Extension and store artifact
-    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        platform: [ macos-latest, ubuntu-latest ]
+    runs-on: ${{ matrix.platform }}
 
     steps:
       - uses: actions/checkout@v1
@@ -19,6 +24,14 @@ jobs:
         run: |
           yarn install --immutable --immutable-cache --check-cache
           yarn build
+      - name: Build with XCode (macos only)
+        if: matrix.platform == 'macos-latest'
+        uses: actions/setup-xcode@v1
+        with:
+          xcode-version: 14.x
+        run: |
+          xcrun safari-web-extension-converter ./build
+          xcodebuild -project ./Markurz/Markurz.xcodeproj -scheme Markurz\ (macOS) -destination "generic/platform=macOS" build
       - name: Zip Folder
         run: zip -r build.zip build
       - uses: actions/upload-artifact@v3
