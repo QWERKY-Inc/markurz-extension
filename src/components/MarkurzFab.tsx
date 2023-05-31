@@ -25,9 +25,6 @@ const MarkurzFab = () => {
       setHighlightedText(selectedText);
       setDivPosition({ top: positionTop, left: positionLeft + 20 });
       setShowDiv(true);
-    } else {
-      setHighlightedText("");
-      setShowDiv(false);
     }
   };
 
@@ -39,11 +36,27 @@ const MarkurzFab = () => {
     setShowDrawer(false);
   };
 
+  const handleSelectionChange = () => {
+    const selection = window.getSelection();
+    const selectedText = selection?.toString();
+
+    if (!selectedText) {
+      setHighlightedText("");
+      setShowDiv(false);
+    }
+  };
+
   useEffect(() => {
     window.addEventListener("mouseup", handleHighlight);
+    window.addEventListener("click", handleHighlight);
+    window.addEventListener("pointerup", handleHighlight);
+    document.addEventListener("selectionchange", handleSelectionChange);
 
     return () => {
       window.removeEventListener("mouseup", handleHighlight);
+      window.removeEventListener("click", handleHighlight);
+      window.removeEventListener("pointerup", handleHighlight);
+      document.removeEventListener("selectionchange", handleSelectionChange);
     };
   }, []);
 
