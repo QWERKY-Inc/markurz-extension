@@ -11,7 +11,8 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useState } from "react";
+import { useForm } from "react-hook-form";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
 
 interface SideDrawerProps extends DrawerProps {
@@ -20,6 +21,12 @@ interface SideDrawerProps extends DrawerProps {
 
 const SideDrawer = (props: SideDrawerProps) => {
   const { highlightedText, ...drawerProps } = props;
+  const [selectedApp, setSelectedApp] = useState("");
+  const { handleSubmit } = useForm();
+
+  const submit = () => {
+    console.log("submit");
+  };
 
   return (
     <Drawer
@@ -32,32 +39,55 @@ const SideDrawer = (props: SideDrawerProps) => {
       }}
       {...drawerProps}
     >
-      <Stack spacing={3} p={2}>
-        <Typography
-          variant="h4"
-          component="p"
-          sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
-        >
-          {highlightedText}
-        </Typography>
-        <TextField select label="Select apps">
-          <MenuItem>
-            <ListItemIcon>
-              <MarkurzIcon fontSize="small" />
-            </ListItemIcon>
-            <ListItemText>Jira</ListItemText>
-          </MenuItem>
-        </TextField>
-        <LoadingButton variant="contained">Send</LoadingButton>
-        <Button
-          startIcon={<Add />}
-          href="https://launch.markurz.com/"
-          rel="noopener"
-          target="_blank"
-        >
-          Add Apps
-        </Button>
-      </Stack>
+      <form onSubmit={handleSubmit(submit)}>
+        <Stack spacing={3} p={2}>
+          <Typography
+            variant="h4"
+            component="p"
+            sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+          >
+            {highlightedText}
+          </Typography>
+          <TextField
+            select
+            label="Select apps"
+            value={selectedApp}
+            onChange={(e) => setSelectedApp(e.target.value)}
+            sx={{
+              "& .MuiSelect-select": {
+                display: "flex",
+                alignItems: "center",
+                gap: 2,
+              },
+              "& .MuiListItemText-root": {
+                margin: 0,
+              },
+              "& .MuiListItemIcon-root": {
+                minWidth: "unset",
+              },
+            }}
+          >
+            <MenuItem value="jira">
+              <ListItemIcon>
+                <MarkurzIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Jira</ListItemText>
+            </MenuItem>
+          </TextField>
+          <LoadingButton variant="contained" type="submit">
+            Send
+          </LoadingButton>
+          <Button
+            type="button"
+            startIcon={<Add />}
+            href="https://launch.markurz.com/"
+            rel="noopener"
+            target="_blank"
+          >
+            Add Apps
+          </Button>
+        </Stack>
+      </form>
     </Drawer>
   );
 };
