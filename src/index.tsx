@@ -59,7 +59,7 @@ if (chrome.cookies) {
   }
   const app = document.createElement("div");
   app.id = "markurz-root";
-  document.body.appendChild(app);
+  document.documentElement.appendChild(app);
 
   const root = ReactDOM.createRoot(app);
   root.render(
