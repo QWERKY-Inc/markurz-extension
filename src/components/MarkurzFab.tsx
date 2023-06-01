@@ -1,14 +1,17 @@
-import { Drawer, Fab, Stack, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Fab } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
+import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
 
 const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
-  const [showDiv, setShowDiv] = useState(false);
+  const [showFab, setShowFab] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [divPosition, setDivPosition] = useState({ top: 0, left: 0 });
 
-  const handleHighlight = () => {
+  const handleHighlight = useCallback(() => {
+    if (showDrawer) return;
+
     const selection = window.getSelection();
     const selectedText = selection?.toString();
 
@@ -24,27 +27,30 @@ const MarkurzFab = () => {
 
       setHighlightedText(selectedText);
       setDivPosition({ top: positionTop, left: positionLeft + 20 });
-      setShowDiv(true);
+      setShowFab(true);
     }
-  };
+  }, [showDrawer]);
 
   const handleFabClick = () => {
     setShowDrawer(true);
+    setShowFab(false);
   };
 
   const handleDrawerClose = () => {
     setShowDrawer(false);
   };
 
-  const handleSelectionChange = () => {
+  const handleSelectionChange = useCallback(() => {
+    if (showDrawer) return;
+
     const selection = window.getSelection();
     const selectedText = selection?.toString();
 
     if (!selectedText) {
       setHighlightedText("");
-      setShowDiv(false);
+      setShowFab(false);
     }
-  };
+  }, [showDrawer]);
 
   useEffect(() => {
     window.addEventListener("mouseup", handleHighlight);
@@ -58,24 +64,22 @@ const MarkurzFab = () => {
       window.removeEventListener("pointerup", handleHighlight);
       document.removeEventListener("selectionchange", handleSelectionChange);
     };
-  }, []);
+  }, [handleHighlight, handleSelectionChange]);
 
   return (
     <>
-      <Drawer open={showDrawer} anchor="right" onClose={handleDrawerClose}>
-        <Stack spacing={2} p={2}>
-          <Typography variant="h2" component="p">
-            {highlightedText}
-          </Typography>
-        </Stack>
-      </Drawer>
+      <SideDrawer
+        highlightedText={highlightedText}
+        open={showDrawer}
+        onClose={handleDrawerClose}
+      />
       <Fab
         aria-label="create-task"
         size="small"
         sx={{
           ...divPosition,
           position: "absolute",
-          display: showDiv ? "" : "none",
+          display: showFab ? "" : "none",
         }}
         color="primary"
         onClick={handleFabClick}
