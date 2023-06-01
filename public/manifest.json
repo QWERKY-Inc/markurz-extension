@@ -13,11 +13,19 @@
     "default_popup": "index.html",
     "default_title": "Markurz"
   },
+  "permissions": [
+    "cookies",
+    "tabs",
+    "scripting"
+  ],
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["./static/js/content.js", "./static/js/main.js"]
+      "js": ["./static/js/main.js"]
     }
+  ],
+  "host_permissions": [
+    "*://*/*"
   ],
   "browser_specific_settings": {
     "gecko": {
