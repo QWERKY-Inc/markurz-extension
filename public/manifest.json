@@ -18,6 +18,9 @@
     "tabs",
     "scripting"
   ],
+  "background": {
+    "service_worker": "./static/js/background.js"
+  },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],

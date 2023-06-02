@@ -10,6 +10,7 @@ module.exports = {
             paths.appIndexJs,
           ].filter(Boolean),
           content: "./src/chromeServices/DOMEvaluator.ts",
+          background: "./src/chromeServices/background.ts",
         },
         output: {
           ...webpackConfig.output,

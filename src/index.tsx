@@ -9,47 +9,47 @@ import theme from "./theme";
  * If there is one, inject the token in the page.
  * If there is none, open a login page instead.
  */
-function injectPlugin(token: string) {
-  chrome.tabs.query(
-    {
-      active: true,
-      currentWindow: true,
-    },
-    (tabs) => {
-      chrome.scripting?.executeScript({
-        target: { tabId: tabs[0].id || 0 },
-        args: [{ token }],
-        func: (args) => {
-          if (args.token) {
-            sessionStorage.setItem("markurz-token", args.token);
-          } else {
-            sessionStorage.removeItem("markurz-token");
-          }
-        },
-      });
-    }
-  );
-}
+// function injectPlugin(token: string) {
+//   chrome.tabs.query(
+//     {
+//       active: true,
+//       currentWindow: true,
+//     },
+//     (tabs) => {
+//       chrome.scripting?.executeScript({
+//         target: { tabId: tabs[0].id || 0 },
+//         args: [{ token }],
+//         func: (args) => {
+//           if (args.token) {
+//             sessionStorage.setItem("markurz-token", args.token);
+//           } else {
+//             sessionStorage.removeItem("markurz-token");
+//           }
+//         },
+//       });
+//     }
+//   );
+// }
 
 if (chrome.cookies) {
-  chrome.cookies.onChanged.addListener((reason) => {
-    if (
-      reason.cookie.domain === "www.deepform.net" &&
-      reason.cookie.name === "__Secure-next-auth.session-token"
-    ) {
-      injectPlugin(reason.removed ? "" : reason.cookie.value);
-    }
-  });
-  chrome.cookies.getAll(
-    { domain: "www.deepform.net", name: "__Secure-next-auth.session-token" },
-    (cookie) => {
-      if (cookie.length) {
-        injectPlugin(cookie[0].value);
-      } else {
-        injectPlugin("");
-      }
-    }
-  );
+  // chrome.cookies.onChanged.addListener((reason) => {
+  //   if (
+  //     reason.cookie.domain === "www.deepform.net" &&
+  //     reason.cookie.name === "__Secure-next-auth.session-token"
+  //   ) {
+  //     injectPlugin(reason.removed ? "" : reason.cookie.value);
+  //   }
+  // });
+  // chrome.cookies.getAll(
+  //   { domain: "www.deepform.net", name: "__Secure-next-auth.session-token" },
+  //   (cookie) => {
+  //     if (cookie.length) {
+  //       injectPlugin(cookie[0].value);
+  //     } else {
+  //       injectPlugin("");
+  //     }
+  //   }
+  // );
   // Inject the plugin only in the content
 } else {
   const prevApp = document.getElementById("markurz-root");
