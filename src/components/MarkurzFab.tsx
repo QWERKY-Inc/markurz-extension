@@ -62,6 +62,12 @@ const MarkurzFab = () => {
     };
   }, []);
 
+  useEffect(() => {
+    chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
+      token = response.token;
+    });
+  }, []);
+
   const handleSelectionChange = useCallback(() => {
     if (showDrawer) return;
 

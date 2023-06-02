@@ -17,15 +17,21 @@ chrome.cookies.onChanged.addListener((reason) => {
   }
 });
 
-chrome.cookies.getAll(
-  { domain: "www.deepform.net", name: "__Secure-next-auth.session-token" },
-  (cookie) => {
-    if (cookie.length) {
-      setMessage(cookie[0].value);
-    } else {
-      setMessage(null);
+chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+  (async function () {
+    if (request.type === "GET_COOKIE") {
+      const cookie = await chrome.cookies.getAll({
+        domain: "www.deepform.net",
+        name: "__Secure-next-auth.session-token",
+      });
+      if (cookie.length) {
+        sendResponse({ token: cookie[0].value });
+        return;
+      }
     }
-  }
-);
+    sendResponse({ token: null });
+  })();
+  return true;
+});
 
 export {};
