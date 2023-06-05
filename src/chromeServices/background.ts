@@ -1,6 +1,6 @@
 function setMessage(token: string | null) {
   chrome.tabs.query({ status: "complete" }, (tabs) => {
-    tabs.map((tab) => {
+    tabs.forEach((tab) => {
       if (tab.id) {
         chrome.tabs.sendMessage(tab.id, { token });
       }
