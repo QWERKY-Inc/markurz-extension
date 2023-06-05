@@ -1,6 +1,34 @@
-import { ApolloClient, InMemoryCache } from "@apollo/client";
+import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
+import { setContext } from "@apollo/client/link/context";
+import { getToken } from "src/components/MarkurzFab";
+
+const authLink = setContext(async (_, { headers }) => {
+  try {
+    const token = getToken();
+    if (token) {
+      return {
+        headers: {
+          ...headers,
+          authorization: headers?.authorization
+            ? headers.authorization
+            : `Bearer ${token}`,
+        },
+      };
+    }
+    return headers;
+  } catch (e) {
+    console.error("[authLink]", e);
+    return headers;
+  }
+});
+
+const link = createHttpLink({
+  uri: `${process.env.REACT_APP_BACKEND_URL}/graphql`,
+  credentials: "same-origin",
+});
 
 export const apolloClient = new ApolloClient({
-  uri: "https://flyby-router-demo.herokuapp.com/",
   cache: new InMemoryCache(),
+  name: "markurz-extension",
+  link: authLink.concat(link),
 });

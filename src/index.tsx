@@ -1,6 +1,8 @@
+import { ApolloProvider } from "@apollo/client";
 import { CssBaseline, ThemeProvider } from "@mui/material";
 import React from "react";
 import ReactDOM from "react-dom/client";
+import { apolloClient } from "src/apollo";
 import App from "./App";
 import theme from "./theme";
 
@@ -64,10 +66,12 @@ if (chrome.cookies) {
   const root = ReactDOM.createRoot(app);
   root.render(
     <React.StrictMode>
-      <ThemeProvider theme={theme}>
-        <CssBaseline />
-        <App />
-      </ThemeProvider>
+      <ApolloProvider client={apolloClient}>
+        <ThemeProvider theme={theme}>
+          <CssBaseline />
+          <App />
+        </ThemeProvider>
+      </ApolloProvider>
     </React.StrictMode>
   );
 }

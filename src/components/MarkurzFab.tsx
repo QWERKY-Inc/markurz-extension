@@ -6,6 +6,8 @@ import MarkurzIcon from "src/components/icons/MarkurzIcon";
 
 let token: string | null = null;
 
+export const getToken = () => token;
+
 const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
   const [showFab, setShowFab] = useState(false);
