@@ -2,7 +2,11 @@ function setMessage(token: string | null) {
   chrome.tabs.query({ status: "complete" }, (tabs) => {
     tabs.forEach((tab) => {
       if (tab.id) {
-        chrome.tabs.sendMessage(tab.id, { token });
+        chrome.tabs
+          .sendMessage(tab.id, { token })
+          .catch((e) =>
+            console.error(`Could not send message to the tab ${tab.id}`, e)
+          );
       }
     });
   });
@@ -10,10 +14,10 @@ function setMessage(token: string | null) {
 
 chrome.cookies.onChanged.addListener((reason) => {
   if (
-    reason.cookie.domain === "www.deepform.net" &&
+    reason.cookie.domain === process.env.REACT_APP_LOGIN_URL &&
     reason.cookie.name === "__Secure-next-auth.session-token"
   ) {
-    setMessage(reason.cookie.value);
+    setMessage(reason.removed ? null : reason.cookie.value);
   }
 });
 
@@ -21,7 +25,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   (async function () {
     if (request.type === "GET_COOKIE") {
       const cookie = await chrome.cookies.getAll({
-        domain: "www.deepform.net",
+        domain: process.env.REACT_APP_LOGIN_URL,
         name: "__Secure-next-auth.session-token",
       });
       if (cookie.length) {

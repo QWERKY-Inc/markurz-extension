@@ -8,21 +8,6 @@ const messagesFromReactAppListener = async (
 ) => {
   console.log("[content.js]. Message received", msg);
 
-  if (msg.type === "GET_COOKIE") {
-    chrome.cookies.getAll(
-      { domain: "www.deepform.net", name: "__Secure-next-auth.session-token" },
-      (cookie) => {
-        console.log("get cookie", cookie);
-        if (cookie.length) {
-          sendResponse({ title: cookie[0].value || "", headlines: [] });
-        } else {
-          sendResponse({ title: "nothing" || "", headlines: [] });
-        }
-      }
-    );
-    return;
-  }
-
   const headlines = Array.from(document.getElementsByTagName<"h1">("h1")).map(
     (h1) => h1.innerText
   );

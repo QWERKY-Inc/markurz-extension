@@ -101,7 +101,10 @@ const MarkurzFab = () => {
   return (
     <>
       {showNewWindow && (
-        <NewWindow onUnload={handleUnload} url="https://www.deepform.net/" />
+        <NewWindow
+          onUnload={handleUnload}
+          url={`https://${process.env.REACT_APP_LOGIN_URL}/login`}
+        />
       )}
       <SideDrawer
         highlightedText={highlightedText}
