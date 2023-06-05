@@ -1,6 +1,6 @@
 import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { getToken } from "src/components/MarkurzFab";
+import { getToken } from "src/lib/token";
 
 const authLink = setContext(async (_, { headers }) => {
   try {

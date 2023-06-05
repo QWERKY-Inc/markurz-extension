@@ -1,19 +1,16 @@
 import { Fab } from "@mui/material";
-import React, { useCallback, useEffect, useState } from "react";
-import NewWindow from "react-new-window";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
-
-let token: string | null = null;
-
-export const getToken = () => token;
+import { useToken } from "src/lib/token";
 
 const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
   const [showFab, setShowFab] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [divPosition, setDivPosition] = useState({ top: 0, left: 0 });
-  const [showNewWindow, setShowNewWindow] = useState(false);
+  const { token } = useToken();
+  const winRef = useRef<Window | null>(null);
 
   const handleHighlight = useCallback(() => {
     if (showDrawer) return;
@@ -42,7 +39,11 @@ const MarkurzFab = () => {
       setShowDrawer(true);
       setShowFab(false);
     } else {
-      setShowNewWindow(true);
+      winRef.current = window.open(
+        `https://${process.env.REACT_APP_LOGIN_URL}/login`,
+        "_blank",
+        "toolbar=0,location=0,menubar=0,width=600,height=800"
+      );
     }
   };
 
@@ -50,25 +51,13 @@ const MarkurzFab = () => {
     setShowDrawer(false);
   };
 
-  const handleMessage = (message: any) => {
-    token = message.token;
-    setShowNewWindow(false);
-  };
-
   useEffect(() => {
-    if (chrome.extension) {
-      chrome.runtime.onMessage.addListener(handleMessage);
+    if (token) {
+      if (winRef.current) {
+        winRef.current?.close();
+      }
     }
-    return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage);
-    };
-  }, []);
-
-  useEffect(() => {
-    chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
-      token = response.token;
-    });
-  }, []);
+  }, [token]);
 
   const handleSelectionChange = useCallback(() => {
     if (showDrawer) return;
@@ -96,18 +85,8 @@ const MarkurzFab = () => {
     };
   }, [handleHighlight, handleSelectionChange]);
 
-  const handleUnload = () => {
-    setShowNewWindow(false);
-  };
-
   return (
     <>
-      {showNewWindow && (
-        <NewWindow
-          onUnload={handleUnload}
-          url={`https://${process.env.REACT_APP_LOGIN_URL}/login`}
-        />
-      )}
       <SideDrawer
         highlightedText={highlightedText}
         open={showDrawer}
