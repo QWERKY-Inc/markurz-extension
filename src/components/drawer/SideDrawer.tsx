@@ -13,6 +13,8 @@ import {
 } from "@mui/material";
 import React, { useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
+import { useLocation } from "react-use";
+import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
 
@@ -25,8 +27,10 @@ const SideDrawer = (props: SideDrawerProps) => {
   const [selectedApp, setSelectedApp] = useState("");
   const methods = useForm();
   const { handleSubmit, reset } = methods;
+  const { href } = useLocation();
 
   const submit = (form: FieldValues) => {
+    form.href = href;
     console.log("submit", form);
   };
 
@@ -90,7 +94,7 @@ const SideDrawer = (props: SideDrawerProps) => {
               </MenuItem>
               <MenuItem value="google-tasks">
                 <ListItemIcon>
-                  <MarkurzIcon fontSize="small" />
+                  <GoogleTasksIcon fontSize="small" />
                 </ListItemIcon>
                 <ListItemText>Google Tasks</ListItemText>
               </MenuItem>

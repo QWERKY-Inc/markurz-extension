@@ -1,3 +1,4 @@
+import { InfoOutlined } from "@mui/icons-material";
 import {
   MenuItem,
   Stack,
@@ -17,7 +18,10 @@ const GoogleTasks = (props: GoogleTasksProps) => {
 
   return (
     <Stack spacing={2} {...props}>
-      <Typography>Create a Task in Google Tasks</Typography>
+      <Typography display="flex" gap={1} alignItems="center">
+        <InfoOutlined fontSize="small" />
+        Create a Task in Google Tasks
+      </Typography>
       <TextField
         label="Title"
         required
@@ -33,7 +37,9 @@ const GoogleTasks = (props: GoogleTasksProps) => {
         name="list"
         control={control}
       />
-      <Typography>Additional Information (optional)</Typography>
+      <Typography color="text.secondary">
+        Additional Information (optional)
+      </Typography>
       <Controller
         render={({ field }) => <DatePicker label="Due date" {...field} />}
         name="date"
