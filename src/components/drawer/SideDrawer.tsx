@@ -50,6 +50,12 @@ const SideDrawer = (props: SideDrawerProps) => {
           maxWidth: 420,
         },
       }}
+      ModalProps={{
+        container: document.getElementById("markurz-root"),
+        style: {
+          zIndex: 10000,
+        },
+      }}
       {...drawerProps}
     >
       <FormProvider {...methods}>
