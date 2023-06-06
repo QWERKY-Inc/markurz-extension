@@ -1,14 +1,21 @@
-import { Drawer, Fab, Stack, Typography } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import { Fab } from "@mui/material";
+import React, { useCallback, useEffect, useState } from "react";
+import NewWindow from "react-new-window";
+import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
+
+let token: string | null = null;
 
 const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
-  const [showDiv, setShowDiv] = useState(false);
+  const [showFab, setShowFab] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
   const [divPosition, setDivPosition] = useState({ top: 0, left: 0 });
+  const [showNewWindow, setShowNewWindow] = useState(false);
 
-  const handleHighlight = () => {
+  const handleHighlight = useCallback(() => {
+    if (showDrawer) return;
+
     const selection = window.getSelection();
     const selectedText = selection?.toString();
 
@@ -24,45 +31,93 @@ const MarkurzFab = () => {
 
       setHighlightedText(selectedText);
       setDivPosition({ top: positionTop, left: positionLeft + 20 });
-      setShowDiv(true);
-    } else {
-      setHighlightedText("");
-      setShowDiv(false);
+      setShowFab(true);
     }
-  };
+  }, [showDrawer]);
 
   const handleFabClick = () => {
-    setShowDrawer(true);
+    if (token) {
+      setShowDrawer(true);
+      setShowFab(false);
+    } else {
+      setShowNewWindow(true);
+    }
   };
 
   const handleDrawerClose = () => {
     setShowDrawer(false);
   };
 
-  useEffect(() => {
-    window.addEventListener("mouseup", handleHighlight);
+  const handleMessage = (message: any) => {
+    token = message.token;
+    setShowNewWindow(false);
+  };
 
+  useEffect(() => {
+    if (chrome.extension) {
+      chrome.runtime.onMessage.addListener(handleMessage);
+    }
     return () => {
-      window.removeEventListener("mouseup", handleHighlight);
+      chrome.runtime.onMessage.removeListener(handleMessage);
     };
   }, []);
 
+  useEffect(() => {
+    chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
+      token = response.token;
+    });
+  }, []);
+
+  const handleSelectionChange = useCallback(() => {
+    if (showDrawer) return;
+
+    const selection = window.getSelection();
+    const selectedText = selection?.toString();
+
+    if (!selectedText) {
+      setHighlightedText("");
+      setShowFab(false);
+    }
+  }, [showDrawer]);
+
+  useEffect(() => {
+    window.addEventListener("mouseup", handleHighlight);
+    window.addEventListener("click", handleHighlight);
+    window.addEventListener("pointerup", handleHighlight);
+    document.addEventListener("selectionchange", handleSelectionChange);
+
+    return () => {
+      window.removeEventListener("mouseup", handleHighlight);
+      window.removeEventListener("click", handleHighlight);
+      window.removeEventListener("pointerup", handleHighlight);
+      document.removeEventListener("selectionchange", handleSelectionChange);
+    };
+  }, [handleHighlight, handleSelectionChange]);
+
+  const handleUnload = () => {
+    setShowNewWindow(false);
+  };
+
   return (
     <>
-      <Drawer open={showDrawer} anchor="right" onClose={handleDrawerClose}>
-        <Stack spacing={2} p={2}>
-          <Typography variant="h2" component="p">
-            {highlightedText}
-          </Typography>
-        </Stack>
-      </Drawer>
+      {showNewWindow && (
+        <NewWindow
+          onUnload={handleUnload}
+          url={`https://${process.env.REACT_APP_LOGIN_URL}/login`}
+        />
+      )}
+      <SideDrawer
+        highlightedText={highlightedText}
+        open={showDrawer}
+        onClose={handleDrawerClose}
+      />
       <Fab
         aria-label="create-task"
         size="small"
         sx={{
           ...divPosition,
           position: "absolute",
-          display: showDiv ? "" : "none",
+          display: showFab ? "" : "none",
         }}
         color="primary"
         onClick={handleFabClick}

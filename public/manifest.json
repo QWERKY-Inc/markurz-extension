@@ -1,11 +1,11 @@
 {
-  "short_name": "Markurz Chrome",
+  "short_name": "Markurz",
   "icons": {
     "16": "logo.png",
     "48": "logo.png",
     "128": "logo.png"
   },
-  "name": "Markurz Chrome Extension",
+  "name": "Markurz",
   "description": "Boost your performance with the Markurz extension.",
   "version": "1.0",
   "manifest_version": 3,
@@ -13,10 +13,27 @@
     "default_popup": "index.html",
     "default_title": "Markurz"
   },
+  "permissions": [
+    "cookies",
+    "tabs",
+    "scripting"
+  ],
+  "background": {
+    "service_worker": "./static/js/background.js"
+  },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["./static/js/content.js", "./static/js/main.js"]
+      "js": ["./static/js/main.js"]
     }
-  ]
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "admin@deepform.net",
+      "strict_min_version": "109.0"
+    }
+  }
 }

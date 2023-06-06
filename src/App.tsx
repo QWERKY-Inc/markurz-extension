@@ -46,9 +46,6 @@ function App() {
 
   return (
     <div className="App">
-      {/*<p style={{ height: 3000 }}>hello</p>*/}
-      {/*<p>hello</p>*/}
-      {/*<p>hello</p>*/}
       <MarkurzFab />
     </div>
   );

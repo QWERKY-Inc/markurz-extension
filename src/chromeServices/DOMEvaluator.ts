@@ -1,7 +1,7 @@
 import { DOMMessage, DOMMessageResponse } from "../types";
 
 // Function called when a new message is received
-const messagesFromReactAppListener = (
+const messagesFromReactAppListener = async (
   msg: DOMMessage,
   sender: chrome.runtime.MessageSender,
   sendResponse: (response: DOMMessageResponse) => void
