@@ -4,7 +4,6 @@ let globalToken: string | null = null;
 
 chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
   globalToken = response.token;
-  console.log("send message", globalToken);
 });
 
 /**

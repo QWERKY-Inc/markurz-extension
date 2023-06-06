@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useState } from "react";
-import { useForm } from "react-hook-form";
+import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
 
@@ -23,10 +23,18 @@ interface SideDrawerProps extends DrawerProps {
 const SideDrawer = (props: SideDrawerProps) => {
   const { highlightedText, ...drawerProps } = props;
   const [selectedApp, setSelectedApp] = useState("");
-  const { handleSubmit } = useForm();
+  const methods = useForm();
+  const { handleSubmit, reset } = methods;
 
-  const submit = () => {
-    console.log("submit");
+  const submit = (form: FieldValues) => {
+    console.log("submit", form);
+  };
+
+  const handleAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSelectedApp(e.target.value);
+    reset({
+      title: highlightedText,
+    });
   };
 
   return (
@@ -40,72 +48,74 @@ const SideDrawer = (props: SideDrawerProps) => {
       }}
       {...drawerProps}
     >
-      <form onSubmit={handleSubmit(submit)}>
-        <Stack spacing={3} p={2}>
-          <Typography
-            variant="h4"
-            component="p"
-            sx={{
-              overflow: "hidden",
-              textOverflow: "ellipsis",
-              whiteSpace: "nowrap",
-            }}
-          >
-            {highlightedText}
-          </Typography>
-          <TextField
-            select
-            required
-            label="Select apps"
-            value={selectedApp}
-            onChange={(e) => setSelectedApp(e.target.value)}
-            sx={{
-              "& .MuiSelect-select": {
-                display: "flex",
-                alignItems: "center",
-                gap: 2,
-              },
-              "& .MuiListItemText-root": {
-                margin: 0,
-              },
-              "& .MuiListItemIcon-root": {
-                minWidth: "unset",
-              },
-            }}
-          >
-            <MenuItem value="jira">
-              <ListItemIcon>
-                <MarkurzIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Jira</ListItemText>
-            </MenuItem>
-            <MenuItem value="google-tasks">
-              <ListItemIcon>
-                <MarkurzIcon fontSize="small" />
-              </ListItemIcon>
-              <ListItemText>Google Tasks</ListItemText>
-            </MenuItem>
-          </TextField>
-          <TabContext value={selectedApp}>
-            <TabPanel value="jira">jira</TabPanel>
-            <TabPanel value="google-tasks">
-              <GoogleTasks />
-            </TabPanel>
-          </TabContext>
-          <LoadingButton variant="contained" type="submit">
-            Send
-          </LoadingButton>
-          <Button
-            type="button"
-            startIcon={<Add />}
-            href="https://launch.markurz.com/"
-            rel="noopener"
-            target="_blank"
-          >
-            Add Apps
-          </Button>
-        </Stack>
-      </form>
+      <FormProvider {...methods}>
+        <form onSubmit={handleSubmit(submit)}>
+          <Stack spacing={3} p={2}>
+            <Typography
+              variant="h4"
+              component="p"
+              sx={{
+                overflow: "hidden",
+                textOverflow: "ellipsis",
+                whiteSpace: "nowrap",
+              }}
+            >
+              {highlightedText}
+            </Typography>
+            <TextField
+              select
+              required
+              label="Select apps"
+              value={selectedApp}
+              onChange={handleAppChange}
+              sx={{
+                "& .MuiSelect-select": {
+                  display: "flex",
+                  alignItems: "center",
+                  gap: 2,
+                },
+                "& .MuiListItemText-root": {
+                  margin: 0,
+                },
+                "& .MuiListItemIcon-root": {
+                  minWidth: "unset",
+                },
+              }}
+            >
+              <MenuItem value="jira">
+                <ListItemIcon>
+                  <MarkurzIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Jira</ListItemText>
+              </MenuItem>
+              <MenuItem value="google-tasks">
+                <ListItemIcon>
+                  <MarkurzIcon fontSize="small" />
+                </ListItemIcon>
+                <ListItemText>Google Tasks</ListItemText>
+              </MenuItem>
+            </TextField>
+            <TabContext value={selectedApp}>
+              <TabPanel value="jira">jira</TabPanel>
+              <TabPanel value="google-tasks">
+                <GoogleTasks />
+              </TabPanel>
+            </TabContext>
+            <LoadingButton variant="contained" type="submit">
+              Send
+            </LoadingButton>
+            <Button
+              type="button"
+              startIcon={<Add />}
+              href="https://launch.markurz.com/"
+              rel="noopener"
+              target="_blank"
+            >
+              Add Apps
+            </Button>
+          </Stack>
+        </form>
+      </FormProvider>
     </Drawer>
   );
 };
