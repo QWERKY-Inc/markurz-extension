@@ -53,7 +53,7 @@ const SideDrawer = (props: SideDrawerProps) => {
       ModalProps={{
         container: document.getElementById("markurz-root"),
         style: {
-          zIndex: 10000,
+          zIndex: 1201,
         },
       }}
       {...drawerProps}
