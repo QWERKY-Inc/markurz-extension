@@ -1,5 +1,7 @@
 import { ApolloProvider } from "@apollo/client";
 import { CssBaseline, ThemeProvider } from "@mui/material";
+import { LocalizationProvider } from "@mui/x-date-pickers";
+import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { apolloClient } from "src/apollo";
@@ -68,8 +70,10 @@ if (chrome.cookies) {
     <React.StrictMode>
       <ApolloProvider client={apolloClient}>
         <ThemeProvider theme={theme}>
-          <CssBaseline />
-          <App />
+          <LocalizationProvider dateAdapter={AdapterMoment}>
+            <CssBaseline />
+            <App />
+          </LocalizationProvider>
         </ThemeProvider>
       </ApolloProvider>
     </React.StrictMode>

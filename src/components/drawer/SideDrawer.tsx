@@ -1,5 +1,5 @@
 import { Add } from "@mui/icons-material";
-import { LoadingButton } from "@mui/lab";
+import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
   Button,
   Drawer,
@@ -14,6 +14,7 @@ import {
 import React, { useState } from "react";
 import { useForm } from "react-hook-form";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
+import GoogleTasks from "src/components/tasks/GoogleTasks";
 
 interface SideDrawerProps extends DrawerProps {
   highlightedText: string;
@@ -44,12 +45,17 @@ const SideDrawer = (props: SideDrawerProps) => {
           <Typography
             variant="h4"
             component="p"
-            sx={{ overflow: "hidden", textOverflow: "ellipsis" }}
+            sx={{
+              overflow: "hidden",
+              textOverflow: "ellipsis",
+              whiteSpace: "nowrap",
+            }}
           >
             {highlightedText}
           </Typography>
           <TextField
             select
+            required
             label="Select apps"
             value={selectedApp}
             onChange={(e) => setSelectedApp(e.target.value)}
@@ -73,7 +79,19 @@ const SideDrawer = (props: SideDrawerProps) => {
               </ListItemIcon>
               <ListItemText>Jira</ListItemText>
             </MenuItem>
+            <MenuItem value="google-tasks">
+              <ListItemIcon>
+                <MarkurzIcon fontSize="small" />
+              </ListItemIcon>
+              <ListItemText>Google Tasks</ListItemText>
+            </MenuItem>
           </TextField>
+          <TabContext value={selectedApp}>
+            <TabPanel value="jira">jira</TabPanel>
+            <TabPanel value="google-tasks">
+              <GoogleTasks />
+            </TabPanel>
+          </TabContext>
           <LoadingButton variant="contained" type="submit">
             Send
           </LoadingButton>
