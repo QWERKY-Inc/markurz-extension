@@ -24,6 +24,13 @@ jobs:
         run: |
           yarn install --immutable --immutable-cache --check-cache
           yarn build
+        env:
+          REACT_APP_LOGIN_URL: ${{ env.REACT_APP_LOGIN_URL }}
+          REACT_APP_COOKIE_DOMAIN: ${{ env.REACT_APP_COOKIE_DOMAIN }}
+          REACT_APP_COOKIE_NAME: ${{ env.REACT_APP_COOKIE_NAME }}
+          REACT_APP_BACKEND_URL: ${{ env.REACT_APP_BACKEND_URL }}
+          GQL_SCHEMA_TOKEN: ${{ secrets.GQL_SCHEMA_TOKEN }}
+          NEXTAUTH_SECRET: ${{ secrets.NEXTAUTH_SECRET }}
       - name: Setup XCode (macos only)
         if: matrix.platform == 'macos-latest'
         uses: maxim-lobanov/setup-xcode@v1
