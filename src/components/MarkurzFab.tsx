@@ -40,7 +40,7 @@ const MarkurzFab = () => {
       setShowFab(false);
     } else {
       winRef.current = window.open(
-        `https://${process.env.REACT_APP_LOGIN_URL}/login`,
+        `${process.env.REACT_APP_LOGIN_URL}/login`,
         "_blank",
         "toolbar=0,location=0,menubar=0,width=600,height=800"
       );
