@@ -15,6 +15,7 @@ import {
 import React, { useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { useLocation } from "react-use";
+import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
 import { graphql } from "src/generated";
 import { ModuleTypeEnum } from "src/generated/graphql";
@@ -39,6 +40,47 @@ const QUERY_MODULES = graphql(/* GraphQL */ `
 interface SideDrawerProps extends DrawerProps {
   highlightedText: string;
 }
+
+const APPS: {
+  [p in ModuleTypeEnum]: { name: string; icon: React.JSX.Element };
+} = {
+  [ModuleTypeEnum.GoogleTasks]: {
+    name: "Google Tasks",
+    icon: <GoogleTasksIcon />,
+  },
+  [ModuleTypeEnum.AppleCalendar]: {
+    name: "",
+    icon: <GoogleTasksIcon />,
+  },
+  [ModuleTypeEnum.AppleReminders]: {
+    name: "",
+    icon: <GoogleTasksIcon />,
+  },
+  [ModuleTypeEnum.GoogleCalendar]: {
+    name: "",
+    icon: <GoogleTasksIcon />,
+  },
+  [ModuleTypeEnum.GoogleDocs]: {
+    name: "",
+    icon: <GoogleTasksIcon />,
+  },
+  [ModuleTypeEnum.Jira]: {
+    name: "",
+    icon: <GoogleTasksIcon />,
+  },
+  [ModuleTypeEnum.Notion]: {
+    name: "",
+    icon: <GoogleTasksIcon />,
+  },
+  [ModuleTypeEnum.Todoist]: {
+    name: "",
+    icon: <GoogleTasksIcon />,
+  },
+  [ModuleTypeEnum.Trello]: {
+    name: "",
+    icon: <GoogleTasksIcon />,
+  },
+};
 
 const SideDrawer = (props: SideDrawerProps) => {
   const { highlightedText, ...drawerProps } = props;
@@ -136,7 +178,10 @@ const SideDrawer = (props: SideDrawerProps) => {
                   key={userModule.module.id}
                   value={userModule.module.type}
                 >
-                  {userModule.module.type}
+                  <ListItemIcon>
+                    {APPS[userModule.module.type].icon}
+                  </ListItemIcon>
+                  {APPS[userModule.module.type].name}
                 </MenuItem>
               ))}
               {/*<MenuItem value="jira">*/}
@@ -153,8 +198,8 @@ const SideDrawer = (props: SideDrawerProps) => {
               {/*</MenuItem>*/}
             </TextField>
             <TabContext value={selectedApp}>
-              <TabPanel value="jira">jira</TabPanel>
-              <TabPanel value="google-tasks">
+              <TabPanel value={ModuleTypeEnum.Jira}>jira</TabPanel>
+              <TabPanel value={ModuleTypeEnum.GoogleTasks}>
                 <GoogleTasks />
               </TabPanel>
             </TabContext>

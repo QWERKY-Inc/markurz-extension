@@ -1,10 +1,12 @@
 import { decode } from "next-auth/jwt";
 
 async function setMessage(token: string | undefined) {
-  const decoded = (await decode({
-    token,
-    secret: process.env.NEXTAUTH_SECRET as string,
-  })) as { user: { accessToken: string } };
+  const decoded = token
+    ? ((await decode({
+        token,
+        secret: process.env.REACT_APP_NEXTAUTH_SECRET as string,
+      })) as { user: { accessToken: string } })
+    : undefined;
   chrome.tabs.query({ status: "complete" }, (tabs) => {
     tabs.forEach((tab) => {
       if (tab.id) {
@@ -35,7 +37,13 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         name: process.env.REACT_APP_COOKIE_NAME,
       });
       if (cookie.length) {
-        sendResponse({ token: cookie[0].value });
+        const decoded = cookie[0].value
+          ? ((await decode({
+              token: cookie[0].value,
+              secret: process.env.REACT_APP_NEXTAUTH_SECRET as string,
+            })) as { user: { accessToken: string } })
+          : undefined;
+        sendResponse({ token: decoded?.user?.accessToken });
         return;
       }
     }
