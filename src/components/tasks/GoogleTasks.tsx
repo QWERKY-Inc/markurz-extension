@@ -7,8 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { TimePicker } from "@mui/x-date-pickers";
-import { DatePicker } from "@mui/x-date-pickers/DatePicker";
+import { DateTimePicker } from "@mui/x-date-pickers";
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
@@ -72,12 +71,7 @@ const GoogleTasks = (props: GoogleTasksProps) => {
         Additional Information (optional)
       </Typography>
       <Controller
-        render={({ field }) => <DatePicker label="Due date" {...field} />}
-        name="element.due"
-        control={control}
-      />
-      <Controller
-        render={({ field }) => <TimePicker label="Set time" {...field} />}
+        render={({ field }) => <DateTimePicker label="Due date" {...field} />}
         name="element.due"
         control={control}
       />
