@@ -1,5 +1,5 @@
 import { DocumentNode, useQuery } from "@apollo/client";
-import { Add } from "@mui/icons-material";
+import { Add, Link } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
   Button,
@@ -118,6 +118,7 @@ const SideDrawer = (props: SideDrawerProps) => {
   const { href } = useLocation();
   const { token } = useToken();
   const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState("");
 
   const { data } = useQuery(QUERY_MODULES, {
     skip: !token,
@@ -131,10 +132,11 @@ const SideDrawer = (props: SideDrawerProps) => {
     if (selectedApp) {
       setLoading(true);
       try {
-        await apolloClient.mutate({
+        const { data: result } = await apolloClient.mutate({
           mutation: APPS[selectedApp].mutation,
           variables: form,
         });
+        setResult(result?.create.outputUrl);
       } catch (e) {
         console.error(e);
       } finally {
@@ -234,8 +236,17 @@ const SideDrawer = (props: SideDrawerProps) => {
                 </TabPanel>
               ))}
             </TabContext>
-            <LoadingButton variant="contained" type="submit" loading={loading}>
-              Send
+            <LoadingButton
+              startIcon={result ? <Link /> : undefined}
+              variant="contained"
+              type={result ? "button" : "submit"}
+              loading={loading}
+              color={result ? "success" : "primary"}
+              href={result}
+              rel="noopener"
+              target="_blank"
+            >
+              {result ? "Link" : "Send"}
             </LoadingButton>
             <Button
               type="button"

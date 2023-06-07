@@ -6,12 +6,13 @@ export const MUTATION_CREATE_GOOGLE_TASKS = graphql(/* GraphQL */ `
     $userModuleId: ID!
     $sourceUrl: String!
   ) {
-    createGoogleTasksTask(
+    create: createGoogleTasksTask(
       element: $element
       userModuleId: $userModuleId
       sourceUrl: $sourceUrl
     ) {
       id
+      outputUrl
     }
   }
 `);
