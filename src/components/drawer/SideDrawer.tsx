@@ -16,9 +16,14 @@ import React, { useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { useLocation } from "react-use";
 import { apolloClient } from "src/apollo";
-import { MUTATION_CREATE_GOOGLE_TASKS } from "src/components/drawer/SideDrawer.operations";
+import {
+  MUTATION_CREATE_GOOGLE_TASKS,
+  MUTATION_CREATE_JIRA_ISSUE,
+} from "src/components/drawer/SideDrawer.operations";
 import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
+import JiraIcon from "src/components/icons/JiraIcon";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
+import Jira from "src/components/tasks/Jira";
 import { graphql } from "src/generated";
 import { ModuleTypeEnum } from "src/generated/graphql";
 import { useToken } from "src/lib/token";
@@ -85,10 +90,10 @@ const APPS: {
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
   },
   [ModuleTypeEnum.Jira]: {
-    name: "",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
+    name: "Jira",
+    icon: <JiraIcon />,
+    Element: Jira,
+    mutation: MUTATION_CREATE_JIRA_ISSUE,
   },
   [ModuleTypeEnum.Notion]: {
     name: "",
