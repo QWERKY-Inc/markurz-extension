@@ -1,6 +1,10 @@
 import { useQuery } from "@apollo/client";
 import { InfoOutlined } from "@mui/icons-material";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import {
+  Autocomplete,
+  Checkbox,
   MenuItem,
   Stack,
   StackProps,
@@ -8,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateJiraIssueArgs } from "src/generated/graphql";
 
@@ -32,9 +36,12 @@ const QUERY_JIRA_DATA = graphql(/* GraphQL */ `
   }
 `);
 
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
+
 const Jira = (props: JiraProps) => {
   const { data } = useQuery(QUERY_JIRA_DATA);
-  const { register } = useFormContext<MutationCreateJiraIssueArgs>();
+  const { register, control } = useFormContext<MutationCreateJiraIssueArgs>();
 
   return (
     <Stack {...props}>
@@ -66,15 +73,36 @@ const Jira = (props: JiraProps) => {
         select
         {...register("element.issueTypeId", { required: true })}
       />
-      <TextField
-        label="Select Labels"
-        select
-        {...register("element.labels", { required: true })}
-      >
-        {data?.jiraInformation.labels.map((label) => (
-          <MenuItem key={label}>{label}</MenuItem>
-        ))}
-      </TextField>
+      <Controller
+        render={({ field: { onChange, value, ...rest } }) => (
+          <Autocomplete
+            freeSolo
+            multiple
+            onChange={(e, data) => {
+              onChange(data);
+            }}
+            value={value || undefined}
+            {...rest}
+            options={data?.jiraInformation.labels ?? []}
+            renderOption={(props, option, { selected }) => (
+              <li {...props}>
+                <Checkbox
+                  icon={icon}
+                  checkedIcon={checkedIcon}
+                  style={{ marginRight: 8 }}
+                  checked={selected}
+                />
+                {option}
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField {...params} variant="outlined" label="Select Labels" />
+            )}
+          />
+        )}
+        name="element.labels"
+        control={control}
+      />
     </Stack>
   );
 };
