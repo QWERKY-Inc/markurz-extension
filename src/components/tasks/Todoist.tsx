@@ -19,6 +19,7 @@ import { MutationCreateTodoistTaskArgs } from "src/generated/graphql";
 
 interface TodoistProps extends StackProps {
   userModuleId: string;
+  highlightedText: string;
 }
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -48,7 +49,7 @@ const QUERY_TODOIST_INFOS = graphql(/* GraphQL */ `
 `);
 
 const Todoist = (props: TodoistProps) => {
-  const { userModuleId } = props;
+  const { userModuleId, highlightedText } = props;
   const { register, control } = useFormContext<MutationCreateTodoistTaskArgs>();
   const { data } = useQuery(QUERY_TODOIST_INFOS, {
     variables: {
@@ -66,7 +67,10 @@ const Todoist = (props: TodoistProps) => {
       <TextField
         label="Title"
         required
-        {...register("element.title", { required: true })}
+        {...register("element.title", {
+          required: true,
+          value: highlightedText,
+        })}
       />
       <TextField
         label="Description"

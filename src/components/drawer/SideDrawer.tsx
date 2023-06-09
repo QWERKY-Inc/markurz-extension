@@ -56,7 +56,7 @@ const APPS: {
   [p in ModuleTypeEnum]: {
     name: string;
     icon: React.JSX.Element;
-    Element: <T extends { userModuleId: string }>(
+    Element: <T extends { userModuleId: string; highlightedText: string }>(
       props: T
     ) => React.JSX.Element;
     mutation: DocumentNode;
@@ -121,7 +121,10 @@ const APPS: {
 const SideDrawer = (props: SideDrawerProps) => {
   const { highlightedText, ...drawerProps } = props;
   const [selectedApp, setSelectedApp] = useState<"" | ModuleTypeEnum>("");
-  const methods = useForm();
+  const methods = useForm({
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
   const { handleSubmit, reset } = methods;
   const { href } = useLocation();
   const { token } = useToken();
@@ -156,16 +159,10 @@ const SideDrawer = (props: SideDrawerProps) => {
   const handleAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
       setSelectedApp(e.target.value as ModuleTypeEnum);
-      reset({
-        element: {
-          title: highlightedText,
-        },
-      });
+      reset();
     }
   };
 
-  // @ts-ignore
-  // @ts-ignore
   return (
     <Drawer
       anchor="right"
@@ -245,6 +242,7 @@ const SideDrawer = (props: SideDrawerProps) => {
                 <TabPanel key={userModule.id} value={userModule.module.type}>
                   {React.createElement(APPS[userModule.module.type].Element, {
                     userModuleId: userModule.id,
+                    highlightedText,
                   })}
                 </TabPanel>
               ))}

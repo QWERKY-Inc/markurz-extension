@@ -15,6 +15,7 @@ import { MutationCreateGoogleTasksTaskArgs } from "src/generated/graphql";
 
 interface GoogleTasksProps extends StackProps {
   userModuleId: string;
+  highlightedText: string;
 }
 
 const QUERY_GOOGLE_TASKS_LIST = graphql(/* GraphQL */ `
@@ -32,7 +33,7 @@ const QUERY_GOOGLE_TASKS_LIST = graphql(/* GraphQL */ `
 `);
 
 const GoogleTasks = (props: GoogleTasksProps) => {
-  const { userModuleId } = props;
+  const { userModuleId, highlightedText } = props;
   const { register, control } =
     useFormContext<MutationCreateGoogleTasksTaskArgs>();
   const { data } = useQuery(QUERY_GOOGLE_TASKS_LIST, {
@@ -51,7 +52,10 @@ const GoogleTasks = (props: GoogleTasksProps) => {
       <TextField
         label="Title"
         required
-        {...register("element.title", { required: true })}
+        {...register("element.title", {
+          required: true,
+          value: highlightedText,
+        })}
       />
       <TextField label="Details" multiline {...register("element.notes")} />
       <Controller

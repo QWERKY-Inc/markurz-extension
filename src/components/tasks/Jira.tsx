@@ -18,16 +18,18 @@ import { MutationCreateJiraIssueArgs } from "src/generated/graphql";
 
 interface JiraProps extends StackProps {
   userModuleId: string;
+  highlightedText: string;
 }
 
 const QUERY_JIRA_DATA = graphql(/* GraphQL */ `
-  query JiraInformation {
-    jiraInformation {
+  query JiraInformation($userModuleId: ID!) {
+    jiraInformation(userModuleId: $userModuleId) {
       labels
       projects {
         id
         name
-        issueTypes {
+        key
+        issuetypes {
           id
           name
         }
@@ -40,11 +42,19 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Jira = (props: JiraProps) => {
-  const { data } = useQuery(QUERY_JIRA_DATA);
-  const { register, control } = useFormContext<MutationCreateJiraIssueArgs>();
+  const { userModuleId, highlightedText } = props;
+  const { data } = useQuery(QUERY_JIRA_DATA, {
+    variables: {
+      userModuleId,
+    },
+  });
+  const { register, control, watch } =
+    useFormContext<MutationCreateJiraIssueArgs>();
+  const projectKey = watch("element.projectKey");
+  register("userModuleId", { value: userModuleId });
 
   return (
-    <Stack {...props}>
+    <Stack spacing={3} {...props}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create an issue in Jira
@@ -52,26 +62,43 @@ const Jira = (props: JiraProps) => {
       <TextField
         label="Summary"
         required
-        {...register("element.summary", { required: true })}
+        {...register("element.summary", {
+          required: true,
+          value: highlightedText,
+        })}
       />
       <TextField
         label="Description"
         multiline
         {...register("element.description")}
       />
-      <TextField
-        label="Select Project"
-        select
-        {...register("element.projectKey", { required: true })}
-      >
-        {data?.jiraInformation.projects.map((project) => (
-          <MenuItem key={project.id}>{project.name}</MenuItem>
-        ))}
-      </TextField>
-      <TextField
-        label="Select Type"
-        select
-        {...register("element.issueTypeId", { required: true })}
+      <Controller
+        render={({ field }) => (
+          <TextField label="Select Project" select required {...field}>
+            {data?.jiraInformation.projects.map((project) => (
+              <MenuItem key={project.id} value={project.key}>
+                {project.name}
+              </MenuItem>
+            ))}
+          </TextField>
+        )}
+        name="element.projectKey"
+        control={control}
+      />
+      <Controller
+        render={({ field }) => (
+          <TextField label="Select Type" select {...field}>
+            {data?.jiraInformation.projects
+              .find((o) => o.key === projectKey)
+              ?.issuetypes.map((issueType) => (
+                <MenuItem key={issueType.id} value={issueType.id}>
+                  {issueType.name}
+                </MenuItem>
+              ))}
+          </TextField>
+        )}
+        name="element.issueTypeId"
+        control={control}
       />
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
