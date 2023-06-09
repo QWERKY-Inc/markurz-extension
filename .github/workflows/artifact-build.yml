@@ -9,6 +9,14 @@ jobs:
     if: startsWith(github.event.commits[0].message, 'MKZ-')
     name: Build Web Extension and store artifact
 
+    env:
+      REACT_APP_LOGIN_URL: ${{ vars.REACT_APP_LOGIN_URL }}
+      REACT_APP_COOKIE_DOMAIN: ${{ vars.REACT_APP_COOKIE_DOMAIN }}
+      REACT_APP_COOKIE_NAME: ${{ vars.REACT_APP_COOKIE_NAME }}
+      REACT_APP_BACKEND_URL: ${{ vars.REACT_APP_BACKEND_URL }}
+      GQL_SCHEMA_TOKEN: ${{ secrets.GQL_SCHEMA_TOKEN }}
+      REACT_APP_NEXTAUTH_SECRET: ${{ secrets.REACT_APP_NEXTAUTH_SECRET }}
+
     strategy:
       fail-fast: false
       matrix:

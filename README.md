@@ -2,6 +2,16 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+Default env file
+```dotenv
+REACT_APP_LOGIN_URL=http://localhost:3000
+REACT_APP_COOKIE_DOMAIN=localhost
+REACT_APP_COOKIE_NAME=next-auth.session-token
+REACT_APP_BACKEND_URL=http://localhost:4000
+GQL_SCHEMA_TOKEN=mySecret
+REACT_APP_NEXTAUTH_SECRET=mySecret
+```
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -21,6 +31,7 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 
 ### `npm run build`
 
+To build the project, this variable should be set in your environment.
 ```dotenv
 INLINE_RUNTIME_CHUNK=false
 ```
