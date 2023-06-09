@@ -19,11 +19,14 @@ import { apolloClient } from "src/apollo";
 import {
   MUTATION_CREATE_GOOGLE_TASKS,
   MUTATION_CREATE_JIRA_ISSUE,
+  MUTATION_CREATE_TODOIST_TASK,
 } from "src/components/drawer/SideDrawer.operations";
 import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
 import JiraIcon from "src/components/icons/JiraIcon";
+import TodoistIcon from "src/components/icons/TodoistIcon";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
 import Jira from "src/components/tasks/Jira";
+import Todoist from "src/components/tasks/Todoist";
 import { graphql } from "src/generated";
 import { ModuleTypeEnum } from "src/generated/graphql";
 import { useToken } from "src/lib/token";
@@ -102,13 +105,13 @@ const APPS: {
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
   },
   [ModuleTypeEnum.Todoist]: {
-    name: "",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
+    name: "Todoist",
+    icon: <TodoistIcon />,
+    Element: Todoist,
+    mutation: MUTATION_CREATE_TODOIST_TASK,
   },
   [ModuleTypeEnum.Trello]: {
-    name: "",
+    name: "Trello",
     icon: <GoogleTasksIcon />,
     Element: GoogleTasks,
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
@@ -161,6 +164,8 @@ const SideDrawer = (props: SideDrawerProps) => {
     }
   };
 
+  // @ts-ignore
+  // @ts-ignore
   return (
     <Drawer
       anchor="right"
@@ -187,7 +192,10 @@ const SideDrawer = (props: SideDrawerProps) => {
               sx={{
                 overflow: "hidden",
                 textOverflow: "ellipsis",
-                whiteSpace: "nowrap",
+                wordBreak: "break-all",
+                display: "-webkit-box",
+                WebkitLineClamp: 2,
+                WebkitBoxOrient: "vertical",
               }}
             >
               {highlightedText}

@@ -23,7 +23,24 @@ export const MUTATION_CREATE_JIRA_ISSUE = graphql(/* GraphQL */ `
     $userModuleId: ID!
     $element: JiraInputArgs!
   ) {
-    createJiraIssue(
+    create: createJiraIssue(
+      sourceUrl: $sourceUrl
+      userModuleId: $userModuleId
+      element: $element
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
+export const MUTATION_CREATE_TODOIST_TASK = graphql(/* GraphQL */ `
+  mutation CreateTodoistTask(
+    $sourceUrl: String!
+    $userModuleId: ID!
+    $element: TodoistTaskArgs!
+  ) {
+    create: createTodoistTask(
       sourceUrl: $sourceUrl
       userModuleId: $userModuleId
       element: $element
