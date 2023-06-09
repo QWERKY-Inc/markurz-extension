@@ -87,7 +87,12 @@ const Jira = (props: JiraProps) => {
       />
       <Controller
         render={({ field }) => (
-          <TextField label="Select Type" select {...field}>
+          <TextField
+            label="Select Type"
+            select
+            disabled={!projectKey}
+            {...field}
+          >
             {data?.jiraInformation.projects
               .find((o) => o.key === projectKey)
               ?.issuetypes.map((issueType) => (
