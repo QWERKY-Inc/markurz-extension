@@ -1,6 +1,10 @@
 import { useQuery } from "@apollo/client";
 import { InfoOutlined } from "@mui/icons-material";
+import CheckBoxIcon from "@mui/icons-material/CheckBox";
+import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import {
+  Autocomplete,
+  Checkbox,
   MenuItem,
   Stack,
   StackProps,
@@ -16,6 +20,9 @@ import { MutationCreateTodoistTaskArgs } from "src/generated/graphql";
 interface TodoistProps extends StackProps {
   userModuleId: string;
 }
+
+const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
+const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const QUERY_TODOIST_INFOS = graphql(/* GraphQL */ `
   query TodoistInfos($userModuleId: ID!) {
@@ -80,14 +87,34 @@ const Todoist = (props: TodoistProps) => {
         control={control}
       />
       <Controller
-        render={({ field }) => (
-          <TextField select label="Select Labels" {...field}>
-            {data?.todoistLabels.elements?.map((todoistLabel) => (
-              <MenuItem key={todoistLabel.id} value={todoistLabel.title}>
-                {todoistLabel.title}
-              </MenuItem>
-            ))}
-          </TextField>
+        render={({ field: { onChange, value, ...rest } }) => (
+          <Autocomplete
+            freeSolo
+            multiple
+            onChange={(e, data) => {
+              onChange(data);
+            }}
+            value={value || undefined}
+            {...rest}
+            options={
+              data?.todoistLabels.elements?.map((element) => element.title) ??
+              []
+            }
+            renderOption={(props, option, { selected }) => (
+              <li {...props}>
+                <Checkbox
+                  icon={icon}
+                  checkedIcon={checkedIcon}
+                  style={{ marginRight: 8 }}
+                  checked={selected}
+                />
+                {option}
+              </li>
+            )}
+            renderInput={(params) => (
+              <TextField {...params} variant="outlined" label="Select Labels" />
+            )}
+          />
         )}
         name="element.labels"
         control={control}
