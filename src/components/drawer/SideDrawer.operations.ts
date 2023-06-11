@@ -50,3 +50,20 @@ export const MUTATION_CREATE_TODOIST_TASK = graphql(/* GraphQL */ `
     }
   }
 `);
+
+export const MUTATION_CREATE_TRELLO_CARD = graphql(/* GraphQL */ `
+  mutation CreateTrelloCard(
+    $sourceUrl: String!
+    $userModuleId: ID!
+    $element: TrelloCreateCardArgs!
+  ) {
+    create: createTrelloCard(
+      sourceUrl: $sourceUrl
+      userModuleId: $userModuleId
+      element: $element
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);

@@ -29,7 +29,7 @@ const QUERY_JIRA_DATA = graphql(/* GraphQL */ `
         id
         name
         key
-        issuetypes {
+        issueTypes {
           id
           name
         }
@@ -95,7 +95,7 @@ const Jira = (props: JiraProps) => {
           >
             {data?.jiraInformation.projects
               .find((o) => o.key === projectKey)
-              ?.issuetypes.map((issueType) => (
+              ?.issueTypes.map((issueType) => (
                 <MenuItem key={issueType.id} value={issueType.id}>
                   {issueType.name}
                 </MenuItem>

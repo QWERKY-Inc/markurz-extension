@@ -9,6 +9,7 @@ REACT_APP_COOKIE_DOMAIN=localhost
 REACT_APP_COOKIE_NAME=next-auth.session-token
 REACT_APP_BACKEND_URL=http://localhost:4000
 GQL_SCHEMA_TOKEN=mySecret
+# Should match FE NEXTAUTH_SECRET secret value
 REACT_APP_NEXTAUTH_SECRET=mySecret
 ```
 
