@@ -12,6 +12,23 @@ GQL_SCHEMA_TOKEN=mySecret
 REACT_APP_NEXTAUTH_SECRET=mySecret
 ```
 
+## Installation
+
+### In Chrome:
+- [chrome://extensions](chrome://extensions)
+- Enable developer mode
+- "Load unpacked"
+- or drag & drop the `build` folder into the extensions
+
+### In Firefox
+- [about:addons](about:addons)
+- Settings (cog button) install Add-on from file
+
+### Safari
+- Have a developer account
+- [Convert an extension](https://developer.apple.com/documentation/safariservices/safari_web_extensions/converting_a_web_extension_for_safari)
+- Test inside Safari browser
+
 ## Available Scripts
 
 In the project directory, you can run:
