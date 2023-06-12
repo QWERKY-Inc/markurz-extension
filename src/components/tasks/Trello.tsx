@@ -148,6 +148,7 @@ const Trello = (props: TrelloProps) => {
         select
         size="small"
         label="Select Board"
+        disabled={!trelloBoards?.trelloBoards.elements?.length}
         onChange={(e) => setSelectedBoard(e.target.value)}
       >
         {trelloBoards?.trelloBoards.elements?.map((board) => (
@@ -165,6 +166,7 @@ const Trello = (props: TrelloProps) => {
             label="Select List"
             required
             size="small"
+            disabled={!selectedBoard}
             onChange={(e) => onChange(e.target.value)}
           >
             {trelloBoards?.trelloBoards.elements

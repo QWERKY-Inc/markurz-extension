@@ -127,7 +127,11 @@ const SideDrawer = (props: SideDrawerProps) => {
     mode: "onChange",
     reValidateMode: "onChange",
   });
-  const { handleSubmit, reset } = methods;
+  const {
+    handleSubmit,
+    reset,
+    formState: { isValid },
+  } = methods;
   const { href } = useLocation();
   const { token } = useToken();
   const [loading, setLoading] = useState(false);
@@ -263,6 +267,7 @@ const SideDrawer = (props: SideDrawerProps) => {
             {/*</Button>*/}
           </Stack>
           <LoadingButton
+            disabled={!isValid}
             startIcon={result ? <Link /> : undefined}
             variant="contained"
             type={result ? "button" : "submit"}
