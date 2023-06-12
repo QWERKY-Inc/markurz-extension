@@ -152,7 +152,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     // If the selection changes reset the result to be ready to get a new url.
     setResult("");
     reset();
-  }, [highlightedText]);
+  }, [highlightedText, reset]);
 
   const submit = async (form: FieldValues) => {
     form.sourceUrl = href;

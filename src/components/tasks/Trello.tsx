@@ -97,7 +97,7 @@ const Trello = (props: TrelloProps) => {
         },
       });
     }
-  }, [selectedWorkspace]);
+  }, [selectedWorkspace, fetchTrelloBoards]);
 
   useEffect(() => {
     if (selectedBoard) {
@@ -108,7 +108,7 @@ const Trello = (props: TrelloProps) => {
         },
       });
     }
-  }, [selectedBoard]);
+  }, [selectedBoard, fetchTrelloLabels]);
 
   return (
     <Stack spacing={3} {...props}>
