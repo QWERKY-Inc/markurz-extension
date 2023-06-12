@@ -42,7 +42,7 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Jira = (props: JiraProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId } = props;
   const { data } = useQuery(QUERY_JIRA_DATA, {
     variables: {
       userModuleId,
@@ -64,7 +64,6 @@ const Jira = (props: JiraProps) => {
         required
         {...register("element.summary", {
           required: true,
-          value: highlightedText,
         })}
       />
       <TextField

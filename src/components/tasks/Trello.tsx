@@ -72,7 +72,7 @@ const QUERY_TRELLO_LABELS = graphql(/* GraphQL */ `
 `);
 
 const Trello = (props: TrelloProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId } = props;
   const { register, control } =
     useFormContext<CreateTrelloCardMutationVariables>();
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
@@ -121,7 +121,6 @@ const Trello = (props: TrelloProps) => {
         required
         {...register("element.name", {
           required: true,
-          value: highlightedText,
         })}
         inputProps={{
           maxLength: 500,
