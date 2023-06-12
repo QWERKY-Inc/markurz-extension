@@ -111,7 +111,7 @@ const Trello = (props: TrelloProps) => {
   }, [selectedBoard]);
 
   return (
-    <Stack spacing={2} {...props}>
+    <Stack spacing={3} {...props}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create a Card in Trello
@@ -119,6 +119,7 @@ const Trello = (props: TrelloProps) => {
       <TextField
         label="Title"
         required
+        size="small"
         {...register("element.name", {
           required: true,
           value: highlightedText,
@@ -127,10 +128,12 @@ const Trello = (props: TrelloProps) => {
       <TextField
         label="Description"
         multiline
+        size="small"
         {...register("element.description")}
       />
       <TextField
         select
+        size="small"
         label="Select Workspace"
         required
         onChange={(e) => setSelectedWorkspace(e.target.value)}
@@ -143,6 +146,7 @@ const Trello = (props: TrelloProps) => {
       </TextField>
       <TextField
         select
+        size="small"
         label="Select Board"
         onChange={(e) => setSelectedBoard(e.target.value)}
       >
@@ -160,6 +164,7 @@ const Trello = (props: TrelloProps) => {
             select
             label="Select List"
             required
+            size="small"
             onChange={(e) => onChange(e.target.value)}
           >
             {trelloBoards?.trelloBoards.elements
@@ -201,23 +206,48 @@ const Trello = (props: TrelloProps) => {
               </li>
             )}
             renderInput={(params) => (
-              <TextField {...params} variant="outlined" label="Select Labels" />
+              <TextField
+                {...params}
+                size="small"
+                variant="outlined"
+                label="Select Labels"
+              />
             )}
           />
         )}
         name="element.labelIds"
         control={control}
       />
-      <Typography color="text.secondary">
+      <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
       </Typography>
       <Controller
-        render={({ field }) => <DateTimePicker label="Start date" {...field} />}
+        render={({ field }) => (
+          <DateTimePicker
+            slotProps={{
+              textField: {
+                size: "small",
+              },
+            }}
+            label="Start date"
+            {...field}
+          />
+        )}
         name="element.start"
         control={control}
       />
       <Controller
-        render={({ field }) => <DateTimePicker label="Due date" {...field} />}
+        render={({ field }) => (
+          <DateTimePicker
+            slotProps={{
+              textField: {
+                size: "small",
+              },
+            }}
+            label="Due date"
+            {...field}
+          />
+        )}
         name="element.due"
         control={control}
       />

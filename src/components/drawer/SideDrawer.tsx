@@ -2,7 +2,6 @@ import { DocumentNode, useQuery } from "@apollo/client";
 import { Add, Link } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
-  Button,
   Drawer,
   DrawerProps,
   ListItemIcon,
@@ -184,8 +183,11 @@ const SideDrawer = (props: SideDrawerProps) => {
       {...drawerProps}
     >
       <FormProvider {...methods}>
-        <form onSubmit={handleSubmit(submit)}>
-          <Stack spacing={3} p={2}>
+        <form
+          onSubmit={handleSubmit(submit)}
+          style={{ height: "100%", display: "flex", flexDirection: "column" }}
+        >
+          <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
             <Typography
               variant="h4"
               component="p"
@@ -203,6 +205,7 @@ const SideDrawer = (props: SideDrawerProps) => {
             <TextField
               select
               required
+              size="small"
               label="Select apps"
               value={selectedApp}
               onChange={handleAppChange}
@@ -250,27 +253,36 @@ const SideDrawer = (props: SideDrawerProps) => {
                 </TabPanel>
               ))}
             </TabContext>
-            <LoadingButton
-              startIcon={result ? <Link /> : undefined}
-              variant="contained"
-              type={result ? "button" : "submit"}
-              loading={loading}
-              color={result ? "success" : "primary"}
-              href={result}
-              rel="noopener"
-              target="_blank"
-            >
-              {result ? "Link" : "Send"}
-            </LoadingButton>
-            <Button
-              type="button"
-              href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}
-              rel="noopener"
-              target="_blank"
-            >
-              Dashboard
-            </Button>
+            {/*<Button*/}
+            {/*  type="button"*/}
+            {/*  href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}*/}
+            {/*  rel="noopener"*/}
+            {/*  target="_blank"*/}
+            {/*>*/}
+            {/*  Dashboard*/}
+            {/*</Button>*/}
           </Stack>
+          <LoadingButton
+            startIcon={result ? <Link /> : undefined}
+            variant="contained"
+            type={result ? "button" : "submit"}
+            loading={loading}
+            color={result ? "success" : "primary"}
+            href={result}
+            rel="noopener"
+            target="_blank"
+            sx={{
+              position: "sticky",
+              left: 16,
+              bottom: 16,
+              width: "calc(100% - 32px)",
+              mt: 3,
+              p: 1,
+              zIndex: 1,
+            }}
+          >
+            {result ? "Link" : "Send"}
+          </LoadingButton>
         </form>
       </FormProvider>
     </Drawer>
