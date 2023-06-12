@@ -65,7 +65,11 @@ const GoogleTasks = (props: GoogleTasksProps) => {
               <MenuItem key={googleTaskElement.id} value={googleTaskElement.id}>
                 {googleTaskElement.title}
               </MenuItem>
-            ))}
+            )) ?? (
+              <MenuItem disabled>
+                There are no list available to select
+              </MenuItem>
+            )}
           </TextField>
         )}
         name="element.googleTaskListId"

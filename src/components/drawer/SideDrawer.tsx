@@ -1,9 +1,12 @@
 import { DocumentNode, useQuery } from "@apollo/client";
-import { Add, Link } from "@mui/icons-material";
+import { Add, Close, Link } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
+  Box,
+  Button,
   Drawer,
   DrawerProps,
+  IconButton,
   ListItemIcon,
   ListItemText,
   MenuItem,
@@ -11,7 +14,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { useLocation } from "react-use";
 import { apolloClient } from "src/apollo";
@@ -23,6 +26,7 @@ import {
 } from "src/components/drawer/SideDrawer.operations";
 import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
 import JiraIcon from "src/components/icons/JiraIcon";
+import MarkurzIcon from "src/components/icons/MarkurzIcon";
 import TodoistIcon from "src/components/icons/TodoistIcon";
 import TrelloIcon from "src/components/icons/TrelloIcon";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
@@ -144,6 +148,12 @@ const SideDrawer = (props: SideDrawerProps) => {
     },
   });
 
+  useEffect(() => {
+    // If the selection changes reset the result to be ready to get a new url.
+    setResult("");
+    reset();
+  }, [highlightedText]);
+
   const submit = async (form: FieldValues) => {
     form.sourceUrl = href;
     if (selectedApp) {
@@ -185,6 +195,22 @@ const SideDrawer = (props: SideDrawerProps) => {
       }}
       {...drawerProps}
     >
+      <Stack spacing={1} p={2} direction="row" alignItems="center">
+        <Box flexGrow={1}>
+          <MarkurzIcon color="primary" />
+        </Box>
+        <Button
+          type="button"
+          href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}
+          rel="noopener"
+          target="_blank"
+        >
+          Dashboard
+        </Button>
+        <IconButton onClick={() => props.onClose?.({}, "backdropClick")}>
+          <Close />
+        </IconButton>
+      </Stack>
       <FormProvider {...methods}>
         <form
           onSubmit={handleSubmit(submit)}
@@ -256,14 +282,6 @@ const SideDrawer = (props: SideDrawerProps) => {
                 </TabPanel>
               ))}
             </TabContext>
-            {/*<Button*/}
-            {/*  type="button"*/}
-            {/*  href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}*/}
-            {/*  rel="noopener"*/}
-            {/*  target="_blank"*/}
-            {/*>*/}
-            {/*  Dashboard*/}
-            {/*</Button>*/}
           </Stack>
           <LoadingButton
             disabled={!isValid}
@@ -271,7 +289,7 @@ const SideDrawer = (props: SideDrawerProps) => {
             variant="contained"
             type={result ? "button" : "submit"}
             loading={loading}
-            color={result ? "success" : "primary"}
+            color={result ? "secondary" : "primary"}
             href={result}
             rel="noopener"
             target="_blank"
