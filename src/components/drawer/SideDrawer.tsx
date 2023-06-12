@@ -174,8 +174,7 @@ const SideDrawer = (props: SideDrawerProps) => {
       anchor="right"
       sx={{
         "& .MuiDrawer-paper": {
-          width: { xs: "90vw", md: "35vw" },
-          maxWidth: 420,
+          width: { xs: 375, sm: 420 },
         },
       }}
       ModalProps={{

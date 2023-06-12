@@ -142,7 +142,11 @@ const Trello = (props: TrelloProps) => {
           <MenuItem key={trelloWorkspaces.id} value={trelloWorkspaces.id}>
             {trelloWorkspaces.displayName}
           </MenuItem>
-        ))}
+        )) ?? (
+          <MenuItem disabled>
+            There are no workspace available to select
+          </MenuItem>
+        )}
       </TextField>
       <TextField
         select
@@ -155,7 +159,9 @@ const Trello = (props: TrelloProps) => {
           <MenuItem key={board.id} value={board.id}>
             {board.name}
           </MenuItem>
-        ))}
+        )) ?? (
+          <MenuItem disabled>There are no boards available to select</MenuItem>
+        )}
       </TextField>
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
@@ -175,7 +181,11 @@ const Trello = (props: TrelloProps) => {
                 <MenuItem key={list.id} value={list.id}>
                   {list.name}
                 </MenuItem>
-              ))}
+              )) ?? (
+              <MenuItem disabled>
+                There are no list available to select
+              </MenuItem>
+            )}
           </TextField>
         )}
         name="element.listId"
