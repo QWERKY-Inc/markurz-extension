@@ -119,21 +119,25 @@ const Trello = (props: TrelloProps) => {
       <TextField
         label="Title"
         required
-        size="small"
         {...register("element.name", {
           required: true,
           value: highlightedText,
         })}
+        inputProps={{
+          maxLength: 500,
+        }}
       />
       <TextField
         label="Description"
         multiline
-        size="small"
         {...register("element.description")}
+        maxRows={10}
+        inputProps={{
+          maxLength: 2000,
+        }}
       />
       <TextField
         select
-        size="small"
         label="Select Workspace"
         required
         onChange={(e) => setSelectedWorkspace(e.target.value)}
@@ -150,7 +154,6 @@ const Trello = (props: TrelloProps) => {
       </TextField>
       <TextField
         select
-        size="small"
         label="Select Board"
         disabled={!trelloBoards?.trelloBoards.elements?.length}
         onChange={(e) => setSelectedBoard(e.target.value)}
@@ -171,7 +174,6 @@ const Trello = (props: TrelloProps) => {
             select
             label="Select List"
             required
-            size="small"
             disabled={!selectedBoard}
             onChange={(e) => onChange(e.target.value)}
           >
@@ -218,12 +220,7 @@ const Trello = (props: TrelloProps) => {
               </li>
             )}
             renderInput={(params) => (
-              <TextField
-                {...params}
-                size="small"
-                variant="outlined"
-                label="Select Labels"
-              />
+              <TextField {...params} variant="outlined" label="Select Labels" />
             )}
           />
         )}

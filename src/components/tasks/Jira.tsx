@@ -79,7 +79,11 @@ const Jira = (props: JiraProps) => {
               <MenuItem key={project.id} value={project.key}>
                 {project.name}
               </MenuItem>
-            ))}
+            )) ?? (
+              <MenuItem disabled>
+                There are no projects available to select
+              </MenuItem>
+            )}
           </TextField>
         )}
         name="element.projectKey"
@@ -99,7 +103,11 @@ const Jira = (props: JiraProps) => {
                 <MenuItem key={issueType.id} value={issueType.id}>
                   {issueType.name}
                 </MenuItem>
-              ))}
+              )) ?? (
+              <MenuItem disabled>
+                There are no types available to select
+              </MenuItem>
+            )}
           </TextField>
         )}
         name="element.issueTypeId"

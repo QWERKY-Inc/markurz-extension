@@ -25,6 +25,11 @@ theme.components = {
       },
     },
   },
+  MuiTextField: {
+    defaultProps: {
+      size: "small",
+    },
+  },
 };
 
 export default theme;

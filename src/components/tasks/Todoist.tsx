@@ -123,7 +123,7 @@ const Todoist = (props: TodoistProps) => {
         name="element.labels"
         control={control}
       />
-      <Typography color="text.secondary">
+      <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
       </Typography>
       <Controller
