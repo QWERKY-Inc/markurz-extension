@@ -17,11 +17,13 @@ jobs:
       GQL_SCHEMA_TOKEN: ${{ secrets.GQL_SCHEMA_TOKEN }}
       REACT_APP_NEXTAUTH_SECRET: ${{ secrets.REACT_APP_NEXTAUTH_SECRET }}
 
-    strategy:
-      fail-fast: false
-      matrix:
-        platform: [ macos-latest, ubuntu-latest ]
-    runs-on: ${{ matrix.platform }}
+# Uncomment to run the build on separate machines
+#    strategy:
+#      fail-fast: false
+#      matrix:
+#        platform: [ macos-latest, ubuntu-latest ]
+#    runs-on: ${{ matrix.platform }}
+    runs-on: macos-latest
 
     steps:
       - uses: actions/checkout@v3
@@ -70,10 +72,17 @@ jobs:
           # build extension
           cat /Applications/Safari.app/Contents/version.plist
           xcrun safari-web-extension-converter ./build --no-open --force --bundle-identifier com.qwerky.markurz
-          xcodebuild -project ./Markurz/Markurz.xcodeproj -scheme "Markurz (macOS)" -destination "generic/platform=macOS" build
-      - name: Zip Folder
+          xcodebuild -project ./Markurz/Markurz.xcodeproj -scheme "Markurz (macOS)" -destination "generic/platform=macOS" build BUILD_DIR=./buildmacos
+
+      - name: Zip Folder Chrome Extension
         run: zip -r build.zip build
       - uses: actions/upload-artifact@v3
         with:
           name: build
           path: build.zip
+      - name: Zip Folder Safari Extension
+        run: zip -r build.zip build
+      - uses: actions/upload-artifact@v3
+        with:
+          name: buildmacos
+          path: Markurz/buildmacos/Debug/Markurz.app
