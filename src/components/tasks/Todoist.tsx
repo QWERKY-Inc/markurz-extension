@@ -50,12 +50,14 @@ const QUERY_TODOIST_INFOS = graphql(/* GraphQL */ `
 
 const Todoist = (props: TodoistProps) => {
   const { userModuleId } = props;
-  const { register, control } = useFormContext<MutationCreateTodoistTaskArgs>();
+  const { register, control, watch } =
+    useFormContext<MutationCreateTodoistTaskArgs>();
   const { data } = useQuery(QUERY_TODOIST_INFOS, {
     variables: {
       userModuleId,
     },
   });
+  const watchLabels = watch("element.labels");
   register("userModuleId", { value: userModuleId });
 
   return (
@@ -70,11 +72,17 @@ const Todoist = (props: TodoistProps) => {
         {...register("element.title", {
           required: true,
         })}
+        inputProps={{
+          maxLength: 500,
+        }}
       />
       <TextField
         label="Description"
         multiline
         {...register("element.description")}
+        inputProps={{
+          maxLength: 2000,
+        }}
       />
       <Controller
         render={({ field }) => (
@@ -92,7 +100,10 @@ const Todoist = (props: TodoistProps) => {
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
           <Autocomplete
-            freeSolo
+            freeSolo={Boolean(!watchLabels || watchLabels.length < 500)}
+            getOptionDisabled={() =>
+              Boolean(watchLabels && watchLabels.length >= 500)
+            }
             multiple
             onChange={(e, data) => {
               onChange(data);
@@ -115,7 +126,15 @@ const Todoist = (props: TodoistProps) => {
               </li>
             )}
             renderInput={(params) => (
-              <TextField {...params} variant="outlined" label="Select Labels" />
+              <TextField
+                {...params}
+                variant="outlined"
+                label="Select Labels"
+                inputProps={{
+                  ...params.inputProps,
+                  maxLength: 60,
+                }}
+              />
             )}
           />
         )}
