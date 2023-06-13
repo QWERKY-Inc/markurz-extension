@@ -81,8 +81,8 @@ jobs:
           name: build
           path: build.zip
       - name: Zip Folder Safari Extension
-        run: zip -r build.zip build
+        run: zip -r buildmacos.zip Markurz/buildmacos/Debug/Markurz.app
       - uses: actions/upload-artifact@v3
         with:
           name: buildmacos
-          path: Markurz/buildmacos/Debug/Markurz.app
+          path: buildmacos.zip
