@@ -9,8 +9,26 @@ REACT_APP_COOKIE_DOMAIN=localhost
 REACT_APP_COOKIE_NAME=next-auth.session-token
 REACT_APP_BACKEND_URL=http://localhost:4000
 GQL_SCHEMA_TOKEN=mySecret
+# Should match FE NEXTAUTH_SECRET secret value
 REACT_APP_NEXTAUTH_SECRET=mySecret
 ```
+
+## Installation
+
+### In Chrome:
+- [chrome://extensions](chrome://extensions)
+- Enable developer mode
+- "Load unpacked"
+- or drag & drop the `build` folder into the extensions
+
+### In Firefox
+- [about:addons](about:addons)
+- Settings (cog button) install Add-on from file
+
+### Safari
+- Have a developer account
+- [Convert an extension](https://developer.apple.com/documentation/safariservices/safari_web_extensions/converting_a_web_extension_for_safari)
+- Test inside Safari browser
 
 ## Available Scripts
 
@@ -59,3 +77,6 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Github Automation
+- to run for [MacOS](https://docs.github.com/en/actions/deployment/deploying-xcode-applications/installing-an-apple-certificate-on-macos-runners-for-xcode-development#introduction)

@@ -20,13 +20,16 @@ import {
   MUTATION_CREATE_GOOGLE_TASKS,
   MUTATION_CREATE_JIRA_ISSUE,
   MUTATION_CREATE_TODOIST_TASK,
+  MUTATION_CREATE_TRELLO_CARD,
 } from "src/components/drawer/SideDrawer.operations";
 import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
 import JiraIcon from "src/components/icons/JiraIcon";
 import TodoistIcon from "src/components/icons/TodoistIcon";
+import TrelloIcon from "src/components/icons/TrelloIcon";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
 import Jira from "src/components/tasks/Jira";
 import Todoist from "src/components/tasks/Todoist";
+import Trello from "src/components/tasks/Trello";
 import { graphql } from "src/generated";
 import { ModuleTypeEnum } from "src/generated/graphql";
 import { useToken } from "src/lib/token";
@@ -56,7 +59,7 @@ const APPS: {
   [p in ModuleTypeEnum]: {
     name: string;
     icon: React.JSX.Element;
-    Element: <T extends { userModuleId: string }>(
+    Element: <T extends { userModuleId: string; highlightedText: string }>(
       props: T
     ) => React.JSX.Element;
     mutation: DocumentNode;
@@ -69,25 +72,25 @@ const APPS: {
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
   },
   [ModuleTypeEnum.AppleCalendar]: {
-    name: "",
+    name: "Apple Calendar",
     icon: <GoogleTasksIcon />,
     Element: GoogleTasks,
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
   },
   [ModuleTypeEnum.AppleReminders]: {
-    name: "",
+    name: "Apple Reminders",
     icon: <GoogleTasksIcon />,
     Element: GoogleTasks,
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
   },
   [ModuleTypeEnum.GoogleCalendar]: {
-    name: "",
+    name: "Google Calendar",
     icon: <GoogleTasksIcon />,
     Element: GoogleTasks,
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
   },
   [ModuleTypeEnum.GoogleDocs]: {
-    name: "",
+    name: "Google Docs",
     icon: <GoogleTasksIcon />,
     Element: GoogleTasks,
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
@@ -99,7 +102,7 @@ const APPS: {
     mutation: MUTATION_CREATE_JIRA_ISSUE,
   },
   [ModuleTypeEnum.Notion]: {
-    name: "",
+    name: "Notion",
     icon: <GoogleTasksIcon />,
     Element: GoogleTasks,
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
@@ -112,16 +115,19 @@ const APPS: {
   },
   [ModuleTypeEnum.Trello]: {
     name: "Trello",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
+    icon: <TrelloIcon />,
+    Element: Trello,
+    mutation: MUTATION_CREATE_TRELLO_CARD,
   },
 };
 
 const SideDrawer = (props: SideDrawerProps) => {
   const { highlightedText, ...drawerProps } = props;
   const [selectedApp, setSelectedApp] = useState<"" | ModuleTypeEnum>("");
-  const methods = useForm();
+  const methods = useForm({
+    mode: "onChange",
+    reValidateMode: "onChange",
+  });
   const { handleSubmit, reset } = methods;
   const { href } = useLocation();
   const { token } = useToken();
@@ -156,16 +162,10 @@ const SideDrawer = (props: SideDrawerProps) => {
   const handleAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
       setSelectedApp(e.target.value as ModuleTypeEnum);
-      reset({
-        element: {
-          title: highlightedText,
-        },
-      });
+      reset();
     }
   };
 
-  // @ts-ignore
-  // @ts-ignore
   return (
     <Drawer
       anchor="right"
@@ -245,6 +245,7 @@ const SideDrawer = (props: SideDrawerProps) => {
                 <TabPanel key={userModule.id} value={userModule.module.type}>
                   {React.createElement(APPS[userModule.module.type].Element, {
                     userModuleId: userModule.id,
+                    highlightedText,
                   })}
                 </TabPanel>
               ))}
