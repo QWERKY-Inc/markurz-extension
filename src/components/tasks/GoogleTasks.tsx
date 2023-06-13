@@ -52,11 +52,21 @@ const GoogleTasks = (props: GoogleTasksProps) => {
       <TextField
         label="Title"
         required
+        inputProps={{
+          maxLength: 500,
+        }}
         {...register("element.title", {
           required: true,
         })}
       />
-      <TextField label="Details" multiline {...register("element.notes")} />
+      <TextField
+        label="Details"
+        multiline
+        inputProps={{
+          maxLength: 2000,
+        }}
+        {...register("element.notes")}
+      />
       <Controller
         render={({ field }) => (
           <TextField select label="Select List" required {...field}>

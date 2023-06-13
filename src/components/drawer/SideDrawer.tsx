@@ -151,7 +151,9 @@ const SideDrawer = (props: SideDrawerProps) => {
   useEffect(() => {
     // If the selection changes reset the result to be ready to get a new url.
     setResult("");
-    reset();
+    reset({
+      sourceText: highlightedText,
+    });
   }, [highlightedText, reset]);
 
   const submit = async (form: FieldValues) => {
@@ -175,7 +177,9 @@ const SideDrawer = (props: SideDrawerProps) => {
   const handleAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
       setSelectedApp(e.target.value as ModuleTypeEnum);
-      reset();
+      reset({
+        sourceText: highlightedText,
+      });
     }
   };
 
