@@ -69,8 +69,8 @@ jobs:
           
           # build extension
           cat /Applications/Safari.app/Contents/version.plist
-          xcrun safari-web-extension-converter ./build
-          xcodebuild -project ./Markurz/Markurz.xcodeproj -scheme Markurz\ (macOS) -destination "generic/platform=macOS" build
+          xcrun safari-web-extension-converter ./build --no-open --force --bundle-identifier com.qwerky.markurz
+          xcodebuild -project ./Markurz/Markurz.xcodeproj -scheme "Markurz (macOS)" -destination "generic/platform=macOS" build
       - name: Zip Folder
         run: zip -r build.zip build
       - uses: actions/upload-artifact@v3
