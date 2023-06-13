@@ -1,12 +1,12 @@
 name: Artifact Build
 
 on:
-  push:
   workflow_dispatch:
 
 jobs:
   build:
-    if: startsWith(github.event.commits[0].message, 'MKZ-')
+#    uncomment if you have to have builds running only on commits linked to tickets
+#    if: startsWith(github.event.commits[0].message, 'MKZ-')
     name: Build Web Extension and store artifact
 
     env:
