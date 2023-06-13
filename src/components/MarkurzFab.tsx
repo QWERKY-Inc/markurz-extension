@@ -55,6 +55,7 @@ const MarkurzFab = () => {
     if (token) {
       if (winRef.current) {
         winRef.current?.close();
+        setShowDrawer(true);
       }
     }
   }, [token]);

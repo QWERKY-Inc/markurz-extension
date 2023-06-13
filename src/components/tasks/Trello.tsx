@@ -69,7 +69,7 @@ const QUERY_TRELLO_LABELS = graphql(/* GraphQL */ `
 `);
 
 const Trello = (props: TrelloProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId } = props;
   const { register, control } =
     useFormContext<CreateTrelloCardMutationVariables>();
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
@@ -94,7 +94,7 @@ const Trello = (props: TrelloProps) => {
         },
       });
     }
-  }, [selectedWorkspace, userModuleId, fetchTrelloBoards]);
+  }, [selectedWorkspace, fetchTrelloBoards, userModuleId]);
 
   useEffect(() => {
     if (selectedBoard) {
@@ -108,7 +108,7 @@ const Trello = (props: TrelloProps) => {
   }, [selectedBoard, fetchTrelloLabels, userModuleId]);
 
   return (
-    <Stack spacing={2} {...props}>
+    <Stack spacing={3} {...props}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create a Card in Trello
@@ -118,13 +118,19 @@ const Trello = (props: TrelloProps) => {
         required
         {...register("element.name", {
           required: true,
-          value: highlightedText,
         })}
+        inputProps={{
+          maxLength: 500,
+        }}
       />
       <TextField
         label="Description"
         multiline
         {...register("element.description")}
+        maxRows={10}
+        inputProps={{
+          maxLength: 2000,
+        }}
       />
       <TextField
         select
@@ -136,18 +142,25 @@ const Trello = (props: TrelloProps) => {
           <MenuItem key={trelloWorkspaces.id} value={trelloWorkspaces.id}>
             {trelloWorkspaces.displayName}
           </MenuItem>
-        ))}
+        )) ?? (
+          <MenuItem disabled>
+            There are no workspace available to select
+          </MenuItem>
+        )}
       </TextField>
       <TextField
         select
         label="Select Board"
+        disabled={!trelloBoards?.trelloBoards.elements?.length}
         onChange={(e) => setSelectedBoard(e.target.value)}
       >
         {trelloBoards?.trelloBoards.elements?.map((board) => (
           <MenuItem key={board.id} value={board.id}>
             {board.name}
           </MenuItem>
-        ))}
+        )) ?? (
+          <MenuItem disabled>There are no boards available to select</MenuItem>
+        )}
       </TextField>
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
@@ -157,6 +170,7 @@ const Trello = (props: TrelloProps) => {
             select
             label="Select List"
             required
+            disabled={!selectedBoard}
             onChange={(e) => onChange(e.target.value)}
           >
             {trelloBoards?.trelloBoards.elements
@@ -165,7 +179,11 @@ const Trello = (props: TrelloProps) => {
                 <MenuItem key={list.id} value={list.id}>
                   {list.name}
                 </MenuItem>
-              ))}
+              )) ?? (
+              <MenuItem disabled>
+                There are no list available to select
+              </MenuItem>
+            )}
           </TextField>
         )}
         name="element.listId"
@@ -210,16 +228,36 @@ const Trello = (props: TrelloProps) => {
         name="element.labelIds"
         control={control}
       />
-      <Typography color="text.secondary">
+      <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
       </Typography>
       <Controller
-        render={({ field }) => <DateTimePicker label="Start date" {...field} />}
+        render={({ field }) => (
+          <DateTimePicker
+            slotProps={{
+              textField: {
+                size: "small",
+              },
+            }}
+            label="Start date"
+            {...field}
+          />
+        )}
         name="element.start"
         control={control}
       />
       <Controller
-        render={({ field }) => <DateTimePicker label="Due date" {...field} />}
+        render={({ field }) => (
+          <DateTimePicker
+            slotProps={{
+              textField: {
+                size: "small",
+              },
+            }}
+            label="Due date"
+            {...field}
+          />
+        )}
         name="element.due"
         control={control}
       />

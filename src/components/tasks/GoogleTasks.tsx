@@ -33,7 +33,7 @@ const QUERY_GOOGLE_TASKS_LIST = graphql(/* GraphQL */ `
 `);
 
 const GoogleTasks = (props: GoogleTasksProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId } = props;
   const { register, control } =
     useFormContext<MutationCreateGoogleTasksTaskArgs>();
   const { data } = useQuery(QUERY_GOOGLE_TASKS_LIST, {
@@ -54,7 +54,6 @@ const GoogleTasks = (props: GoogleTasksProps) => {
         required
         {...register("element.title", {
           required: true,
-          value: highlightedText,
         })}
       />
       <TextField label="Details" multiline {...register("element.notes")} />
@@ -65,7 +64,11 @@ const GoogleTasks = (props: GoogleTasksProps) => {
               <MenuItem key={googleTaskElement.id} value={googleTaskElement.id}>
                 {googleTaskElement.title}
               </MenuItem>
-            ))}
+            )) ?? (
+              <MenuItem disabled>
+                There are no list available to select
+              </MenuItem>
+            )}
           </TextField>
         )}
         name="element.googleTaskListId"

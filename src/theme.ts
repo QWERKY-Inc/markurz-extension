@@ -8,15 +8,28 @@ const theme = createTheme({
       ","
     ),
   },
-  components: {
-    MuiTabPanel: {
-      styleOverrides: {
-        root: {
-          padding: 0,
-        },
+});
+
+theme.components = {
+  MuiTabPanel: {
+    styleOverrides: {
+      root: {
+        padding: 0,
       },
     },
   },
-});
+  MuiInputLabel: {
+    styleOverrides: {
+      asterisk: {
+        color: theme.palette.error.main,
+      },
+    },
+  },
+  MuiTextField: {
+    defaultProps: {
+      size: "small",
+    },
+  },
+};
 
 export default theme;

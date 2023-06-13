@@ -49,7 +49,7 @@ const QUERY_TODOIST_INFOS = graphql(/* GraphQL */ `
 `);
 
 const Todoist = (props: TodoistProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId } = props;
   const { register, control } = useFormContext<MutationCreateTodoistTaskArgs>();
   const { data } = useQuery(QUERY_TODOIST_INFOS, {
     variables: {
@@ -69,7 +69,6 @@ const Todoist = (props: TodoistProps) => {
         required
         {...register("element.title", {
           required: true,
-          value: highlightedText,
         })}
       />
       <TextField
@@ -123,7 +122,7 @@ const Todoist = (props: TodoistProps) => {
         name="element.labels"
         control={control}
       />
-      <Typography color="text.secondary">
+      <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
       </Typography>
       <Controller
