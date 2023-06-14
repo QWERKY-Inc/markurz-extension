@@ -134,7 +134,7 @@ const SideDrawer = (props: SideDrawerProps) => {
   const {
     handleSubmit,
     reset,
-    formState: { isValid },
+    formState: { isValid, isDirty },
   } = methods;
   const { href } = useLocation();
   const { token } = useToken();
@@ -147,6 +147,13 @@ const SideDrawer = (props: SideDrawerProps) => {
       take: 100,
     },
   });
+
+  useEffect(() => {
+    // Reset the result if form gets dirty
+    if (isDirty) {
+      setResult("");
+    }
+  }, [isDirty]);
 
   useEffect(() => {
     // If the selection changes reset the result to be ready to get a new url.
@@ -170,6 +177,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         console.error(e);
       } finally {
         setLoading(false);
+        reset({}, { keepValues: true });
       }
     }
   };
