@@ -1,8 +1,7 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
+import { Circle, InfoOutlined } from "@mui/icons-material";
 import {
   Box,
-  Checkbox,
   Chip,
   ListItemText,
   MenuItem,
@@ -63,6 +62,7 @@ const QUERY_TRELLO_LABELS = graphql(/* GraphQL */ `
       elements {
         id
         label: name
+        color
       }
     }
   }
@@ -106,6 +106,25 @@ const Trello = (props: TrelloProps) => {
       });
     }
   }, [selectedBoard, fetchTrelloLabels, userModuleId]);
+
+  const getElementLabel = (value: any) => {
+    const elem = trelloLabels?.trelloLabels.elements?.find(
+      (o) => o.id === value
+    );
+    if (!elem) return null;
+    return (
+      <>
+        {!!elem.color && (
+          <Circle
+            sx={{
+              color: elem.color ?? "transparent",
+            }}
+          />
+        )}{" "}
+        {elem.label}
+      </>
+    );
+  };
 
   return (
     <Stack spacing={3} {...props}>
@@ -199,16 +218,20 @@ const Trello = (props: TrelloProps) => {
             label="Select Labels"
             SelectProps={{
               renderValue: (selected: any) => (
-                <Box sx={{ display: "flex", flexWrap: "wrap", gap: 0.5 }}>
+                <Box
+                  sx={{
+                    display: "flex",
+                    flexWrap: "wrap",
+                    gap: 0.5,
+                    "& .MuiChip-label": {
+                      display: "flex",
+                      alignItems: "center",
+                      gap: 1,
+                    },
+                  }}
+                >
                   {selected.map((value: any) => (
-                    <Chip
-                      key={value}
-                      label={
-                        trelloLabels?.trelloLabels.elements?.find(
-                          (o) => o.id === value
-                        )?.label
-                      }
-                    />
+                    <Chip key={value} label={<>{getElementLabel(value)}</>} />
                   ))}
                 </Box>
               ),
@@ -217,8 +240,11 @@ const Trello = (props: TrelloProps) => {
           >
             {trelloLabels?.trelloLabels.elements?.map((trelloLabel) => (
               <MenuItem key={trelloLabel.id} value={trelloLabel.id}>
-                <Checkbox
-                  checked={Boolean(value && value.indexOf(trelloLabel.id) > -1)}
+                <Circle
+                  sx={{
+                    color: trelloLabel.color ?? "transparent",
+                    mr: 1,
+                  }}
                 />
                 <ListItemText primary={trelloLabel.label} />
               </MenuItem>

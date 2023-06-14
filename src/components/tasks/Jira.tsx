@@ -65,11 +65,17 @@ const Jira = (props: JiraProps) => {
         {...register("element.summary", {
           required: true,
         })}
+        inputProps={{
+          maxLength: 500,
+        }}
       />
       <TextField
         label="Description"
         multiline
         {...register("element.description")}
+        inputProps={{
+          maxLength: 2000,
+        }}
       />
       <Controller
         render={({ field }) => (

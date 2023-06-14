@@ -10,10 +10,17 @@ jobs:
   build:
     name: Publish web extension testing
     runs-on: ubuntu-latest
+    env:
+      REACT_APP_LOGIN_URL: ${{ vars.REACT_APP_LOGIN_URL }}
+      REACT_APP_COOKIE_DOMAIN: ${{ vars.REACT_APP_COOKIE_DOMAIN }}
+      REACT_APP_COOKIE_NAME: ${{ vars.REACT_APP_COOKIE_NAME }}
+      REACT_APP_BACKEND_URL: ${{ vars.REACT_APP_BACKEND_URL }}
+      GQL_SCHEMA_TOKEN: ${{ secrets.GQL_SCHEMA_TOKEN }}
+      REACT_APP_NEXTAUTH_SECRET: ${{ secrets.REACT_APP_NEXTAUTH_SECRET }}
 
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
+      - uses: actions/checkout@v3
+      - uses: actions/setup-node@v3
         with:
           node-version: 18
       - name: Build
@@ -31,3 +38,7 @@ jobs:
           client-secret: ${{ secrets.CLIENT_SECRET }}
           refresh-token: ${{ secrets.REFRESH_TOKEN }}
           publish: false
+      - uses: actions/upload-artifact@v3
+        with:
+          name: build
+          path: build.zip
