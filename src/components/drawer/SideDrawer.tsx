@@ -74,41 +74,11 @@ const APPS: {
     Element: GoogleTasks,
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
   },
-  [ModuleTypeEnum.AppleCalendar]: {
-    name: "Apple Calendar",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
-  },
-  [ModuleTypeEnum.AppleReminders]: {
-    name: "Apple Reminders",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
-  },
-  [ModuleTypeEnum.GoogleCalendar]: {
-    name: "Google Calendar",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
-  },
-  [ModuleTypeEnum.GoogleDocs]: {
-    name: "Google Docs",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
-  },
   [ModuleTypeEnum.Jira]: {
     name: "Jira",
     icon: <JiraIcon />,
     Element: Jira,
     mutation: MUTATION_CREATE_JIRA_ISSUE,
-  },
-  [ModuleTypeEnum.Notion]: {
-    name: "Notion",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
   },
   [ModuleTypeEnum.Todoist]: {
     name: "Todoist",
