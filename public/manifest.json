@@ -15,8 +15,7 @@
   },
   "permissions": [
     "cookies",
-    "tabs",
-    "scripting"
+    "tabs"
   ],
   "background": {
     "service_worker": "./static/js/background.js"
