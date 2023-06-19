@@ -22,8 +22,8 @@ interface JiraProps extends StackProps {
 }
 
 const QUERY_JIRA_DATA = graphql(/* GraphQL */ `
-  query JiraInformation($userModuleId: ID!) {
-    jiraInformation(userModuleId: $userModuleId) {
+  query JiraInformation($userModuleId: ID!, $siteId: ID!) {
+    jiraInformation(userModuleId: $userModuleId, siteId: $siteId) {
       labels
       projects {
         id
@@ -38,19 +38,37 @@ const QUERY_JIRA_DATA = graphql(/* GraphQL */ `
   }
 `);
 
+const QUERY_JIRA_SITES = graphql(/* GraphQL */ `
+  query JiraSites($userModuleId: ID!) {
+    JiraSites(userModuleId: $userModuleId) {
+      id
+      name
+      url
+    }
+  }
+`);
+
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Jira = (props: JiraProps) => {
   const { userModuleId } = props;
+  const { register, control, watch } =
+    useFormContext<MutationCreateJiraIssueArgs>();
+  const siteId = watch("element.siteId");
+  const projectKey = watch("element.projectKey");
   const { data } = useQuery(QUERY_JIRA_DATA, {
+    variables: {
+      userModuleId,
+      siteId,
+    },
+    skip: !siteId,
+  });
+  const { data: dataSites } = useQuery(QUERY_JIRA_SITES, {
     variables: {
       userModuleId,
     },
   });
-  const { register, control, watch } =
-    useFormContext<MutationCreateJiraIssueArgs>();
-  const projectKey = watch("element.projectKey");
   register("userModuleId", { value: userModuleId });
 
   return (
@@ -76,6 +94,23 @@ const Jira = (props: JiraProps) => {
         inputProps={{
           maxLength: 2000,
         }}
+      />
+      <Controller
+        render={({ field }) => (
+          <TextField label="Select Site" select required {...field}>
+            {dataSites?.JiraSites.map((jiraSite) => (
+              <MenuItem key={jiraSite.id} value={jiraSite.id}>
+                {jiraSite.name}
+              </MenuItem>
+            )) ?? (
+              <MenuItem disabled>
+                There are no sites available to select
+              </MenuItem>
+            )}
+          </TextField>
+        )}
+        name="element.siteId"
+        control={control}
       />
       <Controller
         render={({ field }) => (
