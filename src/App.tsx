@@ -45,11 +45,7 @@ function App() {
   //     );
   // });
 
-  return (
-    <div className="App">
-      <MarkurzFab />
-    </div>
-  );
+  return <MarkurzFab />;
 }
 
 export default App;

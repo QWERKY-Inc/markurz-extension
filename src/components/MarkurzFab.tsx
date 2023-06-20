@@ -8,7 +8,6 @@ const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
   const [showFab, setShowFab] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [divPosition, setDivPosition] = useState({ top: 0, left: 0 });
   const { token } = useToken();
   const winRef = useRef<Window | null>(null);
 
@@ -29,7 +28,11 @@ const MarkurzFab = () => {
       const positionLeft = rect.left + scrollLeft + rect.width;
 
       setHighlightedText(selectedText);
-      setDivPosition({ top: positionTop, left: positionLeft + 20 });
+      const rootElement = document.getElementById("markurz-root");
+      if (rootElement) {
+        rootElement.style.top = `${positionTop.toString()}px`;
+        rootElement.style.left = `${(positionLeft + 20).toString()}px`;
+      }
       setShowFab(true);
     }
   }, [showDrawer]);
@@ -97,8 +100,6 @@ const MarkurzFab = () => {
         aria-label="create-task"
         size="small"
         sx={{
-          ...divPosition,
-          position: "absolute",
           display: showFab ? "" : "none",
         }}
         color="primary"
