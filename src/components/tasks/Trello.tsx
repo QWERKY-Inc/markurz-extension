@@ -223,7 +223,7 @@ const Trello = (props: TrelloProps) => {
                     display: "flex",
                     flexWrap: "wrap",
                     gap: 0.5,
-                    "& .MuiChip-label": {
+                    "& .Markurz-MuiChip-label": {
                       display: "flex",
                       alignItems: "center",
                       gap: 1,

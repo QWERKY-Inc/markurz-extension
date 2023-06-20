@@ -165,7 +165,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     <Drawer
       anchor="right"
       sx={{
-        "& .MuiDrawer-paper": {
+        "& .Markurz-MuiDrawer-paper": {
           width: { xs: 375, sm: 420 },
         },
       }}
@@ -221,15 +221,15 @@ const SideDrawer = (props: SideDrawerProps) => {
               value={selectedApp}
               onChange={handleAppChange}
               sx={{
-                "& .MuiSelect-select": {
+                "& .Markurz-MuiSelect-select": {
                   display: "flex",
                   alignItems: "center",
                   gap: 2,
                 },
-                "& .MuiListItemText-root": {
+                "& .Markurz-MuiListItemText-root": {
                   margin: 0,
                 },
-                "& .MuiListItemIcon-root": {
+                "& .Markurz-MuiListItemIcon-root": {
                   minWidth: "unset",
                 },
               }}

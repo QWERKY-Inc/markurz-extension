@@ -61,8 +61,11 @@ if (chrome.cookies) {
   if (prevApp) {
     prevApp.outerHTML = "";
   }
+  // Set the body to 0 to make sure we draw on top
+  document.body.style.zIndex = "0";
   const app = document.createElement("div");
   app.id = "markurz-root";
+  app.style.zIndex = "999999 !important";
   document.documentElement.appendChild(app);
 
   const root = ReactDOM.createRoot(app);
