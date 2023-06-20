@@ -42,6 +42,7 @@ const QUERY_MODULES = graphql(/* GraphQL */ `
     userModules(take: $take) {
       elements {
         id
+        email
         module {
           id
           type
@@ -165,7 +166,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     <Drawer
       anchor="right"
       sx={{
-        "& .Markurz-MuiDrawer-paper": {
+        "& .MuiDrawer-paper": {
           width: { xs: 375, sm: 420 },
         },
       }}
@@ -221,15 +222,15 @@ const SideDrawer = (props: SideDrawerProps) => {
               value={selectedApp}
               onChange={handleAppChange}
               sx={{
-                "& .Markurz-MuiSelect-select": {
+                "& .MuiSelect-select": {
                   display: "flex",
                   alignItems: "center",
                   gap: 2,
                 },
-                "& .Markurz-MuiListItemText-root": {
+                "& .MuiListItemText-root": {
                   margin: 0,
                 },
-                "& .Markurz-MuiListItemIcon-root": {
+                "& .MuiListItemIcon-root": {
                   minWidth: "unset",
                 },
               }}
@@ -241,16 +242,20 @@ const SideDrawer = (props: SideDrawerProps) => {
                 rel="noopener"
               >
                 <ListItemIcon>
-                  <Add fontSize="small" />
+                  <Add fontSize="small" color="primary" />
                 </ListItemIcon>
-                <ListItemText>Add Apps</ListItemText>
+                <ListItemText sx={{ color: "primary.main" }}>
+                  Connect More Apps
+                </ListItemText>
               </MenuItem>
               {data?.userModules?.elements?.map((userModule) => (
                 <MenuItem key={userModule.id} value={userModule.module.type}>
                   <ListItemIcon>
                     {APPS[userModule.module.type].icon}
                   </ListItemIcon>
-                  {APPS[userModule.module.type].name}
+                  <ListItemText>
+                    {APPS[userModule.module.type].name} ({userModule.email})
+                  </ListItemText>
                 </MenuItem>
               ))}
             </TextField>
