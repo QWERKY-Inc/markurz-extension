@@ -89,6 +89,22 @@ const MarkurzFab = () => {
     };
   }, [handleHighlight, handleSelectionChange]);
 
+  const handleMessage = (message: any) => {
+    if (message.type === "OPEN_DRAWER") {
+      setHighlightedText(message.selectionText);
+      handleFabClick();
+    }
+  };
+
+  useEffect(() => {
+    if (chrome.extension) {
+      chrome.runtime.onMessage.addListener(handleMessage);
+    }
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleMessage);
+    };
+  }, []);
+
   return (
     <>
       <SideDrawer

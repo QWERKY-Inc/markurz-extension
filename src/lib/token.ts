@@ -18,8 +18,10 @@ export const useToken = () => {
   const [token, setToken] = useState<string | null>(globalToken);
 
   const handleMessage = (message: any) => {
-    setToken(message.token);
-    globalToken = message.token;
+    if ("token" in message) {
+      setToken(message.token);
+      globalToken = message.token;
+    }
   };
 
   useEffect(() => {
