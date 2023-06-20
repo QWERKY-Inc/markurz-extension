@@ -33,6 +33,13 @@ theme.components = {
       size: "small",
     },
   },
+  MuiPopover: {
+    styleOverrides: {
+      root: {
+        zIndex: 100000,
+      },
+    },
+  },
 };
 
 export default responsiveFontSizes(theme);
