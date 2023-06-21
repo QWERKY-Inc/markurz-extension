@@ -53,24 +53,21 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
 });
 
 const genericOnClick = (info: chrome.contextMenus.OnClickData) => {
-  switch (info.menuItemId) {
-    default:
-      chrome.tabs.query({ status: "complete", active: true }, (tabs) => {
-        tabs.forEach((tab) => {
-          if (tab.id) {
-            chrome.tabs
-              .sendMessage(tab.id, {
-                pageUrl: info.pageUrl,
-                selectionText: info.selectionText,
-                type: "OPEN_DRAWER",
-              })
-              .catch((e) =>
-                console.error(`Could not send message to the tab ${tab.id}`, e)
-              );
-          }
-        });
-      });
-  }
+  chrome.tabs.query({ status: "complete", active: true }, (tabs) => {
+    tabs.forEach((tab) => {
+      if (tab.id) {
+        chrome.tabs
+          .sendMessage(tab.id, {
+            pageUrl: info.pageUrl,
+            selectionText: info.selectionText,
+            type: "OPEN_DRAWER",
+          })
+          .catch((e) =>
+            console.error(`Could not send message to the tab ${tab.id}`, e)
+          );
+      }
+    });
+  });
 };
 chrome.contextMenus.onClicked.addListener(genericOnClick);
 

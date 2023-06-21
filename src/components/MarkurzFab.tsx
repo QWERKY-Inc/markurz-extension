@@ -30,14 +30,14 @@ const MarkurzFab = () => {
       setHighlightedText(selectedText);
       const rootElement = document.getElementById("markurz-root");
       if (rootElement) {
-        rootElement.style.top = `${positionTop.toString()}px`;
-        rootElement.style.left = `${(positionLeft + 20).toString()}px`;
+        rootElement.style.top = `${positionTop}px`;
+        rootElement.style.left = `${positionLeft + 20}px`;
       }
       setShowFab(true);
     }
   }, [showDrawer]);
 
-  const handleFabClick = () => {
+  const handleFabClick = useCallback(() => {
     if (token) {
       setShowDrawer(true);
       setShowFab(false);
@@ -48,7 +48,7 @@ const MarkurzFab = () => {
         "toolbar=0,location=0,menubar=0,width=600,height=800"
       );
     }
-  };
+  }, []);
 
   const handleDrawerClose = () => {
     setShowDrawer(false);
@@ -89,12 +89,15 @@ const MarkurzFab = () => {
     };
   }, [handleHighlight, handleSelectionChange]);
 
-  const handleMessage = (message: any) => {
-    if (message.type === "OPEN_DRAWER") {
-      setHighlightedText(message.selectionText);
-      handleFabClick();
-    }
-  };
+  const handleMessage = useCallback(
+    (message: any) => {
+      if (message.type === "OPEN_DRAWER") {
+        setHighlightedText(message.selectionText);
+        handleFabClick();
+      }
+    },
+    [handleFabClick]
+  );
 
   useEffect(() => {
     if (chrome.extension) {
@@ -103,8 +106,7 @@ const MarkurzFab = () => {
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
     };
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  }, [handleMessage]);
 
   return (
     <>
