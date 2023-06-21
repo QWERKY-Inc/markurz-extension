@@ -249,7 +249,10 @@ const SideDrawer = (props: SideDrawerProps) => {
                 </ListItemText>
               </MenuItem>
               {data?.userModules?.elements?.map((userModule) => (
-                <MenuItem key={userModule.id} value={userModule.module.type}>
+                <MenuItem
+                  key={userModule.id}
+                  value={`${userModule.module.type}-${userModule.id}`}
+                >
                   <ListItemIcon>
                     {APPS[userModule.module.type].icon}
                   </ListItemIcon>
@@ -261,7 +264,10 @@ const SideDrawer = (props: SideDrawerProps) => {
             </TextField>
             <TabContext value={selectedApp}>
               {data?.userModules?.elements?.map((userModule) => (
-                <TabPanel key={userModule.id} value={userModule.module.type}>
+                <TabPanel
+                  key={userModule.id}
+                  value={`${userModule.module.type}-${userModule.id}`}
+                >
                   {React.createElement(APPS[userModule.module.type].Element, {
                     userModuleId: userModule.id,
                     highlightedText,
