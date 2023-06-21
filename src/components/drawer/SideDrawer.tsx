@@ -112,12 +112,18 @@ const SideDrawer = (props: SideDrawerProps) => {
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
 
-  const { data } = useQuery(QUERY_MODULES, {
+  const { data, refetch } = useQuery(QUERY_MODULES, {
     skip: !token,
     variables: {
       take: 100,
     },
   });
+
+  useEffect(() => {
+    if (drawerProps.open) {
+      refetch();
+    }
+  }, [drawerProps.open]);
 
   useEffect(() => {
     // Reset the result if form gets dirty
@@ -140,7 +146,9 @@ const SideDrawer = (props: SideDrawerProps) => {
       setLoading(true);
       try {
         const { data: result } = await apolloClient.mutate({
-          mutation: APPS[selectedApp].mutation,
+          mutation:
+            // Split on dash to get the first part which is the APP key, second part being the account
+            APPS[selectedApp.split("-")[0] as keyof typeof APPS].mutation,
           variables: form,
         });
         setResult(result?.create.outputUrl);
@@ -148,7 +156,8 @@ const SideDrawer = (props: SideDrawerProps) => {
         console.error(e);
       } finally {
         setLoading(false);
-        reset({}, { keepValues: true });
+        // Suppress the dirty state of the form to allow a re-submit
+        reset(form, { keepValues: true });
       }
     }
   };
