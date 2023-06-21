@@ -13,7 +13,10 @@ async function setMessage(token: string | undefined) {
         chrome.tabs
           .sendMessage(tab.id, { token: decoded?.user?.accessToken })
           .catch((e) =>
-            console.error(`Could not send message to the tab ${tab.id}`, e)
+            console.error(
+              `Could not send message to the tab ${tab.id}/${tab.title}`,
+              e
+            )
           );
       }
     });

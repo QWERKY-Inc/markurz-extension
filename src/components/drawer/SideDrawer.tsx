@@ -35,7 +35,7 @@ import Todoist from "src/components/tasks/Todoist";
 import Trello from "src/components/tasks/Trello";
 import { graphql } from "src/generated";
 import { ModuleTypeEnum } from "src/generated/graphql";
-import { useToken } from "src/lib/token";
+import { useTokenShared } from "src/lib/token";
 
 const QUERY_MODULES = graphql(/* GraphQL */ `
   query UserModules($take: Int) {
@@ -108,7 +108,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     formState: { isValid, isDirty },
   } = methods;
   const { href } = useLocation();
-  const { token } = useToken();
+  const { token } = useTokenShared();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
 

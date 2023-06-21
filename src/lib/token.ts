@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { useBetween } from "use-between";
 
 let globalToken: string | null = null;
 
@@ -35,3 +36,5 @@ export const useToken = () => {
 
   return { token };
 };
+
+export const useTokenShared = () => useBetween(useToken);

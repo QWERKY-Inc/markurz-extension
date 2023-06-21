@@ -2,13 +2,13 @@ import { Fab } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import { useToken } from "src/lib/token";
+import { useTokenShared } from "src/lib/token";
 
 const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
   const [showFab, setShowFab] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  const { token } = useToken();
+  const { token } = useTokenShared();
   const winRef = useRef<Window | null>(null);
 
   const handleHighlight = useCallback(() => {
@@ -48,7 +48,7 @@ const MarkurzFab = () => {
         "toolbar=0,location=0,menubar=0,width=600,height=800"
       );
     }
-  }, []);
+  }, [token]);
 
   const handleDrawerClose = () => {
     setShowDrawer(false);
