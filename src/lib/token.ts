@@ -3,10 +3,6 @@ import { useBetween } from "use-between";
 
 let globalToken: string | null = null;
 
-chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
-  globalToken = response.token;
-});
-
 /**
  * Get the current token
  */
@@ -28,6 +24,10 @@ export const useToken = () => {
   useEffect(() => {
     if (chrome.extension) {
       chrome.runtime.onMessage.addListener(handleMessage);
+      chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
+        globalToken = response.token;
+        setToken(response.token);
+      });
     }
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);
