@@ -40,6 +40,13 @@ theme.components = {
       },
     },
   },
+  MuiPopper: {
+    defaultProps: {
+      style: {
+        zIndex: 100000,
+      },
+    },
+  },
   MuiAutocomplete: {
     styleOverrides: {
       popper: {
