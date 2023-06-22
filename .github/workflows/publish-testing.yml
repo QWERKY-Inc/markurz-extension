@@ -29,7 +29,7 @@ jobs:
           yarn build
       - name: Zip Folder
         run: zip -r build.zip build
-      - name: Upload & release for testing
+      - name: Publish to Chrome Store
         uses: mnao305/chrome-extension-upload@v4.0.1
         with:
           file-path: build.zip
@@ -38,6 +38,14 @@ jobs:
           client-secret: ${{ secrets.CLIENT_SECRET }}
           refresh-token: ${{ secrets.REFRESH_TOKEN }}
           publish: false
+      - name: Publish to Edge store
+        uses: hocgin/action-edge-addone-upload@main
+        with:
+          product_id: ${{ secrets.EDGE_PRODUCT_ID }}
+          client_id: ${{ secrets.EDGE_CLIENT_ID }}
+          client_secret: ${{ secrets.EDGE_CLIENT_SECRET }}
+          access_token_url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
+          addone_file: build.zip
       - uses: actions/upload-artifact@v3
         with:
           name: build
