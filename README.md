@@ -2,6 +2,34 @@
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
+Default env file
+```dotenv
+REACT_APP_LOGIN_URL=http://localhost:3000
+REACT_APP_COOKIE_DOMAIN=localhost
+REACT_APP_COOKIE_NAME=next-auth.session-token
+REACT_APP_BACKEND_URL=http://localhost:4000
+GQL_SCHEMA_TOKEN=mySecret
+# Should match FE NEXTAUTH_SECRET secret value
+REACT_APP_NEXTAUTH_SECRET=mySecret
+```
+
+## Installation
+
+### In Chrome:
+- [chrome://extensions](chrome://extensions)
+- Enable developer mode
+- "Load unpacked"
+- or drag & drop the `build` folder into the extensions
+
+### In Firefox
+- [about:addons](about:addons)
+- Settings (cog button) install Add-on from file
+
+### Safari
+- Have a developer account
+- [Convert an extension](https://developer.apple.com/documentation/safariservices/safari_web_extensions/converting_a_web_extension_for_safari)
+- Test inside Safari browser
+
 ## Available Scripts
 
 In the project directory, you can run:
@@ -21,6 +49,7 @@ See the section about [running tests](https://facebook.github.io/create-react-ap
 
 ### `npm run build`
 
+To build the project, this variable should be set in your environment.
 ```dotenv
 INLINE_RUNTIME_CHUNK=false
 ```
@@ -48,3 +77,6 @@ You don’t have to ever use `eject`. The curated feature set is suitable for sm
 You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
 To learn React, check out the [React documentation](https://reactjs.org/).
+
+## Github Automation
+- to run for [MacOS](https://docs.github.com/en/actions/deployment/deploying-xcode-applications/installing-an-apple-certificate-on-macos-runners-for-xcode-development#introduction)

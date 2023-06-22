@@ -1,22 +1,38 @@
 {
-  "short_name": "Markurz Chrome",
+  "short_name": "Markurz",
   "icons": {
     "16": "logo.png",
     "48": "logo.png",
     "128": "logo.png"
   },
-  "name": "Markurz Chrome Extension",
-  "description": "Boost your performance with the Markurz extension.",
-  "version": "1.0",
+  "name": "Markurz",
+  "description": "Web clipper that connects to all of your favorite productivity apps.",
+  "version": "1.2",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
     "default_title": "Markurz"
   },
+  "permissions": [
+    "cookies",
+    "tabs"
+  ],
+  "background": {
+    "service_worker": "./static/js/background.js"
+  },
   "content_scripts": [
     {
       "matches": ["http://*/*", "https://*/*"],
-      "js": ["./static/js/content.js", "./static/js/main.js"]
+      "js": ["./static/js/main.js"]
     }
-  ]
+  ],
+  "host_permissions": [
+    "*://*/*"
+  ],
+  "browser_specific_settings": {
+    "gecko": {
+      "id": "admin@deepform.net",
+      "strict_min_version": "109.0"
+    }
+  }
 }
