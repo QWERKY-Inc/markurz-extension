@@ -10,6 +10,7 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
+  Paper,
   Stack,
   TextField,
   Typography,
@@ -286,28 +287,33 @@ const SideDrawer = (props: SideDrawerProps) => {
               ))}
             </TabContext>
           </Stack>
-          <LoadingButton
-            disabled={!isValid}
-            startIcon={result ? <Link /> : undefined}
-            variant="contained"
-            type={result ? "button" : "submit"}
-            loading={loading}
-            color={result ? "secondary" : "primary"}
-            href={result}
-            rel="noopener"
-            target="_blank"
+          <Paper
+            square
+            elevation={0}
             sx={{
               position: "sticky",
               left: 16,
               bottom: 16,
               width: "calc(100% - 32px)",
               mt: 3,
-              p: 1,
               zIndex: 1,
             }}
           >
-            {result ? "Link" : "Send"}
-          </LoadingButton>
+            <LoadingButton
+              fullWidth
+              disabled={!isValid}
+              startIcon={result ? <Link /> : undefined}
+              variant="contained"
+              type={result ? "button" : "submit"}
+              loading={loading}
+              color={result ? "secondary" : "primary"}
+              href={result}
+              rel="noopener"
+              target="_blank"
+            >
+              {result ? "Link" : "Send"}
+            </LoadingButton>
+          </Paper>
         </form>
       </FormProvider>
     </Drawer>
