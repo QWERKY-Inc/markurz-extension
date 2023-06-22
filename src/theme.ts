@@ -40,6 +40,13 @@ theme.components = {
       },
     },
   },
+  MuiAutocomplete: {
+    styleOverrides: {
+      popper: {
+        zIndex: 100000,
+      },
+    },
+  },
 };
 
 export default responsiveFontSizes(theme);
