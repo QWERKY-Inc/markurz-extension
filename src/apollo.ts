@@ -1,6 +1,12 @@
-import { ApolloClient, createHttpLink, InMemoryCache } from "@apollo/client";
+import {
+  ApolloClient,
+  createHttpLink,
+  from,
+  InMemoryCache,
+} from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
-import { getToken } from "src/lib/token";
+import { onError } from "@apollo/client/link/error";
+import { getToken, openSignInWindow } from "src/lib/token";
 
 const authLink = setContext(async (_, { headers }) => {
   try {
@@ -27,8 +33,19 @@ const link = createHttpLink({
   credentials: "same-origin",
 });
 
+const errorLink = onError(({ graphQLErrors }) => {
+  if (graphQLErrors) {
+    for (let err of graphQLErrors) {
+      switch (err.extensions.code) {
+        case "UNAUTHENTICATED":
+          openSignInWindow();
+      }
+    }
+  }
+});
+
 export const apolloClient = new ApolloClient({
   cache: new InMemoryCache(),
   name: "markurz-extension",
-  link: authLink.concat(link),
+  link: from([errorLink, authLink.concat(link)]),
 });

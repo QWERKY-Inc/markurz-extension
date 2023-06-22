@@ -38,16 +38,8 @@ const MarkurzFab = () => {
   }, [showDrawer]);
 
   const handleFabClick = useCallback(() => {
-    if (token) {
-      setShowDrawer(true);
-      setShowFab(false);
-    } else {
-      winRef.current = window.open(
-        `${process.env.REACT_APP_LOGIN_URL}/login`,
-        "_blank",
-        "toolbar=0,location=0,menubar=0,width=600,height=800"
-      );
-    }
+    setShowDrawer(true);
+    setShowFab(false);
   }, [token]);
 
   const handleDrawerClose = () => {
