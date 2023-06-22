@@ -35,13 +35,14 @@ import Todoist from "src/components/tasks/Todoist";
 import Trello from "src/components/tasks/Trello";
 import { graphql } from "src/generated";
 import { ModuleTypeEnum } from "src/generated/graphql";
-import { useToken } from "src/lib/token";
+import { useTokenShared } from "src/lib/token";
 
 const QUERY_MODULES = graphql(/* GraphQL */ `
   query UserModules($take: Int) {
     userModules(take: $take) {
       elements {
         id
+        email
         module {
           id
           type
@@ -107,16 +108,22 @@ const SideDrawer = (props: SideDrawerProps) => {
     formState: { isValid, isDirty },
   } = methods;
   const { href } = useLocation();
-  const { token } = useToken();
+  const { token } = useTokenShared();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState("");
 
-  const { data } = useQuery(QUERY_MODULES, {
+  const { data, refetch } = useQuery(QUERY_MODULES, {
     skip: !token,
     variables: {
       take: 100,
     },
   });
+
+  useEffect(() => {
+    if (drawerProps.open) {
+      refetch();
+    }
+  }, [drawerProps.open]);
 
   useEffect(() => {
     // Reset the result if form gets dirty
@@ -139,7 +146,9 @@ const SideDrawer = (props: SideDrawerProps) => {
       setLoading(true);
       try {
         const { data: result } = await apolloClient.mutate({
-          mutation: APPS[selectedApp].mutation,
+          mutation:
+            // Split on dash to get the first part which is the APP key, second part being the account
+            APPS[selectedApp.split("-")[0] as keyof typeof APPS].mutation,
           variables: form,
         });
         setResult(result?.create.outputUrl);
@@ -147,7 +156,8 @@ const SideDrawer = (props: SideDrawerProps) => {
         console.error(e);
       } finally {
         setLoading(false);
-        reset({}, { keepValues: true });
+        // Suppress the dirty state of the form to allow a re-submit
+        reset(form, { keepValues: true });
       }
     }
   };
@@ -167,6 +177,7 @@ const SideDrawer = (props: SideDrawerProps) => {
       sx={{
         "& .MuiDrawer-paper": {
           width: { xs: 375, sm: 420 },
+          maxWidth: "100vw",
         },
       }}
       ModalProps={{
@@ -241,22 +252,32 @@ const SideDrawer = (props: SideDrawerProps) => {
                 rel="noopener"
               >
                 <ListItemIcon>
-                  <Add fontSize="small" />
+                  <Add fontSize="small" color="primary" />
                 </ListItemIcon>
-                <ListItemText>Add Apps</ListItemText>
+                <ListItemText sx={{ color: "primary.main" }}>
+                  Connect More Apps
+                </ListItemText>
               </MenuItem>
               {data?.userModules?.elements?.map((userModule) => (
-                <MenuItem key={userModule.id} value={userModule.module.type}>
+                <MenuItem
+                  key={userModule.id}
+                  value={`${userModule.module.type}-${userModule.id}`}
+                >
                   <ListItemIcon>
                     {APPS[userModule.module.type].icon}
                   </ListItemIcon>
-                  {APPS[userModule.module.type].name}
+                  <ListItemText>
+                    {APPS[userModule.module.type].name} ({userModule.email})
+                  </ListItemText>
                 </MenuItem>
               ))}
             </TextField>
             <TabContext value={selectedApp}>
               {data?.userModules?.elements?.map((userModule) => (
-                <TabPanel key={userModule.id} value={userModule.module.type}>
+                <TabPanel
+                  key={userModule.id}
+                  value={`${userModule.module.type}-${userModule.id}`}
+                >
                   {React.createElement(APPS[userModule.module.type].Element, {
                     userModuleId: userModule.id,
                     highlightedText,

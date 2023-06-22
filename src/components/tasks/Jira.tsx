@@ -102,7 +102,8 @@ const Jira = (props: JiraProps) => {
               <MenuItem key={jiraSite.id} value={jiraSite.id}>
                 {jiraSite.name}
               </MenuItem>
-            )) ?? (
+            ))}
+            {!dataSites?.JiraSites.length && (
               <MenuItem disabled>
                 There are no sites available to select
               </MenuItem>
@@ -119,7 +120,8 @@ const Jira = (props: JiraProps) => {
               <MenuItem key={project.id} value={project.key}>
                 {project.name}
               </MenuItem>
-            )) ?? (
+            ))}
+            {!data?.jiraInformation.projects.length && (
               <MenuItem disabled>
                 There are no projects available to select
               </MenuItem>
@@ -143,7 +145,9 @@ const Jira = (props: JiraProps) => {
                 <MenuItem key={issueType.id} value={issueType.id}>
                   {issueType.name}
                 </MenuItem>
-              )) ?? (
+              ))}
+            {!data?.jiraInformation.projects.find((o) => o.key === projectKey)
+              ?.issueTypes.length && (
               <MenuItem disabled>
                 There are no types available to select
               </MenuItem>

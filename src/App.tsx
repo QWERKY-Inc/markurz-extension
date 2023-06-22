@@ -1,5 +1,6 @@
 import React from "react";
 import MarkurzFab from "src/components/MarkurzFab";
+import "./MuiClassNameSetup";
 
 function App() {
   // const [title, setTitle] = React.useState("");
@@ -44,11 +45,7 @@ function App() {
   //     );
   // });
 
-  return (
-    <div className="App">
-      <MarkurzFab />
-    </div>
-  );
+  return <MarkurzFab />;
 }
 
 export default App;
