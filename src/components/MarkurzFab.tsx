@@ -40,7 +40,7 @@ const MarkurzFab = () => {
   const handleFabClick = useCallback(() => {
     setShowDrawer(true);
     setShowFab(false);
-  }, [token]);
+  }, []);
 
   const handleDrawerClose = () => {
     setShowDrawer(false);

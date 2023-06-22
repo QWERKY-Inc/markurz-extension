@@ -124,7 +124,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     if (drawerProps.open) {
       refetch();
     }
-  }, [drawerProps.open]);
+  }, [drawerProps.open, refetch]);
 
   useEffect(() => {
     // Reset the result if form gets dirty
