@@ -10,6 +10,7 @@ jobs:
   build:
     name: Publish web extension testing
     runs-on: ubuntu-latest
+    environment: Production
     env:
       REACT_APP_LOGIN_URL: ${{ vars.REACT_APP_LOGIN_URL }}
       REACT_APP_COOKIE_DOMAIN: ${{ vars.REACT_APP_COOKIE_DOMAIN }}
