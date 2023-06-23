@@ -31,16 +31,19 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+
       - name: Build
         run: |
           yarn install --immutable --immutable-cache --check-cache
           yarn build
+
       - name: Setup XCode (macos only)
 #        Uncomment to only run on macos
 #        if: matrix.platform == 'macos-latest'
         uses: maxim-lobanov/setup-xcode@v1
         with:
           xcode-version: latest-stable
+
       - name: Build with XCode (macos only)
         #        Uncomment to only run on macos
         #        if: matrix.platform == 'macos-latest'
@@ -78,13 +81,16 @@ jobs:
           xcodebuild -project ./Markurz/Markurz.xcodeproj -scheme "Markurz (macOS)" -destination "generic/platform=macOS" build BUILD_DIR=./buildmacos
 
       - name: Zip Folder Chrome Extension
-        run: zip -r build.zip build
+        run: zip -r build.zip "build/*"
+
       - uses: actions/upload-artifact@v3
         with:
           name: build
           path: build.zip
+
       - name: Zip Folder Safari Extension
         run: zip -r buildmacos.zip Markurz/buildmacos/Debug/Markurz.app
+
       - uses: actions/upload-artifact@v3
         with:
           name: buildmacos
