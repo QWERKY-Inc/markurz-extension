@@ -13,6 +13,7 @@ import {
   Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -48,6 +49,7 @@ const QUERY_MODULES = graphql(/* GraphQL */ `
           id
           type
         }
+        validKey
       }
       meta {
         totalCount
@@ -260,17 +262,28 @@ const SideDrawer = (props: SideDrawerProps) => {
                 </ListItemText>
               </MenuItem>
               {data?.userModules?.elements?.map((userModule) => (
-                <MenuItem
+                <Tooltip
+                  title={
+                    !userModule.validKey &&
+                    "Connection expired. Go to Dashboard > My Apps and reconnect."
+                  }
                   key={userModule.id}
-                  value={`${userModule.module.type}-${userModule.id}`}
+                  placement="top"
                 >
-                  <ListItemIcon>
-                    {APPS[userModule.module.type].icon}
-                  </ListItemIcon>
-                  <ListItemText>
-                    {APPS[userModule.module.type].name} ({userModule.email})
-                  </ListItemText>
-                </MenuItem>
+                  <div>
+                    <MenuItem
+                      value={`${userModule.module.type}-${userModule.id}`}
+                      disabled={!userModule.validKey}
+                    >
+                      <ListItemIcon>
+                        {APPS[userModule.module.type].icon}
+                      </ListItemIcon>
+                      <ListItemText>
+                        {APPS[userModule.module.type].name} ({userModule.email})
+                      </ListItemText>
+                    </MenuItem>
+                  </div>
+                </Tooltip>
               ))}
             </TextField>
             <TabContext value={selectedApp}>
