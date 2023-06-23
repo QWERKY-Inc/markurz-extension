@@ -85,7 +85,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ env.FOLDER_NAME }}
-          path: ${{ env.FOLDER_NAME }}.zip
+          path: ${{ env.FOLDER_NAME }}
 
       - name: Zip Folder Safari Extension
         if: matrix.platform == 'macos-latest'
