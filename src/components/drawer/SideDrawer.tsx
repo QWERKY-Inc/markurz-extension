@@ -262,28 +262,29 @@ const SideDrawer = (props: SideDrawerProps) => {
                 </ListItemText>
               </MenuItem>
               {data?.userModules?.elements?.map((userModule) => (
-                <Tooltip
-                  title={
-                    !userModule.validKey &&
-                    "Connection expired. Go to Dashboard > My Apps and reconnect."
-                  }
+                <MenuItem
+                  value={`${userModule.module.type}-${userModule.id}`}
+                  disabled={!userModule.validKey}
                   key={userModule.id}
-                  placement="top"
                 >
-                  <div>
-                    <MenuItem
-                      value={`${userModule.module.type}-${userModule.id}`}
-                      disabled={!userModule.validKey}
-                    >
+                  <Tooltip
+                    title={
+                      !userModule.validKey &&
+                      "Connection expired. Go to Dashboard > My Apps and reconnect."
+                    }
+                    placement="top"
+                    sx={{ pointerEvents: "none" }}
+                  >
+                    <Stack direction="row" sx={{ pointerEvents: "all" }}>
                       <ListItemIcon>
                         {APPS[userModule.module.type].icon}
                       </ListItemIcon>
                       <ListItemText>
                         {APPS[userModule.module.type].name} ({userModule.email})
                       </ListItemText>
-                    </MenuItem>
-                  </div>
-                </Tooltip>
+                    </Stack>
+                  </Tooltip>
+                </MenuItem>
               ))}
             </TextField>
             <TabContext value={selectedApp}>
