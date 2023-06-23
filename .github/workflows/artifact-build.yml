@@ -79,17 +79,10 @@ jobs:
           xcrun safari-web-extension-converter ./build --no-open --force --bundle-identifier com.qwerky.markurz
           xcodebuild -project ./Markurz/Markurz.xcodeproj -scheme "Markurz (macOS)" -destination "generic/platform=macOS" build BUILD_DIR=./buildmacos
 
-      - name: Zip Folder Chrome Extension
-        run: cd build && zip -r ../${{ env.FOLDER_NAME }}.zip "."
-
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ env.FOLDER_NAME }}
           path: build/
-
-      - name: Zip Folder Safari Extension
-        if: matrix.platform == 'macos-latest'
-        run: zip -r ${{ env.FOLDER_NAME }}macos.zip Markurz/buildmacos/Debug/Markurz.app
 
       - uses: actions/upload-artifact@v3
         if: matrix.platform == 'macos-latest'
