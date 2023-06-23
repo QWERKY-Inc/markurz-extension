@@ -8,6 +8,7 @@ jobs:
 #    uncomment if you have to have builds running only on commits linked to tickets
 #    if: startsWith(github.event.commits[0].message, 'MKZ-')
     name: Build Web Extension and store artifact
+    environment: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Development' }}
 
     env:
       REACT_APP_LOGIN_URL: ${{ vars.REACT_APP_LOGIN_URL }}

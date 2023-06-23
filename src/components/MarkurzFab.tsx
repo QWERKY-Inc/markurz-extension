@@ -2,14 +2,13 @@ import { Fab } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import { useToken } from "src/lib/token";
+import { useTokenShared } from "src/lib/token";
 
 const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
   const [showFab, setShowFab] = useState(false);
   const [showDrawer, setShowDrawer] = useState(false);
-  const [divPosition, setDivPosition] = useState({ top: 0, left: 0 });
-  const { token } = useToken();
+  const { token } = useTokenShared();
   const winRef = useRef<Window | null>(null);
 
   const handleHighlight = useCallback(() => {
@@ -29,23 +28,19 @@ const MarkurzFab = () => {
       const positionLeft = rect.left + scrollLeft + rect.width;
 
       setHighlightedText(selectedText);
-      setDivPosition({ top: positionTop, left: positionLeft + 20 });
+      const rootElement = document.getElementById("markurz-root");
+      if (rootElement) {
+        rootElement.style.top = `${positionTop}px`;
+        rootElement.style.left = `${positionLeft + 20}px`;
+      }
       setShowFab(true);
     }
   }, [showDrawer]);
 
-  const handleFabClick = () => {
-    if (token) {
-      setShowDrawer(true);
-      setShowFab(false);
-    } else {
-      winRef.current = window.open(
-        `${process.env.REACT_APP_LOGIN_URL}/login`,
-        "_blank",
-        "toolbar=0,location=0,menubar=0,width=600,height=800"
-      );
-    }
-  };
+  const handleFabClick = useCallback(() => {
+    setShowDrawer(true);
+    setShowFab(false);
+  }, []);
 
   const handleDrawerClose = () => {
     setShowDrawer(false);
@@ -86,6 +81,25 @@ const MarkurzFab = () => {
     };
   }, [handleHighlight, handleSelectionChange]);
 
+  const handleMessage = useCallback(
+    (message: any) => {
+      if (message.type === "OPEN_DRAWER") {
+        setHighlightedText((prevState) => prevState || message.selectionText);
+        handleFabClick();
+      }
+    },
+    [handleFabClick]
+  );
+
+  useEffect(() => {
+    if (chrome.extension) {
+      chrome.runtime.onMessage.addListener(handleMessage);
+    }
+    return () => {
+      chrome.runtime.onMessage.removeListener(handleMessage);
+    };
+  }, [handleMessage]);
+
   return (
     <>
       <SideDrawer
@@ -97,8 +111,6 @@ const MarkurzFab = () => {
         aria-label="create-task"
         size="small"
         sx={{
-          ...divPosition,
-          position: "absolute",
           display: showFab ? "" : "none",
         }}
         color="primary"

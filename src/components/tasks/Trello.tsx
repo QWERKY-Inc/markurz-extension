@@ -170,6 +170,7 @@ const Trello = (props: TrelloProps) => {
       <TextField
         select
         label="Select Board"
+        required
         disabled={!trelloBoards?.trelloBoards.elements?.length}
         onChange={(e) => setSelectedBoard(e.target.value)}
       >

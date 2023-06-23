@@ -63,6 +63,8 @@ if (chrome.cookies) {
   }
   const app = document.createElement("div");
   app.id = "markurz-root";
+  app.style.position = "absolute";
+  app.style.zIndex = "99999";
   document.documentElement.appendChild(app);
 
   const root = ReactDOM.createRoot(app);
@@ -71,7 +73,7 @@ if (chrome.cookies) {
       <ApolloProvider client={apolloClient}>
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterMoment}>
-            <ScopedCssBaseline>
+            <ScopedCssBaseline sx={{ backgroundColor: "transparent" }}>
               <App />
             </ScopedCssBaseline>
           </LocalizationProvider>

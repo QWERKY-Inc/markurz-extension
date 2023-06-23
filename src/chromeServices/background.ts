@@ -1,6 +1,6 @@
 import { decode } from "next-auth/jwt";
 
-async function setMessage(token: string | undefined) {
+async function setMessage(token: string | null) {
   const decoded = token
     ? ((await decode({
         token,
@@ -13,7 +13,10 @@ async function setMessage(token: string | undefined) {
         chrome.tabs
           .sendMessage(tab.id, { token: decoded?.user?.accessToken })
           .catch((e) =>
-            console.error(`Could not send message to the tab ${tab.id}`, e)
+            console.error(
+              `Could not send message to the tab [${tab.id}/${tab.title}]`,
+              e
+            )
           );
       }
     });
@@ -25,7 +28,7 @@ chrome.cookies.onChanged.addListener((reason) => {
     reason.cookie.domain === process.env.REACT_APP_COOKIE_DOMAIN &&
     reason.cookie.name === process.env.REACT_APP_COOKIE_NAME
   ) {
-    setMessage(reason.removed ? undefined : reason.cookie.value);
+    setMessage(reason.removed ? null : reason.cookie.value);
   }
 });
 
@@ -47,9 +50,48 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
         return;
       }
     }
-    sendResponse({ token: undefined });
+    sendResponse({ token: null });
   })();
   return true;
+});
+
+const genericOnClick = (info: chrome.contextMenus.OnClickData) => {
+  chrome.tabs.query({ status: "complete", active: true }, (tabs) => {
+    tabs.forEach((tab) => {
+      if (tab.id) {
+        chrome.tabs
+          .sendMessage(tab.id, {
+            pageUrl: info.pageUrl,
+            selectionText: info.selectionText,
+            type: "OPEN_DRAWER",
+          })
+          .catch((e) =>
+            console.error(
+              `Could not send message to the tab [${tab.id}/${tab.title}]`,
+              e
+            )
+          );
+      }
+    });
+  });
+};
+chrome.contextMenus.onClicked.addListener(genericOnClick);
+
+chrome.runtime.onInstalled.addListener(function () {
+  chrome.contextMenus.create(
+    {
+      title: "Markurz",
+      contexts: ["selection"],
+      id: "markurz",
+    },
+    function () {
+      if (chrome.runtime.lastError) {
+        console.error(
+          "Context menu error: " + chrome.runtime.lastError.message
+        );
+      }
+    }
+  );
 });
 
 export {};
