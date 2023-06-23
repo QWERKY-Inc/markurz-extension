@@ -1,12 +1,27 @@
 import { useEffect, useState } from "react";
+import { apolloClient } from "src/apollo";
 import { useBetween } from "use-between";
 
 let globalToken: string | null = null;
+
+let windowRef: Window | null = null;
 
 /**
  * Get the current token
  */
 export const getToken = () => globalToken;
+
+export const openSignInWindow = () => {
+  if (windowRef && !windowRef.closed) {
+    windowRef.focus();
+  } else {
+    windowRef = window.open(
+      `${process.env.REACT_APP_LOGIN_URL}/login`,
+      "_blank",
+      "toolbar=0,location=0,menubar=0,width=600,height=800"
+    );
+  }
+};
 
 /**
  * Hook retrieving the current token
@@ -18,6 +33,10 @@ export const useToken = () => {
     if ("token" in message) {
       setToken(message.token);
       globalToken = message.token;
+      if (message.token) {
+        apolloClient.refetchQueries({});
+        windowRef?.close();
+      }
     }
   };
 

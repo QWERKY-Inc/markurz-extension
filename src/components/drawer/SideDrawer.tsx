@@ -10,8 +10,10 @@ import {
   ListItemIcon,
   ListItemText,
   MenuItem,
+  Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -47,6 +49,7 @@ const QUERY_MODULES = graphql(/* GraphQL */ `
           id
           type
         }
+        validKey
       }
       meta {
         totalCount
@@ -123,7 +126,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     if (drawerProps.open) {
       refetch();
     }
-  }, [drawerProps.open]);
+  }, [drawerProps.open, refetch]);
 
   useEffect(() => {
     // Reset the result if form gets dirty
@@ -259,17 +262,28 @@ const SideDrawer = (props: SideDrawerProps) => {
                 </ListItemText>
               </MenuItem>
               {data?.userModules?.elements?.map((userModule) => (
-                <MenuItem
+                <Tooltip
+                  title={
+                    !userModule.validKey &&
+                    "Connection expired. Go to Dashboard > My Apps and reconnect."
+                  }
                   key={userModule.id}
-                  value={`${userModule.module.type}-${userModule.id}`}
+                  placement="top"
                 >
-                  <ListItemIcon>
-                    {APPS[userModule.module.type].icon}
-                  </ListItemIcon>
-                  <ListItemText>
-                    {APPS[userModule.module.type].name} ({userModule.email})
-                  </ListItemText>
-                </MenuItem>
+                  <div>
+                    <MenuItem
+                      value={`${userModule.module.type}-${userModule.id}`}
+                      disabled={!userModule.validKey}
+                    >
+                      <ListItemIcon>
+                        {APPS[userModule.module.type].icon}
+                      </ListItemIcon>
+                      <ListItemText>
+                        {APPS[userModule.module.type].name} ({userModule.email})
+                      </ListItemText>
+                    </MenuItem>
+                  </div>
+                </Tooltip>
               ))}
             </TextField>
             <TabContext value={selectedApp}>
@@ -286,28 +300,33 @@ const SideDrawer = (props: SideDrawerProps) => {
               ))}
             </TabContext>
           </Stack>
-          <LoadingButton
-            disabled={!isValid}
-            startIcon={result ? <Link /> : undefined}
-            variant="contained"
-            type={result ? "button" : "submit"}
-            loading={loading}
-            color={result ? "secondary" : "primary"}
-            href={result}
-            rel="noopener"
-            target="_blank"
+          <Paper
+            square
+            elevation={0}
             sx={{
               position: "sticky",
               left: 16,
               bottom: 16,
               width: "calc(100% - 32px)",
               mt: 3,
-              p: 1,
               zIndex: 1,
             }}
           >
-            {result ? "Link" : "Send"}
-          </LoadingButton>
+            <LoadingButton
+              fullWidth
+              disabled={!isValid}
+              startIcon={result ? <Link /> : undefined}
+              variant="contained"
+              type={result ? "button" : "submit"}
+              loading={loading}
+              color={result ? "secondary" : "primary"}
+              href={result}
+              rel="noopener"
+              target="_blank"
+            >
+              {result ? "Link" : "Send"}
+            </LoadingButton>
+          </Paper>
         </form>
       </FormProvider>
     </Drawer>

@@ -136,6 +136,7 @@ const Jira = (props: JiraProps) => {
           <TextField
             label="Select Type"
             select
+            required
             disabled={!projectKey}
             {...field}
           >

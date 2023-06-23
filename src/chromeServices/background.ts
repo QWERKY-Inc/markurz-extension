@@ -83,7 +83,9 @@ chrome.runtime.onInstalled.addListener(function () {
     },
     function () {
       if (chrome.runtime.lastError) {
-        console.log("Context menu error: " + chrome.runtime.lastError.message);
+        console.error(
+          "Context menu error: " + chrome.runtime.lastError.message
+        );
       }
     }
   );
