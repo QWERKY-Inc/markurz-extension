@@ -13,7 +13,6 @@ import {
   Paper,
   Stack,
   TextField,
-  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -267,23 +266,12 @@ const SideDrawer = (props: SideDrawerProps) => {
                   disabled={!userModule.validKey}
                   key={userModule.id}
                 >
-                  <Tooltip
-                    title={
-                      !userModule.validKey &&
-                      "Connection expired. Go to Dashboard > My Apps and reconnect."
-                    }
-                    placement="top"
-                    sx={{ pointerEvents: "none" }}
-                  >
-                    <Stack direction="row" sx={{ pointerEvents: "all" }}>
-                      <ListItemIcon>
-                        {APPS[userModule.module.type].icon}
-                      </ListItemIcon>
-                      <ListItemText>
-                        {APPS[userModule.module.type].name} ({userModule.email})
-                      </ListItemText>
-                    </Stack>
-                  </Tooltip>
+                  <ListItemIcon>
+                    {APPS[userModule.module.type].icon}
+                  </ListItemIcon>
+                  <ListItemText>
+                    {APPS[userModule.module.type].name} ({userModule.email})
+                  </ListItemText>
                 </MenuItem>
               ))}
             </TextField>
