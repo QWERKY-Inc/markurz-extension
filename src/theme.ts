@@ -54,6 +54,26 @@ theme.components = {
       },
     },
   },
+  MuiInputBase: {
+    styleOverrides: {
+      inputMultiline: {
+        border: "none !important",
+        boxShadow: "none !important",
+        padding: "unset !important",
+      },
+      input: {
+        border: "none !important",
+        boxShadow: "none !important",
+      },
+    },
+  },
+  MuiDivider: {
+    styleOverrides: {
+      root: {
+        background: "none",
+      },
+    },
+  },
 };
 
 export default responsiveFontSizes(theme);
