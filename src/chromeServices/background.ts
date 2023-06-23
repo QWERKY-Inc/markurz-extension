@@ -66,7 +66,10 @@ const genericOnClick = (info: chrome.contextMenus.OnClickData) => {
             type: "OPEN_DRAWER",
           })
           .catch((e) =>
-            console.error(`Could not send message to the tab ${tab.id}`, e)
+            console.error(
+              `Could not send message to the tab [${tab.id}/${tab.title}]`,
+              e
+            )
           );
       }
     });
