@@ -85,7 +85,7 @@ jobs:
       - uses: actions/upload-artifact@v3
         with:
           name: ${{ env.FOLDER_NAME }}
-          path: ${{ env.FOLDER_NAME }}
+          path: ${{ env.FOLDER_NAME }}/
 
       - name: Zip Folder Safari Extension
         if: matrix.platform == 'macos-latest'
@@ -95,4 +95,4 @@ jobs:
         if: matrix.platform == 'macos-latest'
         with:
           name: ${{ env.FOLDER_NAME }}macos
-          path: ${{ env.FOLDER_NAME }}macos.zip
+          path: Markurz/buildmacos/Debug/Markurz.app

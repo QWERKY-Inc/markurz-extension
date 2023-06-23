@@ -6,6 +6,9 @@ on:
       - 'v((?![a-zA-Z]).)*'
   workflow_dispatch:
 
+env:
+  FOLDER_NAME: build_${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+
 jobs:
   build:
     name: Publish web extension testing
@@ -24,21 +27,25 @@ jobs:
       - uses: actions/setup-node@v3
         with:
           node-version: 18
+
       - name: Build
         run: |
           yarn install --immutable --immutable-cache --check-cache
           yarn build
+
       - name: Zip Folder
-        run: cd build && zip -r ../build_${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}.zip "."
+        run: cd build && zip -r ../${{ env.FOLDER_NAME }}.zip "."
+
       - name: Publish to Chrome Store
         uses: mnao305/chrome-extension-upload@v4.0.1
         with:
-          file-path: build.zip
+          file-path: ${{ env.FOLDER_NAME }}.zip
           extension-id: lnbfijiimlnnpjmfgmfdmdmlobadcloo
           client-id: ${{ secrets.CLIENT_ID }}
           client-secret: ${{ secrets.CLIENT_SECRET }}
           refresh-token: ${{ secrets.REFRESH_TOKEN }}
           publish: false
+
       - name: Publish to Edge store
         uses: hocgin/action-edge-addone-upload@main
         with:
@@ -46,8 +53,9 @@ jobs:
           client_id: ${{ secrets.EDGE_CLIENT_ID }}
           client_secret: ${{ secrets.EDGE_CLIENT_SECRET }}
           access_token_url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
-          addone_file: build.zip
+          addone_file: ${{ env.FOLDER_NAME }}.zip
+
       - uses: actions/upload-artifact@v3
         with:
-          name: build
-          path: build.zip
+          name: ${{ env.FOLDER_NAME }}
+          path: ${{ env.FOLDER_NAME }}.zip
