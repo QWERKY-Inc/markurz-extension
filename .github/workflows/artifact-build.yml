@@ -81,7 +81,7 @@ jobs:
           xcodebuild -project ./Markurz/Markurz.xcodeproj -scheme "Markurz (macOS)" -destination "generic/platform=macOS" build BUILD_DIR=./buildmacos
 
       - name: Zip Folder Chrome Extension
-        run: zip -r build.zip "build/*"
+        run: cd build && zip -r ../build_${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}.zip "."
 
       - uses: actions/upload-artifact@v3
         with:
