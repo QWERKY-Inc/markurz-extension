@@ -3,6 +3,9 @@ name: Artifact Build
 on:
   workflow_dispatch:
 
+env:
+  FOLDER_NAME: build_${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}
+
 jobs:
   build:
 #    uncomment if you have to have builds running only on commits linked to tickets
@@ -77,17 +80,19 @@ jobs:
           xcodebuild -project ./Markurz/Markurz.xcodeproj -scheme "Markurz (macOS)" -destination "generic/platform=macOS" build BUILD_DIR=./buildmacos
 
       - name: Zip Folder Chrome Extension
-        run: cd build && zip -r ../build_${{ github.ref == 'refs/heads/main' && 'prod' || 'dev' }}.zip "."
+        run: cd build && zip -r ../$FOLDER_NAME.zip "."
 
       - uses: actions/upload-artifact@v3
         with:
           name: build
-          path: build.zip
+          path: $FOLDER_NAME.zip
 
       - name: Zip Folder Safari Extension
+        if: matrix.platform == 'macos-latest'
         run: zip -r buildmacos.zip Markurz/buildmacos/Debug/Markurz.app
 
       - uses: actions/upload-artifact@v3
+        if: matrix.platform == 'macos-latest'
         with:
           name: buildmacos
           path: buildmacos.zip
