@@ -115,7 +115,7 @@ const SideDrawer = (props: SideDrawerProps) => {
   const [result, setResult] = useState("");
 
   const { data, refetch } = useQuery(QUERY_MODULES, {
-    skip: !token,
+    skip: !token || !drawerProps.open,
     variables: {
       take: 100,
     },
