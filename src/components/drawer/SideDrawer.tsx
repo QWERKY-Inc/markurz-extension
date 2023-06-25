@@ -35,12 +35,12 @@ import Jira from "src/components/tasks/Jira";
 import Todoist from "src/components/tasks/Todoist";
 import Trello from "src/components/tasks/Trello";
 import { graphql } from "src/generated";
-import { ModuleTypeEnum } from "src/generated/graphql";
+import { ModuleTypeEnum, OrderByEnum } from "src/generated/graphql";
 import { useTokenShared } from "src/lib/token";
 
 const QUERY_MODULES = graphql(/* GraphQL */ `
-  query UserModules($take: Int) {
-    userModules(take: $take) {
+  query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
+    userModules(take: $take, order: $order) {
       elements {
         id
         email
@@ -118,6 +118,13 @@ const SideDrawer = (props: SideDrawerProps) => {
     skip: !token || !drawerProps.open,
     variables: {
       take: 100,
+      order: [
+        {
+          module: {
+            name: OrderByEnum.Asc,
+          },
+        },
+      ],
     },
   });
 
