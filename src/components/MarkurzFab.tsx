@@ -17,7 +17,7 @@ const MarkurzFab = () => {
     const selection = window.getSelection();
     const selectedText = selection?.toString();
 
-    if (selectedText && selection) {
+    if (selectedText && selection && /\S/.test(selectedText)) {
       const range = selection.getRangeAt(0);
       const rect = range.getBoundingClientRect();
 
