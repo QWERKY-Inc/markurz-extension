@@ -107,7 +107,7 @@ const Trello = (props: TrelloProps) => {
         },
       });
     }
-  }, [selectedBoard, fetchTrelloLabels, userModuleId]);
+  }, [selectedBoard, fetchTrelloLabels, userModuleId, resetField]);
 
   const getElementLabel = (value: any) => {
     const elem = trelloLabels?.trelloLabels.elements?.find(
