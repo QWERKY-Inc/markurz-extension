@@ -34,6 +34,11 @@ jobs:
           yarn install --immutable --immutable-cache --check-cache
           yarn build
 
+      - uses: EndBug/add-and-commit@v9
+        with:
+          add: './public/manifest.json'
+          message: 'Increased semver patch'
+
       - name: Zip Folder
         run: cd build && zip -r ../${{ env.FOLDER_NAME }}.zip "."
 

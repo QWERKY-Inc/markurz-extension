@@ -39,6 +39,11 @@ jobs:
           yarn install --immutable --immutable-cache --check-cache
           yarn build
 
+      - uses: EndBug/add-and-commit@v9
+        with:
+          add: './public/manifest.json'
+          message: 'Increased semver patch'
+
       - name: Setup XCode (macos only)
         if: matrix.platform == 'macos-latest'
         uses: maxim-lobanov/setup-xcode@v1
