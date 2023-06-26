@@ -37,7 +37,8 @@
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "generate": "graphql-codegen -r dotenv/config",
-    "watch": "yarn graphql-codegen -r dotenv/config --watch"
+    "watch": "yarn graphql-codegen -r dotenv/config --watch",
+    "semver": "node semver.ts"
   },
   "eslintConfig": {
     "extends": [
@@ -61,6 +62,8 @@
     "@graphql-codegen/cli": "4.0.1",
     "@graphql-codegen/client-preset": "4.0.0",
     "@types/chrome": "0.0.237",
-    "prettier": "2.8.8"
+    "@types/semver": "7.5.0",
+    "prettier": "2.8.8",
+    "semver": "7.5.3"
   }
 }

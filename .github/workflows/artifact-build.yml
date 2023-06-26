@@ -35,6 +35,7 @@ jobs:
 
       - name: Build
         run: |
+          yarn semver
           yarn install --immutable --immutable-cache --check-cache
           yarn build
 
