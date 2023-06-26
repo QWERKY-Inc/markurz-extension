@@ -26,7 +26,7 @@ export const openSignInWindow = () => {
 /**
  * Hook retrieving the current token
  */
-export const useToken = () => {
+const useToken = () => {
   const [token, setToken] = useState<string | null>(globalToken);
 
   const handleMessage = (message: any) => {
