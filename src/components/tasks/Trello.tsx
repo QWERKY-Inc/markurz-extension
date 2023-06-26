@@ -70,7 +70,7 @@ const QUERY_TRELLO_LABELS = graphql(/* GraphQL */ `
 
 const Trello = (props: TrelloProps) => {
   const { userModuleId } = props;
-  const { register, control } =
+  const { register, control, resetField } =
     useFormContext<CreateTrelloCardMutationVariables>();
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
   const [selectedBoard, setSelectedBoard] = useState("");
@@ -98,6 +98,8 @@ const Trello = (props: TrelloProps) => {
 
   useEffect(() => {
     if (selectedBoard) {
+      // If the selected board changes we need to reset the labels since they belong to a specific board
+      resetField("element.labelIds");
       fetchTrelloLabels({
         variables: {
           userModuleId,
@@ -105,7 +107,7 @@ const Trello = (props: TrelloProps) => {
         },
       });
     }
-  }, [selectedBoard, fetchTrelloLabels, userModuleId]);
+  }, [selectedBoard, fetchTrelloLabels, userModuleId, resetField]);
 
   const getElementLabel = (value: any) => {
     const elem = trelloLabels?.trelloLabels.elements?.find(
@@ -217,6 +219,7 @@ const Trello = (props: TrelloProps) => {
             value={value || []}
             {...rest}
             label="Select Labels"
+            disabled={!selectedBoard}
             SelectProps={{
               renderValue: (selected: any) => (
                 <Box
