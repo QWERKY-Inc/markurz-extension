@@ -62,6 +62,7 @@ const ExtensionApp = () => {
         name: process.env.REACT_APP_COOKIE_NAME as string,
         url: process.env.REACT_APP_LOGIN_URL as string,
       });
+      window.close();
     } catch (e) {
       console.error("Failed to sign out:", e);
     }
@@ -143,6 +144,7 @@ const ExtensionApp = () => {
               href={`${process.env.REACT_APP_LOGIN_URL}/login`}
               target="_blank"
               rel="noreferrer"
+              onClick={() => window.close()}
             >
               Sign In
             </Button>
