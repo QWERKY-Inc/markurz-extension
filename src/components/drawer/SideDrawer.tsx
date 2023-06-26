@@ -13,6 +13,7 @@ import {
   Paper,
   Stack,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
@@ -35,12 +36,12 @@ import Jira from "src/components/tasks/Jira";
 import Todoist from "src/components/tasks/Todoist";
 import Trello from "src/components/tasks/Trello";
 import { graphql } from "src/generated";
-import { ModuleTypeEnum } from "src/generated/graphql";
+import { ModuleTypeEnum, OrderByEnum } from "src/generated/graphql";
 import { useTokenShared } from "src/lib/token";
 
 const QUERY_MODULES = graphql(/* GraphQL */ `
-  query UserModules($take: Int) {
-    userModules(take: $take) {
+  query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
+    userModules(take: $take, order: $order) {
       elements {
         id
         email
@@ -64,6 +65,7 @@ interface SideDrawerProps extends DrawerProps {
 const APPS: {
   [p in ModuleTypeEnum]: {
     name: string;
+    taskName: string;
     icon: React.JSX.Element;
     Element: <T extends { userModuleId: string; highlightedText: string }>(
       props: T
@@ -73,24 +75,28 @@ const APPS: {
 } = {
   [ModuleTypeEnum.GoogleTasks]: {
     name: "Google Tasks",
+    taskName: "task",
     icon: <GoogleTasksIcon />,
     Element: GoogleTasks,
     mutation: MUTATION_CREATE_GOOGLE_TASKS,
   },
   [ModuleTypeEnum.Jira]: {
     name: "Jira",
+    taskName: "issue",
     icon: <JiraIcon />,
     Element: Jira,
     mutation: MUTATION_CREATE_JIRA_ISSUE,
   },
   [ModuleTypeEnum.Todoist]: {
     name: "Todoist",
+    taskName: "task",
     icon: <TodoistIcon />,
     Element: Todoist,
     mutation: MUTATION_CREATE_TODOIST_TASK,
   },
   [ModuleTypeEnum.Trello]: {
     name: "Trello",
+    taskName: "card",
     icon: <TrelloIcon />,
     Element: Trello,
     mutation: MUTATION_CREATE_TRELLO_CARD,
@@ -112,12 +118,23 @@ const SideDrawer = (props: SideDrawerProps) => {
   const { href } = useLocation();
   const { token } = useTokenShared();
   const [loading, setLoading] = useState(false);
-  const [result, setResult] = useState("");
+  const [result, setResult] = useState<{
+    appName: string;
+    taskName: string;
+    url: string;
+  } | null>(null);
 
   const { data, refetch } = useQuery(QUERY_MODULES, {
-    skip: !token,
+    skip: !token || !drawerProps.open,
     variables: {
       take: 100,
+      order: [
+        {
+          module: {
+            name: OrderByEnum.Asc,
+          },
+        },
+      ],
     },
   });
 
@@ -130,13 +147,13 @@ const SideDrawer = (props: SideDrawerProps) => {
   useEffect(() => {
     // Reset the result if form gets dirty
     if (isDirty) {
-      setResult("");
+      setResult(null);
     }
   }, [isDirty]);
 
   useEffect(() => {
     // If the selection changes reset the result to be ready to get a new url.
-    setResult("");
+    setResult(null);
     reset({
       sourceText: highlightedText,
     });
@@ -147,13 +164,18 @@ const SideDrawer = (props: SideDrawerProps) => {
     if (selectedApp) {
       setLoading(true);
       try {
+        const appKey = selectedApp.split("-")[0] as keyof typeof APPS;
         const { data: result } = await apolloClient.mutate({
           mutation:
             // Split on dash to get the first part which is the APP key, second part being the account
-            APPS[selectedApp.split("-")[0] as keyof typeof APPS].mutation,
+            APPS[appKey].mutation,
           variables: form,
         });
-        setResult(result?.create.outputUrl);
+        setResult({
+          appName: APPS[appKey].name,
+          taskName: APPS[appKey].taskName,
+          url: result?.create.outputUrl,
+        });
       } catch (e) {
         console.error(e);
       } finally {
@@ -301,20 +323,31 @@ const SideDrawer = (props: SideDrawerProps) => {
               zIndex: 1,
             }}
           >
-            <LoadingButton
-              fullWidth
-              disabled={!isValid}
-              startIcon={result ? <Link /> : undefined}
-              variant="contained"
-              type={result ? "button" : "submit"}
-              loading={loading}
-              color={result ? "secondary" : "primary"}
-              href={result}
-              rel="noopener"
-              target="_blank"
+            <Tooltip
+              title={
+                result
+                  ? `Task created! Click to check and input additional information in ${result.appName}`
+                  : null
+              }
+              placement="top"
             >
-              {result ? "Link" : "Send"}
-            </LoadingButton>
+              <LoadingButton
+                fullWidth
+                disabled={!isValid}
+                startIcon={result ? <Link /> : undefined}
+                variant="contained"
+                type={result ? "button" : "submit"}
+                loading={loading}
+                color={result ? "secondary" : "primary"}
+                href={result?.url || ""}
+                rel="noopener"
+                target="_blank"
+              >
+                {result
+                  ? `Link to ${result.appName} ${result.taskName}`
+                  : "Send"}
+              </LoadingButton>
+            </Tooltip>
           </Paper>
         </form>
       </FormProvider>
