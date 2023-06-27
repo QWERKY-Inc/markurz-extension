@@ -40,12 +40,10 @@ const MUTATION_SIGN_OUT = graphql(/* GraphQL */ `
 
 const ExtensionApp = () => {
   const { token } = useTokenShared();
-  const { data, loading } = useQuery(QUERY_ME, {
+  const { data, loading, error } = useQuery(QUERY_ME, {
     skip: !token,
   });
   const [signOut, { loading: signOutLoading }] = useMutation(MUTATION_SIGN_OUT);
-
-  console.log("token", token);
 
   const handleSignOut = async () => {
     try {
@@ -71,7 +69,7 @@ const ExtensionApp = () => {
   return (
     <Paper elevation={0} square sx={{ m: -1, minWidth: 216, pb: 0.5 }}>
       <List dense>
-        {token && (
+        {token && !error && (
           <>
             <ListItem>
               <ListItemText
@@ -126,29 +124,33 @@ const ExtensionApp = () => {
           </ListItemIcon>
           <ListItemText primary="Extension Guide" />
         </ListItemButton>
-        <Divider sx={{ my: 0.25 }} />
-        {token ? (
-          <ListItemButton onClick={handleSignOut} disabled={signOutLoading}>
-            <ListItemIcon>
-              <Logout />
-            </ListItemIcon>
-            <ListItemText primary="Sign Out" />
-          </ListItemButton>
-        ) : (
-          <Box sx={{ px: 2, py: 1 }}>
-            <Button
-              fullWidth
-              variant="contained"
-              color="primary"
-              size="small"
-              href={`${process.env.REACT_APP_LOGIN_URL}/login`}
-              target="_blank"
-              rel="noreferrer"
-              onClick={() => window.close()}
-            >
-              Sign In
-            </Button>
-          </Box>
+        {!loading && (
+          <>
+            <Divider sx={{ my: 0.25 }} />
+            {token && !error ? (
+              <ListItemButton onClick={handleSignOut} disabled={signOutLoading}>
+                <ListItemIcon>
+                  <Logout />
+                </ListItemIcon>
+                <ListItemText primary="Sign Out" />
+              </ListItemButton>
+            ) : (
+              <Box sx={{ px: 2, py: 1 }}>
+                <Button
+                  fullWidth
+                  variant="contained"
+                  color="primary"
+                  size="small"
+                  href={`${process.env.REACT_APP_LOGIN_URL}/login`}
+                  target="_blank"
+                  rel="noreferrer"
+                  onClick={() => window.close()}
+                >
+                  Sign In
+                </Button>
+              </Box>
+            )}
+          </>
         )}
       </List>
     </Paper>
