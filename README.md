@@ -55,3 +55,4 @@ See the docs about [craco](https://github.com/dilanx/craco) for more information
 ## Github Automation
 - to run for [MacOS](https://docs.github.com/en/actions/deployment/deploying-xcode-applications/installing-an-apple-certificate-on-macos-runners-for-xcode-development#introduction)
 - to deploy for [Chrome Extension Store](https://github.com/marketplace/actions/chrome-extension-upload-action)
+- to deploy for [Edge](https://github.com/hocgin/action-edge-addone-upload), visit [Microsoft Partners](https://partner.microsoft.com/en-us/dashboard/microsoftedge/publishapi) to get the credentials

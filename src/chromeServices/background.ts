@@ -11,7 +11,7 @@ async function setMessage(token: string | null) {
     tabs.forEach((tab) => {
       if (tab.id) {
         chrome.tabs
-          .sendMessage(tab.id, { token: decoded?.user?.accessToken })
+          .sendMessage(tab.id, { token: decoded?.user?.accessToken || null })
           .catch((e) =>
             console.error(
               `Could not send message to the tab [${tab.id}/${tab.title}]`,
@@ -46,7 +46,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
               secret: process.env.REACT_APP_NEXTAUTH_SECRET as string,
             })) as { user: { accessToken: string } })
           : undefined;
-        sendResponse({ token: decoded?.user?.accessToken });
+        sendResponse({ token: decoded?.user?.accessToken || null });
         return;
       }
     }

@@ -5,6 +5,7 @@ import { AdapterMoment } from "@mui/x-date-pickers/AdapterMoment";
 import React from "react";
 import ReactDOM from "react-dom/client";
 import { apolloClient } from "src/apollo";
+import ExtensionApp from "src/extension/ExtensionApp";
 import App from "./App";
 import theme from "./theme";
 
@@ -36,24 +37,20 @@ import theme from "./theme";
 // }
 
 if (chrome.cookies) {
-  // chrome.cookies.onChanged.addListener((reason) => {
-  //   if (
-  //     reason.cookie.domain === "www.deepform.net" &&
-  //     reason.cookie.name === "__Secure-next-auth.session-token"
-  //   ) {
-  //     injectPlugin(reason.removed ? "" : reason.cookie.value);
-  //   }
-  // });
-  // chrome.cookies.getAll(
-  //   { domain: "www.deepform.net", name: "__Secure-next-auth.session-token" },
-  //   (cookie) => {
-  //     if (cookie.length) {
-  //       injectPlugin(cookie[0].value);
-  //     } else {
-  //       injectPlugin("");
-  //     }
-  //   }
-  // );
+  const root = ReactDOM.createRoot(
+    document.getElementById("root") as HTMLElement
+  );
+  root.render(
+    <React.StrictMode>
+      <ApolloProvider client={apolloClient}>
+        <ThemeProvider theme={theme}>
+          <ScopedCssBaseline>
+            <ExtensionApp />
+          </ScopedCssBaseline>
+        </ThemeProvider>
+      </ApolloProvider>
+    </React.StrictMode>
+  );
   // Inject the plugin only in the content
 } else {
   const prevApp = document.getElementById("markurz-root");

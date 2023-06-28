@@ -1,5 +1,5 @@
 import { DocumentNode, useQuery } from "@apollo/client";
-import { Add, Close, Link } from "@mui/icons-material";
+import { Add, Close, Link, PowerOff } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
   Box,
@@ -291,8 +291,11 @@ const SideDrawer = (props: SideDrawerProps) => {
                   <ListItemIcon>
                     {APPS[userModule.module.type].icon}
                   </ListItemIcon>
-                  <ListItemText>
-                    {APPS[userModule.module.type].name} ({userModule.email})
+                  <ListItemText
+                    sx={{ "& > span": { display: "flex", gap: 1 } }}
+                  >
+                    {APPS[userModule.module.type].name} ({userModule.email}){" "}
+                    {!userModule.validKey && <PowerOff />}
                   </ListItemText>
                 </MenuItem>
               ))}
