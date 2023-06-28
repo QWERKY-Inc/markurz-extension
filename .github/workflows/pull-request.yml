@@ -21,8 +21,8 @@ jobs:
           echo "Git logs diff"
           echo "$(git log --pretty=%B origin/develop...origin/main)"
           echo "Detecting following tickets:"
-          echo $(echo "$(git log --pretty=%B origin/develop...origin/main)" | grep -oE "DEEP-[0-9]+")
-          for fn in $(echo "$(git log --pretty=%B origin/develop...origin/main)" | grep -oE "DEEP-[0-9]+"); do echo "$fn=https://qwerky.atlassian.net/browse/$fn" >> $GITHUB_OUTPUT; done
+          echo $(echo "$(git log --pretty=%B origin/develop...origin/main)" | grep -oE "MKZ-[0-9]+")
+          for fn in $(echo "$(git log --pretty=%B origin/develop...origin/main)" | grep -oE "MKZ-[0-9]+"); do echo "$fn=https://qwerky.atlassian.net/browse/$fn" >> $GITHUB_OUTPUT; done
       - name: pull-request
         uses: repo-sync/pull-request@v2
         with:
