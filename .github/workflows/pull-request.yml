@@ -1,0 +1,41 @@
+name: Create and Update PR
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - develop
+  pull_request:
+    types:
+      - merged
+
+jobs:
+  pull-request:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+        with:
+          fetch-depth: 0
+      - name: get file changes
+        id: changes
+        run: |
+          echo "Git logs diff"
+          echo "$(git log --pretty=%B origin/develop...origin/main)"
+          echo "Detecting following tickets:"
+          echo $(echo "$(git log --pretty=%B origin/develop...origin/main)" | grep -oE "DEEP-[0-9]+")
+          for fn in $(echo "$(git log --pretty=%B origin/develop...origin/main)" | grep -oE "DEEP-[0-9]+"); do echo "$fn=https://qwerky.atlassian.net/browse/$fn" >> $GITHUB_OUTPUT; done
+      - name: pull-request
+        uses: repo-sync/pull-request@v2
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          source_branch: develop
+          destination_branch: main
+          pr_title: "Merge ${{ github.ref }} into main"
+          pr_body: |
+            Depends on:
+            ${{join(steps.changes.outputs.*, '\n')}}
+      - name: update-pull-request
+        uses: kt3k/update-pr-description@v2.1.1
+        with:
+          destination_branch: main
+          pr_body: "Depends on:\n${{join(steps.changes.outputs.*, '\n')}}"
+          github_token: ${{ secrets.GITHUB_TOKEN }}
