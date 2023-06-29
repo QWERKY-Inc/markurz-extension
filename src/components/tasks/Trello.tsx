@@ -164,7 +164,8 @@ const Trello = (props: TrelloProps) => {
           <MenuItem key={trelloWorkspaces.id} value={trelloWorkspaces.id}>
             {trelloWorkspaces.displayName}
           </MenuItem>
-        )) ?? (
+        ))}
+        {!data?.trelloWorkspaces.elements?.length && (
           <MenuItem disabled>
             There are no workspace available to select
           </MenuItem>
@@ -181,7 +182,8 @@ const Trello = (props: TrelloProps) => {
           <MenuItem key={board.id} value={board.id}>
             {board.name}
           </MenuItem>
-        )) ?? (
+        ))}
+        {!trelloBoards?.trelloBoards.elements?.length && (
           <MenuItem disabled>There are no boards available to select</MenuItem>
         )}
       </TextField>
@@ -202,7 +204,10 @@ const Trello = (props: TrelloProps) => {
                 <MenuItem key={list.id} value={list.id}>
                   {list.name}
                 </MenuItem>
-              )) ?? (
+              ))}
+            {!trelloBoards?.trelloBoards.elements?.find(
+              (o) => o.id === selectedBoard
+            )?.lists?.length && (
               <MenuItem disabled>
                 There are no list available to select
               </MenuItem>
