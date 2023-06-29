@@ -124,7 +124,8 @@ const Jira = (props: JiraProps) => {
             ))}
             {!data?.jiraInformation.projects.length && (
               <MenuItem disabled>
-                There are no projects available to select
+                There are no projects available to select. Please create a
+                project in Jira.
               </MenuItem>
             )}
           </TextField>
