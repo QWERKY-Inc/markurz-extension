@@ -224,7 +224,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         >
           Dashboard
         </Button>
-        <IconButton onClick={() => props.onClose?.({}, "backdropClick")}>
+        <IconButton onClick={() => props.onClose?.({}, "escapeKeyDown")}>
           <Close />
         </IconButton>
       </Stack>
