@@ -52,7 +52,7 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Jira = (props: JiraProps) => {
-  const { userModuleId } = props;
+  const { userModuleId, highlightedText } = props;
   const { register, control, watch } =
     useFormContext<MutationCreateJiraIssueArgs>();
   const siteId = watch("element.siteId");
@@ -82,6 +82,7 @@ const Jira = (props: JiraProps) => {
         required
         {...register("element.summary", {
           required: true,
+          value: highlightedText,
         })}
         inputProps={{
           maxLength: 500,
