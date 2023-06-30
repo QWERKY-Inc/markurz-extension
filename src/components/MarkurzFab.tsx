@@ -89,7 +89,9 @@ const MarkurzFab = () => {
   const handleMessage = useCallback(
     (message: any) => {
       if (message.type === "OPEN_DRAWER") {
-        setHighlightedText((prevState) => prevState || message.selectionText);
+        setHighlightedText(
+          (prevState) => prevState || message.selectionText || document.title
+        );
         handleFabClick();
       }
     },
