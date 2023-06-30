@@ -16,9 +16,10 @@ export const openSignInWindow = () => {
     windowRef.focus();
   } else {
     windowRef = window.open(
-      `${process.env.REACT_APP_LOGIN_URL}/login`,
-      "_blank",
-      "toolbar=0,location=0,menubar=0,width=600,height=800"
+      `${process.env.REACT_APP_LOGIN_URL}/login?referrer=${document.documentURI}`,
+      "_blank"
+      // Uncomment to make it a popup rather than a tab
+      // "toolbar=0,location=0,menubar=0,width=600,height=800"
     );
   }
 };

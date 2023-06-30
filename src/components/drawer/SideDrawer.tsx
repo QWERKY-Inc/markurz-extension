@@ -235,7 +235,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         >
           <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
             <Typography
-              variant="h4"
+              variant="h5"
               component="p"
               sx={{
                 overflow: "hidden",
