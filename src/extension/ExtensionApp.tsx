@@ -1,10 +1,5 @@
-import { useMutation, useQuery } from "@apollo/client";
-import {
-  CableRounded,
-  InfoOutlined,
-  Logout,
-  SpeedRounded,
-} from "@mui/icons-material";
+import { useQuery } from "@apollo/client";
+import { CableRounded, InfoOutlined, SpeedRounded } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -18,6 +13,7 @@ import {
   Skeleton,
 } from "@mui/material";
 import React from "react";
+import { genericOnClick } from "src/chromeServices/contextMenu";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
 import { graphql } from "src/generated";
 import { useTokenShared } from "src/lib/token";
@@ -32,38 +28,15 @@ const QUERY_ME = graphql(/* GraphQL */ `
   }
 `);
 
-const MUTATION_SIGN_OUT = graphql(/* GraphQL */ `
-  mutation SignOut($input: SignOutInput!) {
-    signOut(input: $input)
-  }
-`);
-
 const ExtensionApp = () => {
   const { token } = useTokenShared();
   const { data, loading, error } = useQuery(QUERY_ME, {
     skip: !token,
   });
-  const [signOut, { loading: signOutLoading }] = useMutation(MUTATION_SIGN_OUT);
 
-  const handleSignOut = async () => {
-    try {
-      if (token) {
-        await signOut({
-          variables: {
-            input: {
-              refreshToken: token,
-            },
-          },
-        });
-      }
-      await chrome.cookies.remove({
-        name: process.env.REACT_APP_COOKIE_NAME as string,
-        url: process.env.REACT_APP_LOGIN_URL as string,
-      });
-      window.close();
-    } catch (e) {
-      console.error("Failed to sign out:", e);
-    }
+  const handleOpenDrawerButtonClick = () => {
+    genericOnClick({ menuItemId: 0, editable: false, pageUrl: "" });
+    window.close();
   };
 
   return (
@@ -124,32 +97,20 @@ const ExtensionApp = () => {
           </ListItemIcon>
           <ListItemText primary="Extension Guide" />
         </ListItemButton>
-        {!loading && (
+        {!loading && token && (
           <>
             <Divider sx={{ my: 0.25 }} />
-            {token && !error ? (
-              <ListItemButton onClick={handleSignOut} disabled={signOutLoading}>
-                <ListItemIcon>
-                  <Logout />
-                </ListItemIcon>
-                <ListItemText primary="Sign Out" />
-              </ListItemButton>
-            ) : (
-              <Box sx={{ px: 2, py: 1 }}>
-                <Button
-                  fullWidth
-                  variant="contained"
-                  color="primary"
-                  size="small"
-                  href={`${process.env.REACT_APP_LOGIN_URL}/login`}
-                  target="_blank"
-                  rel="noreferrer"
-                  onClick={() => window.close()}
-                >
-                  Sign In
-                </Button>
-              </Box>
-            )}
+            <Box sx={{ px: 2, py: 1 }}>
+              <Button
+                fullWidth
+                variant="contained"
+                color="primary"
+                size="small"
+                onClick={handleOpenDrawerButtonClick}
+              >
+                Mark this page
+              </Button>
+            </Box>
           </>
         )}
       </List>
