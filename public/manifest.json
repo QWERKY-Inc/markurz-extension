@@ -7,7 +7,7 @@
   },
   "name": "Markurz",
   "description": "Web clipper that connects to all of your favorite productivity apps.",
-  "version": "1.2.6",
+  "version": "1.2.7",
   "manifest_version": 3,
   "action": {
     "default_popup": "index.html",
