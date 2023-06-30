@@ -80,7 +80,7 @@ chrome.contextMenus.onClicked.addListener(genericOnClick);
 chrome.runtime.onInstalled.addListener(function () {
   chrome.contextMenus.create(
     {
-      title: "Markurz",
+      title: "Mark with Markurz",
       contexts: ["selection"],
       id: "markurz",
     },

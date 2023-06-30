@@ -42,8 +42,13 @@ const MarkurzFab = () => {
     setShowFab(false);
   }, []);
 
-  const handleDrawerClose = () => {
-    setShowDrawer(false);
+  const handleDrawerClose = (
+    event: React.KeyboardEvent | React.MouseEvent,
+    reason: "backdropClick" | "escapeKeyDown"
+  ) => {
+    if (reason !== "backdropClick") {
+      setShowDrawer(false);
+    }
   };
 
   useEffect(() => {

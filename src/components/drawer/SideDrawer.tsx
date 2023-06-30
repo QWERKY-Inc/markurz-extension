@@ -224,7 +224,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         >
           Dashboard
         </Button>
-        <IconButton onClick={() => props.onClose?.({}, "backdropClick")}>
+        <IconButton onClick={() => props.onClose?.({}, "escapeKeyDown")}>
           <Close />
         </IconButton>
       </Stack>
@@ -235,7 +235,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         >
           <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
             <Typography
-              variant="h4"
+              variant="h5"
               component="p"
               sx={{
                 overflow: "hidden",

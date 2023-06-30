@@ -69,7 +69,7 @@ const QUERY_TRELLO_LABELS = graphql(/* GraphQL */ `
 `);
 
 const Trello = (props: TrelloProps) => {
-  const { userModuleId } = props;
+  const { userModuleId, highlightedText } = props;
   const { register, control, resetField } =
     useFormContext<CreateTrelloCardMutationVariables>();
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
@@ -139,6 +139,7 @@ const Trello = (props: TrelloProps) => {
         required
         {...register("element.name", {
           required: true,
+          value: highlightedText,
         })}
         inputProps={{
           maxLength: 500,
@@ -163,7 +164,8 @@ const Trello = (props: TrelloProps) => {
           <MenuItem key={trelloWorkspaces.id} value={trelloWorkspaces.id}>
             {trelloWorkspaces.displayName}
           </MenuItem>
-        )) ?? (
+        ))}
+        {!data?.trelloWorkspaces.elements?.length && (
           <MenuItem disabled>
             There are no workspace available to select
           </MenuItem>
@@ -180,7 +182,8 @@ const Trello = (props: TrelloProps) => {
           <MenuItem key={board.id} value={board.id}>
             {board.name}
           </MenuItem>
-        )) ?? (
+        ))}
+        {!trelloBoards?.trelloBoards.elements?.length && (
           <MenuItem disabled>There are no boards available to select</MenuItem>
         )}
       </TextField>
@@ -201,7 +204,10 @@ const Trello = (props: TrelloProps) => {
                 <MenuItem key={list.id} value={list.id}>
                   {list.name}
                 </MenuItem>
-              )) ?? (
+              ))}
+            {!trelloBoards?.trelloBoards.elements?.find(
+              (o) => o.id === selectedBoard
+            )?.lists?.length && (
               <MenuItem disabled>
                 There are no list available to select
               </MenuItem>
