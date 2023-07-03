@@ -14,6 +14,13 @@ const theme = createTheme({
 });
 
 theme.components = {
+  MuiTypography: {
+    styleOverrides: {
+      h5: {
+        fontWeight: 600,
+      },
+    },
+  },
   MuiTabPanel: {
     styleOverrides: {
       root: {
