@@ -17,9 +17,9 @@ export const openSignInWindow = () => {
   } else {
     windowRef = window.open(
       `${process.env.REACT_APP_LOGIN_URL}/login?referrer=${document.documentURI}`,
-      "_blank"
-      // Uncomment to make it a popup rather than a tab
-      // "toolbar=0,location=0,menubar=0,width=600,height=800"
+      "_blank",
+      // Make it a popup rather than a tab
+      "toolbar=0,location=0,menubar=0,width=600,height=800"
     );
   }
 };
@@ -29,14 +29,16 @@ export const openSignInWindow = () => {
  */
 const useToken = () => {
   const [token, setToken] = useState<string | null>(globalToken);
+  const [loading, setLoading] = useState(true);
 
   const handleMessage = (message: any) => {
     if ("token" in message) {
       setToken(message.token);
       globalToken = message.token;
       if (message.token) {
-        apolloClient.refetchQueries({});
+        apolloClient.refetchQueries({ include: "active" });
         windowRef?.close();
+        windowRef = null;
       }
     }
   };
@@ -47,6 +49,7 @@ const useToken = () => {
       chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
         globalToken = response.token;
         setToken(response.token);
+        setLoading(false);
       });
     }
     return () => {
@@ -54,7 +57,7 @@ const useToken = () => {
     };
   }, []);
 
-  return { token };
+  return { token, loading };
 };
 
 export const useTokenShared = () => useBetween(useToken);

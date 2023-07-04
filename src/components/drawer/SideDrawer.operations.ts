@@ -75,3 +75,22 @@ export const MUTATION_CREATE_TRELLO_CARD = graphql(/* GraphQL */ `
     }
   }
 `);
+
+export const QUERY_MODULES = graphql(/* GraphQL */ `
+  query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
+    userModules(take: $take, order: $order) {
+      elements {
+        id
+        email
+        module {
+          id
+          type
+        }
+        validKey
+      }
+      meta {
+        totalCount
+      }
+    }
+  }
+`);

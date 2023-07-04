@@ -1,4 +1,4 @@
-import { DocumentNode, useQuery } from "@apollo/client";
+import { useQuery } from "@apollo/client";
 import { Add, Close, Link, PowerOff } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
@@ -20,88 +20,16 @@ import React, { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { useLocation } from "react-use";
 import { apolloClient } from "src/apollo";
-import {
-  MUTATION_CREATE_GOOGLE_TASKS,
-  MUTATION_CREATE_JIRA_ISSUE,
-  MUTATION_CREATE_TODOIST_TASK,
-  MUTATION_CREATE_TRELLO_CARD,
-} from "src/components/drawer/SideDrawer.operations";
-import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
-import JiraIcon from "src/components/icons/JiraIcon";
+import { APPS } from "src/components/drawer/Apps";
+import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
+import { QUERY_MODULES } from "src/components/drawer/SideDrawer.operations";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import TodoistIcon from "src/components/icons/TodoistIcon";
-import TrelloIcon from "src/components/icons/TrelloIcon";
-import GoogleTasks from "src/components/tasks/GoogleTasks";
-import Jira from "src/components/tasks/Jira";
-import Todoist from "src/components/tasks/Todoist";
-import Trello from "src/components/tasks/Trello";
-import { graphql } from "src/generated";
 import { ModuleTypeEnum, OrderByEnum } from "src/generated/graphql";
 import { useTokenShared } from "src/lib/token";
-
-const QUERY_MODULES = graphql(/* GraphQL */ `
-  query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
-    userModules(take: $take, order: $order) {
-      elements {
-        id
-        email
-        module {
-          id
-          type
-        }
-        validKey
-      }
-      meta {
-        totalCount
-      }
-    }
-  }
-`);
 
 interface SideDrawerProps extends DrawerProps {
   highlightedText: string;
 }
-
-const APPS: {
-  [p in ModuleTypeEnum]: {
-    name: string;
-    taskName: string;
-    icon: React.JSX.Element;
-    Element: <T extends { userModuleId: string; highlightedText: string }>(
-      props: T
-    ) => React.JSX.Element;
-    mutation: DocumentNode;
-  };
-} = {
-  [ModuleTypeEnum.GoogleTasks]: {
-    name: "Google Tasks",
-    taskName: "task",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
-  },
-  [ModuleTypeEnum.Jira]: {
-    name: "Jira",
-    taskName: "issue",
-    icon: <JiraIcon />,
-    Element: Jira,
-    mutation: MUTATION_CREATE_JIRA_ISSUE,
-  },
-  [ModuleTypeEnum.Todoist]: {
-    name: "Todoist",
-    taskName: "task",
-    icon: <TodoistIcon />,
-    Element: Todoist,
-    mutation: MUTATION_CREATE_TODOIST_TASK,
-  },
-  [ModuleTypeEnum.Trello]: {
-    name: "Trello",
-    taskName: "card",
-    icon: <TrelloIcon />,
-    Element: Trello,
-    mutation: MUTATION_CREATE_TRELLO_CARD,
-  },
-};
 
 const SideDrawer = (props: SideDrawerProps) => {
   const { highlightedText, ...drawerProps } = props;
@@ -116,7 +44,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     formState: { isValid, isDirty },
   } = methods;
   const { href } = useLocation();
-  const { token } = useTokenShared();
+  const { token, loading: tokenLoading } = useTokenShared();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
     appName: string;
@@ -124,8 +52,9 @@ const SideDrawer = (props: SideDrawerProps) => {
     url: string;
   } | null>(null);
 
-  const { data, refetch } = useQuery(QUERY_MODULES, {
-    skip: !token || !drawerProps.open,
+  const { data, refetch, error } = useQuery(QUERY_MODULES, {
+    // This skip should be there but seems to break global refetch
+    // skip: !token || !drawerProps.open || tokenLoading,
     variables: {
       take: 100,
       order: [
@@ -139,10 +68,10 @@ const SideDrawer = (props: SideDrawerProps) => {
   });
 
   useEffect(() => {
-    if (drawerProps.open) {
+    if (drawerProps.open && token) {
       refetch();
     }
-  }, [drawerProps.open, refetch]);
+  }, [drawerProps.open, refetch, token]);
 
   useEffect(() => {
     // Reset the result if form gets dirty
@@ -228,132 +157,136 @@ const SideDrawer = (props: SideDrawerProps) => {
           <Close />
         </IconButton>
       </Stack>
-      <FormProvider {...methods}>
-        <form
-          onSubmit={handleSubmit(submit)}
-          style={{ height: "100%", display: "flex", flexDirection: "column" }}
-        >
-          <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
-            <Typography
-              variant="h5"
-              component="p"
-              sx={{
-                overflow: "hidden",
-                textOverflow: "ellipsis",
-                wordBreak: "break-all",
-                display: "-webkit-box",
-                WebkitLineClamp: 2,
-                WebkitBoxOrient: "vertical",
-              }}
-            >
-              {highlightedText}
-            </Typography>
-            <TextField
-              select
-              required
-              size="small"
-              label="Select apps"
-              value={selectedApp}
-              onChange={handleAppChange}
-              sx={{
-                "& .MuiSelect-select": {
-                  display: "flex",
-                  alignItems: "center",
-                  gap: 2,
-                },
-                "& .MuiListItemText-root": {
-                  margin: 0,
-                },
-                "& .MuiListItemIcon-root": {
-                  minWidth: "unset",
-                },
-              }}
-            >
-              <MenuItem
-                component="a"
-                href={`${process.env.REACT_APP_LOGIN_URL}`}
-                target="_blank"
-                rel="noopener"
+      {!token || error ? (
+        <LoggedOutScreen loading={tokenLoading} />
+      ) : (
+        <FormProvider {...methods}>
+          <form
+            onSubmit={handleSubmit(submit)}
+            style={{ height: "100%", display: "flex", flexDirection: "column" }}
+          >
+            <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
+              <Typography
+                variant="h5"
+                component="p"
+                sx={{
+                  overflow: "hidden",
+                  textOverflow: "ellipsis",
+                  wordBreak: "break-all",
+                  display: "-webkit-box",
+                  WebkitLineClamp: 2,
+                  WebkitBoxOrient: "vertical",
+                }}
               >
-                <ListItemIcon>
-                  <Add fontSize="small" color="primary" />
-                </ListItemIcon>
-                <ListItemText sx={{ color: "primary.main" }}>
-                  Connect More Apps
-                </ListItemText>
-              </MenuItem>
-              {data?.userModules?.elements?.map((userModule) => (
+                {highlightedText}
+              </Typography>
+              <TextField
+                select
+                required
+                size="small"
+                label="Select apps"
+                value={selectedApp}
+                onChange={handleAppChange}
+                sx={{
+                  "& .MuiSelect-select": {
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 2,
+                  },
+                  "& .MuiListItemText-root": {
+                    margin: 0,
+                  },
+                  "& .MuiListItemIcon-root": {
+                    minWidth: "unset",
+                  },
+                }}
+              >
                 <MenuItem
-                  value={`${userModule.module.type}-${userModule.id}`}
-                  disabled={!userModule.validKey}
-                  key={userModule.id}
+                  component="a"
+                  href={`${process.env.REACT_APP_LOGIN_URL}`}
+                  target="_blank"
+                  rel="noopener"
                 >
                   <ListItemIcon>
-                    {APPS[userModule.module.type].icon}
+                    <Add fontSize="small" color="primary" />
                   </ListItemIcon>
-                  <ListItemText
-                    sx={{ "& > span": { display: "flex", gap: 1 } }}
-                  >
-                    {APPS[userModule.module.type].name} ({userModule.email}){" "}
-                    {!userModule.validKey && <PowerOff />}
+                  <ListItemText sx={{ color: "primary.main" }}>
+                    Connect More Apps
                   </ListItemText>
                 </MenuItem>
-              ))}
-            </TextField>
-            <TabContext value={selectedApp}>
-              {data?.userModules?.elements?.map((userModule) => (
-                <TabPanel
-                  key={userModule.id}
-                  value={`${userModule.module.type}-${userModule.id}`}
-                >
-                  {React.createElement(APPS[userModule.module.type].Element, {
-                    userModuleId: userModule.id,
-                    highlightedText,
-                  })}
-                </TabPanel>
-              ))}
-            </TabContext>
-          </Stack>
-          <Paper
-            square
-            elevation={0}
-            sx={{
-              position: "sticky",
-              left: 16,
-              bottom: 16,
-              width: "calc(100% - 32px)",
-              mt: 3,
-              zIndex: 1,
-            }}
-          >
-            <Tooltip
-              title={
-                result
-                  ? `Task created! Click to check and input additional information in ${result.appName}`
-                  : null
-              }
-              placement="top"
+                {data?.userModules?.elements?.map((userModule) => (
+                  <MenuItem
+                    value={`${userModule.module.type}-${userModule.id}`}
+                    disabled={!userModule.validKey}
+                    key={userModule.id}
+                  >
+                    <ListItemIcon>
+                      {APPS[userModule.module.type].icon}
+                    </ListItemIcon>
+                    <ListItemText
+                      sx={{ "& > span": { display: "flex", gap: 1 } }}
+                    >
+                      {APPS[userModule.module.type].name} ({userModule.email}){" "}
+                      {!userModule.validKey && <PowerOff />}
+                    </ListItemText>
+                  </MenuItem>
+                ))}
+              </TextField>
+              <TabContext value={selectedApp}>
+                {data?.userModules?.elements?.map((userModule) => (
+                  <TabPanel
+                    key={userModule.id}
+                    value={`${userModule.module.type}-${userModule.id}`}
+                  >
+                    {React.createElement(APPS[userModule.module.type].Element, {
+                      userModuleId: userModule.id,
+                      highlightedText,
+                    })}
+                  </TabPanel>
+                ))}
+              </TabContext>
+            </Stack>
+            <Paper
+              square
+              elevation={0}
+              sx={{
+                position: "sticky",
+                left: 16,
+                bottom: 16,
+                width: "calc(100% - 32px)",
+                mt: 3,
+                zIndex: 1,
+              }}
             >
-              <LoadingButton
-                fullWidth
-                disabled={!isValid}
-                startIcon={result ? <Link /> : undefined}
-                variant="contained"
-                type={result ? "button" : "submit"}
-                loading={loading}
-                color={result ? "secondary" : "primary"}
-                href={result?.url || ""}
-                rel="noopener"
-                target="_blank"
+              <Tooltip
+                title={
+                  result
+                    ? `Task created! Click to check and input additional information in ${result.appName}`
+                    : null
+                }
+                placement="top"
               >
-                {result
-                  ? `Link to ${result.appName} ${result.taskName}`
-                  : "Send"}
-              </LoadingButton>
-            </Tooltip>
-          </Paper>
-        </form>
-      </FormProvider>
+                <LoadingButton
+                  fullWidth
+                  disabled={!isValid}
+                  startIcon={result ? <Link /> : undefined}
+                  variant="contained"
+                  type={result ? "button" : "submit"}
+                  loading={loading}
+                  color={result ? "secondary" : "primary"}
+                  href={result?.url || ""}
+                  rel="noopener"
+                  target="_blank"
+                >
+                  {result
+                    ? `Link to ${result.appName} ${result.taskName}`
+                    : "Send"}
+                </LoadingButton>
+              </Tooltip>
+            </Paper>
+          </form>
+        </FormProvider>
+      )}
     </Drawer>
   );
 };
