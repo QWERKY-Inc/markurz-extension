@@ -22,29 +22,10 @@ import { useLocation } from "react-use";
 import { apolloClient } from "src/apollo";
 import { APPS } from "src/components/drawer/Apps";
 import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
+import { QUERY_MODULES } from "src/components/drawer/SideDrawer.operations";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import { graphql } from "src/generated";
 import { ModuleTypeEnum, OrderByEnum } from "src/generated/graphql";
 import { useTokenShared } from "src/lib/token";
-
-const QUERY_MODULES = graphql(/* GraphQL */ `
-  query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
-    userModules(take: $take, order: $order) {
-      elements {
-        id
-        email
-        module {
-          id
-          type
-        }
-        validKey
-      }
-      meta {
-        totalCount
-      }
-    }
-  }
-`);
 
 interface SideDrawerProps extends DrawerProps {
   highlightedText: string;
@@ -72,7 +53,8 @@ const SideDrawer = (props: SideDrawerProps) => {
   } | null>(null);
 
   const { data, refetch, error } = useQuery(QUERY_MODULES, {
-    skip: !token || !drawerProps.open || tokenLoading,
+    // This skip should be there but seems to break global refetch
+    // skip: !token || !drawerProps.open || tokenLoading,
     variables: {
       take: 100,
       order: [
@@ -86,10 +68,10 @@ const SideDrawer = (props: SideDrawerProps) => {
   });
 
   useEffect(() => {
-    if (drawerProps.open) {
+    if (drawerProps.open && token) {
       refetch();
     }
-  }, [drawerProps.open, refetch]);
+  }, [drawerProps.open, refetch, token]);
 
   useEffect(() => {
     // Reset the result if form gets dirty
