@@ -36,7 +36,7 @@ const useToken = () => {
       setToken(message.token);
       globalToken = message.token;
       if (message.token) {
-        apolloClient.refetchQueries({});
+        apolloClient.refetchQueries({ include: "active" });
         windowRef?.close();
         windowRef = null;
       }
