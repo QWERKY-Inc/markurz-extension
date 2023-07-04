@@ -97,7 +97,7 @@ const ExtensionApp = () => {
           </ListItemIcon>
           <ListItemText primary="Extension Guide" />
         </ListItemButton>
-        {!loading && token && (
+        {!loading && (
           <>
             <Divider sx={{ my: 0.25 }} />
             <Box sx={{ px: 2, py: 1 }}>

@@ -6,7 +6,7 @@ import {
 } from "@apollo/client";
 import { setContext } from "@apollo/client/link/context";
 import { onError } from "@apollo/client/link/error";
-import { getToken, openSignInWindow } from "src/lib/token";
+import { getToken } from "src/lib/token";
 
 const authLink = setContext(async (_, { headers }) => {
   try {
@@ -34,14 +34,16 @@ const link = createHttpLink({
 });
 
 const errorLink = onError(({ graphQLErrors }) => {
-  if (graphQLErrors) {
-    for (let err of graphQLErrors) {
-      switch (err.extensions.code) {
-        case "UNAUTHENTICATED":
-          openSignInWindow();
-      }
-    }
-  }
+  // Uncomment for Sign In Window on query error
+  // if (graphQLErrors) {
+  //   for (let err of graphQLErrors) {
+  //     switch (err.extensions.code) {
+  //       case "UNAUTHENTICATED":
+  //         openSignInWindow();
+  //     }
+  //   }
+  // }
+  console.error(graphQLErrors);
 });
 
 export const apolloClient = new ApolloClient({
