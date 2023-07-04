@@ -27,13 +27,13 @@ export const APPS: {
     mutation: DocumentNode;
   };
 } = {
-  [ModuleTypeEnum.Evernote]: {
-    name: "Evernote",
-    taskName: "task",
-    icon: <TrelloIcon />,
-    Element: Trello,
-    mutation: MUTATION_CREATE_TRELLO_CARD,
-  },
+  // [ModuleTypeEnum.Evernote]: {
+  //   name: "Evernote",
+  //   taskName: "task",
+  //   icon: <TrelloIcon />,
+  //   Element: Trello,
+  //   mutation: MUTATION_CREATE_TRELLO_CARD,
+  // },
   [ModuleTypeEnum.GoogleTasks]: {
     name: "Google Tasks",
     taskName: "task",
