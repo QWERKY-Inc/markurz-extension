@@ -80,7 +80,7 @@ export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
   mutation CreateEvernoteNote(
     $sourceUrl: String!
     $userModuleId: ID!
-    $element: CreateNoteInput!
+    $element: CreateEvernoteNoteInput!
     $sourceText: String!
   ) {
     create: createEvernoteNote(
