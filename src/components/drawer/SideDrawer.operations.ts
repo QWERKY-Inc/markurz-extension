@@ -76,6 +76,25 @@ export const MUTATION_CREATE_TRELLO_CARD = graphql(/* GraphQL */ `
   }
 `);
 
+export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
+  mutation CreateEvernoteNote(
+    $sourceUrl: String!
+    $userModuleId: ID!
+    $element: CreateNoteInput!
+    $sourceText: String!
+  ) {
+    create: createEvernoteNote(
+      sourceUrl: $sourceUrl
+      userModuleId: $userModuleId
+      element: $element
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
 export const QUERY_MODULES = graphql(/* GraphQL */ `
   query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
     userModules(take: $take, order: $order) {

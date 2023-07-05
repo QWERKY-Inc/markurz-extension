@@ -1,15 +1,18 @@
 import { DocumentNode } from "@apollo/client";
 import React from "react";
 import {
+  MUTATION_CREATE_EVERNOTE_NOTE,
   MUTATION_CREATE_GOOGLE_TASKS,
   MUTATION_CREATE_JIRA_ISSUE,
   MUTATION_CREATE_TODOIST_TASK,
   MUTATION_CREATE_TRELLO_CARD,
 } from "src/components/drawer/SideDrawer.operations";
+import EvernoteIcon from "src/components/icons/EvernoteIcon";
 import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
 import JiraIcon from "src/components/icons/JiraIcon";
 import TodoistIcon from "src/components/icons/TodoistIcon";
 import TrelloIcon from "src/components/icons/TrelloIcon";
+import Evernote from "src/components/tasks/Evernote";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
 import Jira from "src/components/tasks/Jira";
 import Todoist from "src/components/tasks/Todoist";
@@ -29,10 +32,10 @@ export const APPS: {
 } = {
   [ModuleTypeEnum.Evernote]: {
     name: "Evernote",
-    taskName: "task",
-    icon: <TrelloIcon />,
-    Element: Trello,
-    mutation: MUTATION_CREATE_TRELLO_CARD,
+    taskName: "Note",
+    icon: <EvernoteIcon />,
+    Element: Evernote,
+    mutation: MUTATION_CREATE_EVERNOTE_NOTE,
   },
   [ModuleTypeEnum.GoogleTasks]: {
     name: "Google Tasks",
