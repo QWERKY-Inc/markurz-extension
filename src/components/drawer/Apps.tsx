@@ -37,6 +37,20 @@ export const APPS: {
     Element: Evernote,
     mutation: MUTATION_CREATE_EVERNOTE_NOTE,
   },
+  [ModuleTypeEnum.Gmail]: {
+    name: "Gmail",
+    taskName: "email",
+    icon: <GoogleTasksIcon />,
+    Element: GoogleTasks,
+    mutation: MUTATION_CREATE_GOOGLE_TASKS,
+  },
+  [ModuleTypeEnum.GoogleCalendar]: {
+    name: "Google Calendar",
+    taskName: "event",
+    icon: <GoogleTasksIcon />,
+    Element: GoogleTasks,
+    mutation: MUTATION_CREATE_GOOGLE_TASKS,
+  },
   [ModuleTypeEnum.GoogleTasks]: {
     name: "Google Tasks",
     taskName: "task",

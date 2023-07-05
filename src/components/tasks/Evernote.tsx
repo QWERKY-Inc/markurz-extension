@@ -49,9 +49,14 @@ const QUERY_EVERNOTE_DATA = graphql(/* GraphQL */ `
 
 const Evernote = (props: EvernoteProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { data: dataNotebooks } = useQuery(QUERY_EVERNOTE_DATA);
+  const { data: dataNotebooks } = useQuery(QUERY_EVERNOTE_DATA, {
+    variables: {
+      userModuleId,
+    },
+  });
   const { register, control } =
     useFormContext<MutationCreateEvernoteNoteArgs>();
+  register("userModuleId", { value: userModuleId });
 
   return (
     <Stack spacing={2} {...stackProps}>
@@ -73,6 +78,7 @@ const Evernote = (props: EvernoteProps) => {
       <TextField
         label="Content"
         multiline
+        required
         inputProps={{
           maxLength: 255,
         }}
@@ -91,7 +97,9 @@ const Evernote = (props: EvernoteProps) => {
             }}
             value={value || undefined}
             {...rest}
-            options={dataNotebooks?.evernoteTags.elements ?? []}
+            options={
+              dataNotebooks?.evernoteTags.elements?.map((o) => o.name) ?? []
+            }
             renderOption={(props, option, { selected }) => (
               <li {...props}>
                 <Checkbox
