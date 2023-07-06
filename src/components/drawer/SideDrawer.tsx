@@ -261,7 +261,7 @@ const SideDrawer = (props: SideDrawerProps) => {
               <Tooltip
                 title={
                   result
-                    ? `Task created! Click to check and input additional information in ${result.appName}`
+                    ? `${result.taskName} created! Click to check and input additional information in ${result.appName}`
                     : null
                 }
                 placement="top"

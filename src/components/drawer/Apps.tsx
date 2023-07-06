@@ -65,6 +65,13 @@ export const APPS: {
     Element: Jira,
     mutation: MUTATION_CREATE_JIRA_ISSUE,
   },
+  [ModuleTypeEnum.Notion]: {
+    name: "Notion",
+    taskName: "item",
+    icon: <TodoistIcon />,
+    Element: Todoist,
+    mutation: MUTATION_CREATE_TODOIST_TASK,
+  },
   [ModuleTypeEnum.Todoist]: {
     name: "Todoist",
     taskName: "task",
