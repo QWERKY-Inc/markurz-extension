@@ -89,8 +89,9 @@ const Notion = (props: NotionProps) => {
         // }}
         // value={value || undefined}
         //{...rest}
+        openOnFocus
         loading={loading}
-        getOptionLabel={(o) => o.title}
+        getOptionLabel={(o) => o.title || "Unnamed"}
         groupBy={(o) => o.__typename || ""}
         options={
           data
@@ -100,11 +101,18 @@ const Notion = (props: NotionProps) => {
               ]
             : []
         }
+        renderGroup={(params) => (
+          <li key={params.key}>
+            <div>{params.group}</div>
+            <ul>{params.children}</ul>
+          </li>
+        )}
         renderInput={(params) => (
           <TextField
             {...params}
             variant="outlined"
             label="Select Pages or Databases"
+            required
           />
         )}
       />
