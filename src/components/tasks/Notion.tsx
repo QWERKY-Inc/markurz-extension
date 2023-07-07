@@ -51,7 +51,7 @@ const QUERY_NOTION_OBJECTS = graphql(/* GraphQL */ `
 const Notion = (props: NotionProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
   const { register } = useFormContext<CreateNotionPageMutationVariables>();
-  const { data } = useQuery(QUERY_NOTION_OBJECTS, {
+  const { data, loading } = useQuery(QUERY_NOTION_OBJECTS, {
     variables: {
       userModuleId,
     },
@@ -89,6 +89,7 @@ const Notion = (props: NotionProps) => {
         // }}
         // value={value || undefined}
         //{...rest}
+        loading={loading}
         getOptionLabel={(o) => o.title}
         groupBy={(o) => o.__typename || ""}
         options={
