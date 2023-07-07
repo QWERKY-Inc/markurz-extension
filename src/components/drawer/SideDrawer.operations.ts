@@ -57,6 +57,25 @@ export const MUTATION_CREATE_TODOIST_TASK = graphql(/* GraphQL */ `
   }
 `);
 
+export const MUTATION_CREATE_NOTION_PAGE = graphql(/* GraphQL */ `
+  mutation CreateNotionPage(
+    $sourceUrl: String!
+    $userModuleId: ID!
+    $element: CreateNotionPageInput!
+    $sourceText: String!
+  ) {
+    create: createNotionPage(
+      sourceUrl: $sourceUrl
+      userModuleId: $userModuleId
+      element: $element
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
 export const MUTATION_CREATE_TRELLO_CARD = graphql(/* GraphQL */ `
   mutation CreateTrelloCard(
     $sourceUrl: String!
@@ -65,6 +84,25 @@ export const MUTATION_CREATE_TRELLO_CARD = graphql(/* GraphQL */ `
     $sourceText: String!
   ) {
     create: createTrelloCard(
+      sourceUrl: $sourceUrl
+      userModuleId: $userModuleId
+      element: $element
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
+export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
+  mutation CreateEvernoteNote(
+    $sourceUrl: String!
+    $userModuleId: ID!
+    $element: CreateEvernoteNoteInput!
+    $sourceText: String!
+  ) {
+    create: createEvernoteNote(
       sourceUrl: $sourceUrl
       userModuleId: $userModuleId
       element: $element

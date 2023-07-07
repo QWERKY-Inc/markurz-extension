@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery } from "@apollo/client";
 import { Add, Close, Link, PowerOff } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
@@ -52,7 +52,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     url: string;
   } | null>(null);
 
-  const { data, refetch, error } = useQuery(QUERY_MODULES, {
+  const [queryModules, { data, error }] = useLazyQuery(QUERY_MODULES, {
     // This skip should be there but seems to break global refetch
     // skip: !token || !drawerProps.open || tokenLoading,
     variables: {
@@ -69,9 +69,9 @@ const SideDrawer = (props: SideDrawerProps) => {
 
   useEffect(() => {
     if (drawerProps.open && token) {
-      refetch();
+      queryModules();
     }
-  }, [drawerProps.open, refetch, token]);
+  }, [drawerProps.open, token, queryModules]);
 
   useEffect(() => {
     // Reset the result if form gets dirty
@@ -261,7 +261,7 @@ const SideDrawer = (props: SideDrawerProps) => {
               <Tooltip
                 title={
                   result
-                    ? `Task created! Click to check and input additional information in ${result.appName}`
+                    ? `${result.taskName} created! Click to check and input additional information in ${result.appName}`
                     : null
                 }
                 placement="top"
