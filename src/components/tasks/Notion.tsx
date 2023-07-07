@@ -30,6 +30,7 @@ const QUERY_NOTION_OBJECTS = graphql(/* GraphQL */ `
       elements {
         id
         title
+        parentType
       }
     }
     pages: notionObjects(
@@ -43,6 +44,7 @@ const QUERY_NOTION_OBJECTS = graphql(/* GraphQL */ `
       elements {
         id
         title
+        parentType
       }
     }
   }
@@ -50,8 +52,9 @@ const QUERY_NOTION_OBJECTS = graphql(/* GraphQL */ `
 
 const Notion = (props: NotionProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register } = useFormContext<CreateNotionPageMutationVariables>();
-  const { data, loading } = useQuery(QUERY_NOTION_OBJECTS, {
+  const { register, setValue } =
+    useFormContext<CreateNotionPageMutationVariables>();
+  const { data, loading, refetch } = useQuery(QUERY_NOTION_OBJECTS, {
     variables: {
       userModuleId,
     },
@@ -84,15 +87,22 @@ const Notion = (props: NotionProps) => {
         {...register("element.content")}
       />
       <Autocomplete
-        // onChange={(e, data) => {
-        //   onChange(data);
-        // }}
-        // value={value || undefined}
-        //{...rest}
+        onChange={(e, data) => {
+          if (data) {
+            setValue("element.parentId", data.id);
+            setValue("element.parentType", data.parentType);
+          }
+        }}
+        filterOptions={(x) => x}
+        onInputChange={async (event, value) => {
+          await refetch({
+            title: value,
+          });
+        }}
         openOnFocus
         loading={loading}
         getOptionLabel={(o) => o.title || "Unnamed"}
-        groupBy={(o) => o.__typename || ""}
+        groupBy={(o) => o.parentType}
         options={
           data
             ? [
@@ -101,12 +111,6 @@ const Notion = (props: NotionProps) => {
               ]
             : []
         }
-        renderGroup={(params) => (
-          <li key={params.key}>
-            <div>{params.group}</div>
-            <ul>{params.children}</ul>
-          </li>
-        )}
         renderInput={(params) => (
           <TextField
             {...params}
