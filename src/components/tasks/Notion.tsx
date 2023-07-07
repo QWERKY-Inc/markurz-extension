@@ -101,7 +101,7 @@ const Notion = (props: NotionProps) => {
         }}
         openOnFocus
         loading={loading}
-        getOptionLabel={(o) => o.title || "Unnamed"}
+        getOptionLabel={(o) => o.title || "Untitled"}
         groupBy={(o) => o.parentType}
         options={
           data
