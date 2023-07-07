@@ -119,7 +119,7 @@ const Evernote = (props: EvernoteProps) => {
         label="Title"
         required
         inputProps={{
-          maxLength: 500,
+          maxLength: 255,
         }}
         {...register("element.title", {
           required: true,
@@ -130,7 +130,7 @@ const Evernote = (props: EvernoteProps) => {
         label="Content"
         multiline
         inputProps={{
-          maxLength: 255,
+          maxLength: 2000,
         }}
         {...register("element.content")}
       />
