@@ -115,7 +115,8 @@ const Notion = (props: NotionProps) => {
           <TextField
             {...params}
             variant="outlined"
-            label="Search Pages or Databases"
+            label="Page or Database"
+            placeholder="Search pages or databases"
             required
           />
         )}
