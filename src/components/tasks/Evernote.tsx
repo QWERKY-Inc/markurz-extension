@@ -21,7 +21,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateEvernoteNoteArgs } from "src/generated/graphql";
@@ -91,6 +91,26 @@ const QUERY_EVERNOTE_DATA = graphql(/* GraphQL */ `
   }
 `);
 
+class NodeElement {
+  public readonly id: string;
+  public readonly name: string;
+  public readonly children: Array<NodeElement>;
+
+  constructor({
+    id,
+    name,
+    children = [],
+  }: {
+    id: string;
+    name: string;
+    children?: Array<NodeElement>;
+  }) {
+    this.id = id;
+    this.name = name;
+    this.children = children;
+  }
+}
+
 const Evernote = (props: EvernoteProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
   const { data: dataNotebooks, loading } = useQuery(QUERY_EVERNOTE_DATA, {
@@ -108,6 +128,38 @@ const Evernote = (props: EvernoteProps) => {
       )
     : null;
   const [open, setOpen] = useState(false);
+
+  const tree = useMemo(() => {
+    if (!dataNotebooks?.evernoteNotebooks.elements) return [];
+    return dataNotebooks.evernoteNotebooks.elements?.reduce<Array<NodeElement>>(
+      (acc, curr) => {
+        // It has a parent
+        if (curr.stack) {
+          const id = curr.stack;
+          // Checks if there is already a parent inserted
+          const idx = acc.findIndex((o) => o.id === id);
+          // If so, append a child
+          const newNode = new NodeElement({ id: curr.id, name: curr.name });
+          if (idx !== -1) {
+            acc[idx].children?.push(newNode);
+            return acc;
+          }
+          // Else create a new root node
+          return [
+            ...acc,
+            new NodeElement({ id, name: curr.stack, children: [newNode] }),
+          ];
+          // Otherwise insert a new leaf node
+        } else {
+          const id = curr.id;
+          return [...acc, new NodeElement({ id, name: curr.name })];
+        }
+      },
+      []
+    );
+  }, [dataNotebooks?.evernoteNotebooks.elements]);
+
+  console.log("tree", tree);
 
   return (
     <Stack spacing={2} {...stackProps}>
@@ -161,46 +213,43 @@ const Evernote = (props: EvernoteProps) => {
             disablePortal
             PaperComponent={() => (
               <Paper sx={{ px: 1, py: 2 }}>
-                {loading && !dataNotebooks ? (
+                {loading && !dataNotebooks && (
                   <Typography sx={{ paddingLeft: 1 }}>Loading...</Typography>
-                ) : (
-                  <TreeView
-                    defaultCollapseIcon={<ExpandMore />}
-                    defaultExpandIcon={<ChevronRight />}
-                  >
-                    {dataNotebooks?.evernoteNotebooks.elements?.map(
-                      (evernoteNotebook) => (
-                        <StyledTreeItem
-                          labelIcon={
-                            evernoteNotebook.stack
-                              ? ViewAgendaOutlined
-                              : BookOutlined
-                          }
-                          nodeId={evernoteNotebook.id}
-                          labelText={evernoteNotebook.name}
-                          onClick={
-                            !evernoteNotebook.stack
-                              ? () => {
-                                  setValue(
-                                    "element.notebookId",
-                                    evernoteNotebook.id
-                                  );
-                                }
-                              : undefined
-                          }
-                        >
-                          {evernoteNotebook.stack && (
-                            <StyledTreeItem
-                              nodeId={`${evernoteNotebook.id}-${evernoteNotebook.stack}`}
-                              labelText={evernoteNotebook.stack}
-                              labelIcon={BookOutlined}
-                            />
-                          )}
-                        </StyledTreeItem>
-                      )
-                    )}
-                  </TreeView>
                 )}
+                <TreeView
+                  defaultCollapseIcon={<ExpandMore />}
+                  defaultExpandIcon={<ChevronRight />}
+                  sx={{ display: loading && !dataNotebooks ? "none" : "" }}
+                >
+                  {tree?.map((node) => (
+                    <StyledTreeItem
+                      labelIcon={
+                        node.children ? ViewAgendaOutlined : BookOutlined
+                      }
+                      nodeId={node.id}
+                      labelText={node.name}
+                      onClick={
+                        !node.children.length
+                          ? () => {
+                              setValue("element.notebookId", node.id);
+                            }
+                          : undefined
+                      }
+                    >
+                      {node.children?.map((child) => (
+                        <StyledTreeItem
+                          key={child.id}
+                          nodeId={child.id}
+                          labelText={child.name}
+                          labelIcon={BookOutlined}
+                          onClick={() => {
+                            setValue("element.notebookId", child.id);
+                          }}
+                        />
+                      ))}
+                    </StyledTreeItem>
+                  ))}
+                </TreeView>
               </Paper>
             )}
           />
