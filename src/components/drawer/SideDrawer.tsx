@@ -52,20 +52,23 @@ const SideDrawer = (props: SideDrawerProps) => {
     url: string;
   } | null>(null);
 
-  const [queryModules, { data, error }] = useLazyQuery(QUERY_MODULES, {
-    // This skip should be there but seems to break global refetch
-    // skip: !token || !drawerProps.open || tokenLoading,
-    variables: {
-      take: 100,
-      order: [
-        {
-          module: {
-            name: OrderByEnum.Asc,
+  const [queryModules, { data, error, loading: loadingModules }] = useLazyQuery(
+    QUERY_MODULES,
+    {
+      // This skip should be there but seems to break global refetch
+      // skip: !token || !drawerProps.open || tokenLoading,
+      variables: {
+        take: 100,
+        order: [
+          {
+            module: {
+              name: OrderByEnum.Asc,
+            },
           },
-        },
-      ],
-    },
-  });
+        ],
+      },
+    }
+  );
 
   useEffect(() => {
     if (drawerProps.open && token) {
@@ -214,6 +217,7 @@ const SideDrawer = (props: SideDrawerProps) => {
                     Connect More Apps
                   </ListItemText>
                 </MenuItem>
+                {loadingModules && <MenuItem disabled>Loading...</MenuItem>}
                 {data?.userModules?.elements?.map((userModule) => (
                   <MenuItem
                     value={`${userModule.module.type}-${userModule.id}`}

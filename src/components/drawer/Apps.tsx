@@ -2,6 +2,7 @@ import { DocumentNode } from "@apollo/client";
 import React from "react";
 import {
   MUTATION_CREATE_EVERNOTE_NOTE,
+  MUTATION_CREATE_GMAIL_EMAIL,
   MUTATION_CREATE_GOOGLE_TASKS,
   MUTATION_CREATE_JIRA_ISSUE,
   MUTATION_CREATE_NOTION_PAGE,
@@ -9,12 +10,14 @@ import {
   MUTATION_CREATE_TRELLO_CARD,
 } from "src/components/drawer/SideDrawer.operations";
 import EvernoteIcon from "src/components/icons/EvernoteIcon";
+import GmailIcon from "src/components/icons/GmailIcon";
 import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
 import JiraIcon from "src/components/icons/JiraIcon";
 import NotionIcon from "src/components/icons/NotionIcon";
 import TodoistIcon from "src/components/icons/TodoistIcon";
 import TrelloIcon from "src/components/icons/TrelloIcon";
 import Evernote from "src/components/tasks/Evernote";
+import Gmail from "src/components/tasks/Gmail";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
 import Jira from "src/components/tasks/Jira";
 import Notion from "src/components/tasks/Notion";
@@ -42,10 +45,10 @@ export const APPS: {
   },
   [ModuleTypeEnum.Gmail]: {
     name: "Gmail",
-    taskName: "email",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
+    taskName: "Message",
+    icon: <GmailIcon />,
+    Element: Gmail,
+    mutation: MUTATION_CREATE_GMAIL_EMAIL,
   },
   [ModuleTypeEnum.GoogleCalendar]: {
     name: "Google Calendar",

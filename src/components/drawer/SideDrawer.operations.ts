@@ -19,6 +19,27 @@ export const MUTATION_CREATE_GOOGLE_TASKS = graphql(/* GraphQL */ `
   }
 `);
 
+export const MUTATION_CREATE_GMAIL_EMAIL = graphql(/* GraphQL */ `
+  mutation CreateGmailEmail(
+    $element: GmailEmailArgs!
+    $userModuleId: ID!
+    $sourceUrl: String!
+    $sourceText: String!
+    $isDraft: Boolean!
+  ) {
+    create: createGMailEmail(
+      isDraft: $isDraft
+      element: $element
+      userModuleId: $userModuleId
+      sourceUrl: $sourceUrl
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
 export const MUTATION_CREATE_JIRA_ISSUE = graphql(/* GraphQL */ `
   mutation CreateJiraIssue(
     $sourceUrl: String!
