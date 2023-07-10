@@ -54,6 +54,8 @@ jobs:
 
       - name: Publish to Edge store
         uses: hocgin/action-edge-addone-upload@main
+        # Runs even if Chrome Upload failed, but not on cancellation
+        if: '!cancelled()'
         with:
           product_id: ${{ secrets.EDGE_PRODUCT_ID }}
           client_id: ${{ secrets.EDGE_CLIENT_ID }}
