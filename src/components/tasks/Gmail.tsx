@@ -164,16 +164,21 @@ const Gmail = (props: GmailProps) => {
         <InfoOutlined fontSize="small" />
         Create a Message in Gmail
       </Typography>
-      <TextField
-        label="Subject"
-        required
-        inputProps={{
-          maxLength: 500,
-        }}
-        {...register("element.subject", {
-          required: true,
-          value: highlightedText,
-        })}
+      <Controller
+        render={({ field }) => (
+          <TextField
+            label="Subject"
+            required
+            inputProps={{
+              maxLength: 500,
+            }}
+            {...field}
+          />
+        )}
+        name="element.subject"
+        control={control}
+        rules={{ required: true }}
+        defaultValue={highlightedText}
       />
       <TextField
         label="Description"
