@@ -19,6 +19,25 @@ export const MUTATION_CREATE_GOOGLE_TASKS = graphql(/* GraphQL */ `
   }
 `);
 
+export const MUTATION_CREATE_GOOGLE_CALENDAR_EVENT = graphql(/* GraphQL */ `
+  mutation CreateGoogleCalendarEvent(
+    $element: GoogleCalendarEventArgs!
+    $userModuleId: ID!
+    $sourceUrl: String!
+    $sourceText: String!
+  ) {
+    create: createGoogleCalendarEvent(
+      element: $element
+      userModuleId: $userModuleId
+      sourceUrl: $sourceUrl
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
 export const MUTATION_CREATE_GMAIL_EMAIL = graphql(/* GraphQL */ `
   mutation CreateGmailEmail(
     $element: GmailEmailArgs!
