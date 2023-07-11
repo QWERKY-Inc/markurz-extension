@@ -43,7 +43,10 @@ const QUERY_CONTACTS = graphql(/* GraphQL */ `
   }
 `);
 
-const emailReg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+// This regex seems to totally freak out on certain values, commented for now
+// Eg test with 1axcqj738g07pjmsldlaxh731apekrag8tfj7p-test=test.xyz@7660877m.retool.com and it will infinite loop
+// const emailReg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+const emailReg = /^.+@.+(\.\w{1,4})+$/;
 
 const EmailField = (
   props: Omit<
@@ -148,7 +151,7 @@ const EmailField = (
 };
 
 const Gmail = (props: GmailProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId, highlightedText, ...stackProps } = props;
   const { register, control } =
     useFormContext<CreateGmailEmailMutationVariables>();
   const { data, loading, refetch } = useQuery(QUERY_CONTACTS, {
@@ -164,7 +167,7 @@ const Gmail = (props: GmailProps) => {
   register("userModuleId", { value: userModuleId });
 
   return (
-    <Stack spacing={2} {...props}>
+    <Stack spacing={2} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create a Message in Gmail

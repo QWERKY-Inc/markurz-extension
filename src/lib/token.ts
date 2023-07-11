@@ -44,13 +44,20 @@ const useToken = () => {
   };
 
   useEffect(() => {
-    if (chrome.extension) {
-      chrome.runtime.onMessage.addListener(handleMessage);
-      chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
-        globalToken = response.token;
-        setToken(response.token);
-        setLoading(false);
-      });
+    if (!process.env.REACT_APP_SIMULATE_LOCALLY) {
+      if (chrome.extension) {
+        chrome.runtime.onMessage.addListener(handleMessage);
+        chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
+          globalToken = response.token;
+          setToken(response.token);
+          setLoading(false);
+        });
+      }
+    } else {
+      const token = window.localStorage.getItem("token");
+      globalToken = token;
+      setToken(token);
+      setLoading(false);
     }
     return () => {
       chrome.runtime.onMessage.removeListener(handleMessage);

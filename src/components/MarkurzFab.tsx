@@ -6,7 +6,9 @@ import { useTokenShared } from "src/lib/token";
 
 const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
-  const [showFab, setShowFab] = useState(false);
+  const [showFab, setShowFab] = useState(
+    !!process.env.REACT_APP_SIMULATE_LOCALLY
+  );
   const [showDrawer, setShowDrawer] = useState(false);
   const { token } = useTokenShared();
   const winRef = useRef<Window | null>(null);
@@ -100,10 +102,10 @@ const MarkurzFab = () => {
 
   useEffect(() => {
     if (chrome.extension) {
-      chrome.runtime.onMessage.addListener(handleMessage);
+      chrome.runtime?.onMessage.addListener(handleMessage);
     }
     return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage);
+      chrome.runtime?.onMessage.removeListener(handleMessage);
     };
   }, [handleMessage]);
 
