@@ -11,6 +11,14 @@ GQL_SCHEMA_TOKEN=mySecret
 # Should match FE NEXTAUTH_SECRET secret value
 REACT_APP_NEXTAUTH_SECRET=mySecret
 ```
+## Running without building
+It is possible to run the extension without having to build every time. To do so, add the env value
+```dotenv
+REACT_APP_SIMULATE_LOCALLY=1
+```
+Then, run the project with `yarn start`.
+Once done, go to your `Application` tab of your browser and add a `token=<value>` inside the `Local Storage`. Once the 
+page is reloaded with a valid token, you should appear logged in.
 
 ## Installation
 

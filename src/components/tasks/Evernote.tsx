@@ -167,16 +167,21 @@ const Evernote = (props: EvernoteProps) => {
         <InfoOutlined fontSize="small" />
         Create a Note in Evernote
       </Typography>
-      <TextField
-        label="Title"
-        required
-        inputProps={{
-          maxLength: 255,
-        }}
-        {...register("element.title", {
-          required: true,
-          value: highlightedText,
-        })}
+      <Controller
+        render={({ field }) => (
+          <TextField
+            label="Title"
+            required
+            inputProps={{
+              maxLength: 255,
+            }}
+            {...field}
+          />
+        )}
+        name="element.title"
+        control={control}
+        rules={{ required: true }}
+        defaultValue={highlightedText}
       />
       <TextField
         label="Content"

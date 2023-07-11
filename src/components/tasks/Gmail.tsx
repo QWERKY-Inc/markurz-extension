@@ -43,7 +43,10 @@ const QUERY_CONTACTS = graphql(/* GraphQL */ `
   }
 `);
 
-const emailReg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+// This regex seems to totally freak out on certain values, commented for now
+// Eg test with 1axcqj738g07pjmsldlaxh731apekrag8tfj7p-test=test.xyz@7660877m.retool.com and it will infinite loop
+// const emailReg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+const emailReg = /^.+@.+(\.\w{1,4})+$/;
 
 const EmailField = (
   props: Omit<
@@ -72,78 +75,83 @@ const EmailField = (
 
   return (
     <Controller
-      render={({ field: { onChange, value, onBlur, ...rest } }) => (
-        <Autocomplete
-          onBlur={() => {
-            if (inputValue) {
-              if (emailReg.test(inputValue)) {
-                onChange([...((value as string[]) || []), inputValue]);
-                setInputValue("");
+      render={({ field: { onChange, value, onBlur, ...rest } }) => {
+        const val: string[] | undefined = value as string[];
+        return (
+          <Autocomplete
+            onBlur={() => {
+              if (inputValue) {
+                if (emailReg.test(inputValue)) {
+                  if (!val?.length || !val.includes(inputValue)) {
+                    onChange([...(val || []), inputValue]);
+                    setInputValue("");
+                  }
+                } else {
+                  setError(controllerProps.name, {
+                    type: "manual",
+                    message: "Invalid email",
+                  });
+                }
+              }
+            }}
+            freeSolo
+            multiple
+            openOnFocus
+            loading={loading}
+            onChange={(e, data) => {
+              const newValue = data.length ? data[data.length - 1] : "";
+              // If there is no item at all or if the item is a proper email, proceed to add it
+              if (emailReg.test(newValue) || data?.length <= 0) {
+                onChange(data);
+                // Otherwise trigger a form error and set the input field back to its last value
               } else {
                 setError(controllerProps.name, {
                   type: "manual",
                   message: "Invalid email",
                 });
+                setInputValue(newValue);
               }
-            }
-          }}
-          freeSolo
-          multiple
-          loading={loading}
-          onChange={(e, data) => {
-            const newValue = data.length ? data[data.length - 1] : "";
-            if (emailReg.test(newValue)) {
-              onChange(data);
-            } else {
-              setError(controllerProps.name, {
-                type: "manual",
-                message: "Invalid email",
-              });
-              setInputValue(newValue);
-            }
-          }}
-          onInputChange={(e, value) => {
-            if (value) {
-              refetch({
-                query: value,
-              });
-            }
-            setInputValue(value);
-          }}
-          inputValue={inputValue}
-          value={(value as string[]) || undefined}
-          {...rest}
-          options={contacts}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="outlined"
-              label={label}
-              type="email"
-              required={required}
-              helperText={errObjPath?.message}
-              error={!!errObjPath}
-              inputProps={{
-                ...params.inputProps,
-                maxLength: 60,
-                required: required && !(value as string[])?.length,
-              }}
-            />
-          )}
-        />
-      )}
+            }}
+            onInputChange={(e, value) => {
+              if (value) {
+                refetch({
+                  query: value,
+                });
+              }
+              setInputValue(value);
+            }}
+            inputValue={inputValue}
+            value={(value as string[]) || undefined}
+            {...rest}
+            options={contacts}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                label={label}
+                type="email"
+                required={required}
+                helperText={errObjPath?.message}
+                error={!!errObjPath}
+                inputProps={{
+                  ...params.inputProps,
+                  maxLength: 500,
+                  required: required && !(value as string[])?.length,
+                }}
+              />
+            )}
+          />
+        );
+      }}
       control={control}
       defaultValue={[]}
-      rules={{
-        pattern: emailReg,
-      }}
       {...controllerProps}
     />
   );
 };
 
 const Gmail = (props: GmailProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId, highlightedText, ...stackProps } = props;
   const { register, control } =
     useFormContext<CreateGmailEmailMutationVariables>();
   const { data, loading, refetch } = useQuery(QUERY_CONTACTS, {
@@ -159,21 +167,26 @@ const Gmail = (props: GmailProps) => {
   register("userModuleId", { value: userModuleId });
 
   return (
-    <Stack spacing={2} {...props}>
+    <Stack spacing={2} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create a Message in Gmail
       </Typography>
-      <TextField
-        label="Subject"
-        required
-        inputProps={{
-          maxLength: 500,
-        }}
-        {...register("element.subject", {
-          required: true,
-          value: highlightedText,
-        })}
+      <Controller
+        render={({ field }) => (
+          <TextField
+            label="Subject"
+            required
+            inputProps={{
+              maxLength: 500,
+            }}
+            {...field}
+          />
+        )}
+        name="element.subject"
+        control={control}
+        rules={{ required: true }}
+        defaultValue={highlightedText}
       />
       <TextField
         label="Description"
