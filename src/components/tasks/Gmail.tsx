@@ -11,9 +11,15 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useMemo, useState } from "react";
-import { Controller, ControllerProps, useFormContext } from "react-hook-form";
+import {
+  Controller,
+  ControllerProps,
+  FieldError,
+  useFormContext,
+} from "react-hook-form";
 import { graphql } from "src/generated";
 import { CreateGmailEmailMutationVariables } from "src/generated/graphql";
+import { resolveObjectPath } from "src/lib/object";
 
 interface GmailProps extends StackProps {
   userModuleId: string;
@@ -37,6 +43,8 @@ const QUERY_CONTACTS = graphql(/* GraphQL */ `
   }
 `);
 
+const emailReg = /^\w+([.-]?\w+)*@\w+([.-]?\w+)*(\.\w{2,3})+$/;
+
 const EmailField = (
   props: Omit<
     ControllerProps<CreateGmailEmailMutationVariables>,
@@ -49,10 +57,18 @@ const EmailField = (
     required?: boolean;
   }
 ) => {
-  const { control } = useFormContext<CreateGmailEmailMutationVariables>();
+  const {
+    control,
+    formState: { errors },
+    setError,
+  } = useFormContext<CreateGmailEmailMutationVariables>();
   const { loading, contacts, refetch, label, required, ...controllerProps } =
     props;
   const [inputValue, setInputValue] = useState("");
+  const errObjPath = resolveObjectPath<FieldError>(
+    controllerProps.name,
+    errors
+  );
 
   return (
     <Controller
@@ -60,20 +76,38 @@ const EmailField = (
         <Autocomplete
           onBlur={() => {
             if (inputValue) {
-              onChange([...((value as string[]) || []), inputValue]);
-              setInputValue("");
+              if (emailReg.test(inputValue)) {
+                onChange([...((value as string[]) || []), inputValue]);
+                setInputValue("");
+              } else {
+                setError(controllerProps.name, {
+                  type: "manual",
+                  message: "Invalid email",
+                });
+              }
             }
           }}
           freeSolo
           multiple
           loading={loading}
           onChange={(e, data) => {
-            onChange(data);
+            const newValue = data.length ? data[data.length - 1] : "";
+            if (emailReg.test(newValue)) {
+              onChange(data);
+            } else {
+              setError(controllerProps.name, {
+                type: "manual",
+                message: "Invalid email",
+              });
+              setInputValue(newValue);
+            }
           }}
           onInputChange={(e, value) => {
-            refetch({
-              query: value,
-            });
+            if (value) {
+              refetch({
+                query: value,
+              });
+            }
             setInputValue(value);
           }}
           inputValue={inputValue}
@@ -87,6 +121,8 @@ const EmailField = (
               label={label}
               type="email"
               required={required}
+              helperText={errObjPath?.message}
+              error={!!errObjPath}
               inputProps={{
                 ...params.inputProps,
                 maxLength: 60,
@@ -98,6 +134,9 @@ const EmailField = (
       )}
       control={control}
       defaultValue={[]}
+      rules={{
+        pattern: emailReg,
+      }}
       {...controllerProps}
     />
   );
