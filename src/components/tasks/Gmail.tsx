@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useMemo } from "react";
+import React, { useMemo, useState } from "react";
 import { Controller, ControllerProps, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { CreateGmailEmailMutationVariables } from "src/generated/graphql";
@@ -38,7 +38,10 @@ const QUERY_CONTACTS = graphql(/* GraphQL */ `
 `);
 
 const EmailField = (
-  props: Omit<ControllerProps<CreateGmailEmailMutationVariables>, "render"> & {
+  props: Omit<
+    ControllerProps<CreateGmailEmailMutationVariables>,
+    "render" | "control"
+  > & {
     loading: boolean;
     contacts: Array<string>;
     refetch: <T extends Partial<object>>(args: T) => void;
@@ -46,24 +49,34 @@ const EmailField = (
     required?: boolean;
   }
 ) => {
+  const { control } = useFormContext<CreateGmailEmailMutationVariables>();
   const { loading, contacts, refetch, label, required, ...controllerProps } =
     props;
+  const [inputValue, setInputValue] = useState("");
 
   return (
     <Controller
-      render={({ field: { onChange, value, ...rest } }) => (
+      render={({ field: { onChange, value, onBlur, ...rest } }) => (
         <Autocomplete
+          onBlur={() => {
+            if (inputValue) {
+              onChange([...((value as string[]) || []), inputValue]);
+              setInputValue("");
+            }
+          }}
           freeSolo
           multiple
           loading={loading}
           onChange={(e, data) => {
             onChange(data);
           }}
-          onInputChange={(e, value) =>
+          onInputChange={(e, value) => {
             refetch({
               query: value,
-            })
-          }
+            });
+            setInputValue(value);
+          }}
+          inputValue={inputValue}
           value={(value as string[]) || undefined}
           {...rest}
           options={contacts}
@@ -77,11 +90,14 @@ const EmailField = (
               inputProps={{
                 ...params.inputProps,
                 maxLength: 60,
+                required: required && !(value as string[])?.length,
               }}
             />
           )}
         />
       )}
+      control={control}
+      defaultValue={[]}
       {...controllerProps}
     />
   );
@@ -169,7 +185,6 @@ const Gmail = (props: GmailProps) => {
         loading={loading}
         contacts={contacts}
         refetch={refetch}
-        control={control}
         label="To"
         required
       />
@@ -178,7 +193,6 @@ const Gmail = (props: GmailProps) => {
         loading={loading}
         contacts={contacts}
         refetch={refetch}
-        control={control}
         label="Cc"
       />
       <EmailField
@@ -186,7 +200,6 @@ const Gmail = (props: GmailProps) => {
         loading={loading}
         contacts={contacts}
         refetch={refetch}
-        control={control}
         label="Bcc"
       />
     </Stack>
