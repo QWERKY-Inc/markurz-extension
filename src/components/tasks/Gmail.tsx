@@ -72,71 +72,76 @@ const EmailField = (
 
   return (
     <Controller
-      render={({ field: { onChange, value, onBlur, ...rest } }) => (
-        <Autocomplete
-          onBlur={() => {
-            if (inputValue) {
-              if (emailReg.test(inputValue)) {
-                onChange([...((value as string[]) || []), inputValue]);
-                setInputValue("");
+      render={({ field: { onChange, value, onBlur, ...rest } }) => {
+        const val: string[] | undefined = value as string[];
+        return (
+          <Autocomplete
+            onBlur={() => {
+              if (inputValue) {
+                if (emailReg.test(inputValue)) {
+                  if (!val?.length || !val.includes(inputValue)) {
+                    onChange([...(val || []), inputValue]);
+                    setInputValue("");
+                  }
+                } else {
+                  setError(controllerProps.name, {
+                    type: "manual",
+                    message: "Invalid email",
+                  });
+                }
+              }
+            }}
+            freeSolo
+            multiple
+            openOnFocus
+            loading={loading}
+            onChange={(e, data) => {
+              const newValue = data.length ? data[data.length - 1] : "";
+              // If there is no item at all or if the item is a proper email, proceed to add it
+              if (emailReg.test(newValue) || data?.length <= 0) {
+                onChange(data);
+                // Otherwise trigger a form error and set the input field back to its last value
               } else {
                 setError(controllerProps.name, {
                   type: "manual",
                   message: "Invalid email",
                 });
+                setInputValue(newValue);
               }
-            }
-          }}
-          freeSolo
-          multiple
-          loading={loading}
-          onChange={(e, data) => {
-            const newValue = data.length ? data[data.length - 1] : "";
-            if (emailReg.test(newValue)) {
-              onChange(data);
-            } else {
-              setError(controllerProps.name, {
-                type: "manual",
-                message: "Invalid email",
-              });
-              setInputValue(newValue);
-            }
-          }}
-          onInputChange={(e, value) => {
-            if (value) {
-              refetch({
-                query: value,
-              });
-            }
-            setInputValue(value);
-          }}
-          inputValue={inputValue}
-          value={(value as string[]) || undefined}
-          {...rest}
-          options={contacts}
-          renderInput={(params) => (
-            <TextField
-              {...params}
-              variant="outlined"
-              label={label}
-              type="email"
-              required={required}
-              helperText={errObjPath?.message}
-              error={!!errObjPath}
-              inputProps={{
-                ...params.inputProps,
-                maxLength: 60,
-                required: required && !(value as string[])?.length,
-              }}
-            />
-          )}
-        />
-      )}
+            }}
+            onInputChange={(e, value) => {
+              if (value) {
+                refetch({
+                  query: value,
+                });
+              }
+              setInputValue(value);
+            }}
+            inputValue={inputValue}
+            value={(value as string[]) || undefined}
+            {...rest}
+            options={contacts}
+            renderInput={(params) => (
+              <TextField
+                {...params}
+                variant="outlined"
+                label={label}
+                type="email"
+                required={required}
+                helperText={errObjPath?.message}
+                error={!!errObjPath}
+                inputProps={{
+                  ...params.inputProps,
+                  maxLength: 500,
+                  required: required && !(value as string[])?.length,
+                }}
+              />
+            )}
+          />
+        );
+      }}
       control={control}
       defaultValue={[]}
-      rules={{
-        pattern: emailReg,
-      }}
       {...controllerProps}
     />
   );
