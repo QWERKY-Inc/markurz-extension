@@ -7,6 +7,7 @@ import {
   Stack,
   StackProps,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import React, { useMemo } from "react";
@@ -84,7 +85,28 @@ const Gmail = (props: GmailProps) => {
               marginLeft: -10,
             }}
             control={<Checkbox {...field} />}
-            label="Create draft"
+            componentsProps={{
+              typography: {
+                sx: {
+                  display: "flex",
+                  flexDirection: "row",
+                  alignItems: "center",
+                  gap: 1,
+                  flexWrap: "wrap",
+                },
+              },
+            }}
+            label={
+              <>
+                Create as draft
+                <Tooltip
+                  title="Only create a draft, no email will be sent"
+                  placeholder="top"
+                >
+                  <InfoOutlined fontSize="small" />
+                </Tooltip>
+              </>
+            }
           />
         )}
         name="isDraft"
