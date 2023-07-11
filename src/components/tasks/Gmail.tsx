@@ -11,7 +11,7 @@ import {
   Typography,
 } from "@mui/material";
 import React, { useMemo } from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import { Controller, ControllerProps, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { CreateGmailEmailMutationVariables } from "src/generated/graphql";
 
@@ -36,6 +36,56 @@ const QUERY_CONTACTS = graphql(/* GraphQL */ `
     }
   }
 `);
+
+const EmailField = (
+  props: Omit<ControllerProps<CreateGmailEmailMutationVariables>, "render"> & {
+    loading: boolean;
+    contacts: Array<string>;
+    refetch: <T extends Partial<object>>(args: T) => void;
+    label: string;
+    required?: boolean;
+  }
+) => {
+  const { loading, contacts, refetch, label, required, ...controllerProps } =
+    props;
+
+  return (
+    <Controller
+      render={({ field: { onChange, value, ...rest } }) => (
+        <Autocomplete
+          freeSolo
+          multiple
+          loading={loading}
+          onChange={(e, data) => {
+            onChange(data);
+          }}
+          onInputChange={(e, value) =>
+            refetch({
+              query: value,
+            })
+          }
+          value={(value as string[]) || undefined}
+          {...rest}
+          options={contacts}
+          renderInput={(params) => (
+            <TextField
+              {...params}
+              variant="outlined"
+              label={label}
+              type="email"
+              required={required}
+              inputProps={{
+                ...params.inputProps,
+                maxLength: 60,
+              }}
+            />
+          )}
+        />
+      )}
+      {...controllerProps}
+    />
+  );
+};
 
 const Gmail = (props: GmailProps) => {
   const { userModuleId, highlightedText } = props;
@@ -114,106 +164,30 @@ const Gmail = (props: GmailProps) => {
         defaultValue={false}
       />
       <Typography color="text.secondary">Recipients :</Typography>
-      <Controller
-        render={({ field: { onChange, value, onBlur, ...rest } }) => (
-          <Autocomplete
-            freeSolo
-            multiple
-            loading={loading}
-            onChange={(e, data) => {
-              onChange(data);
-            }}
-            onInputChange={(e, value) =>
-              refetch({
-                query: value,
-              })
-            }
-            value={value}
-            {...rest}
-            options={contacts}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                label="To"
-                required
-                inputProps={{
-                  ...params.inputProps,
-                  maxLength: 60,
-                  required: !value?.length,
-                }}
-              />
-            )}
-          />
-        )}
+      <EmailField
         name="element.recipients"
+        loading={loading}
+        contacts={contacts}
+        refetch={refetch}
         control={control}
+        label="To"
+        required
       />
-      <Controller
-        render={({ field: { onChange, value, ...rest } }) => (
-          <Autocomplete
-            freeSolo
-            multiple
-            loading={loading}
-            onChange={(e, data) => {
-              onChange(data);
-            }}
-            onInputChange={(e, value) =>
-              refetch({
-                query: value,
-              })
-            }
-            value={value || undefined}
-            {...rest}
-            options={contacts}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                label="Cc"
-                inputProps={{
-                  ...params.inputProps,
-                  maxLength: 60,
-                }}
-              />
-            )}
-          />
-        )}
+      <EmailField
         name="element.cc"
+        loading={loading}
+        contacts={contacts}
+        refetch={refetch}
         control={control}
+        label="Cc"
       />
-      <Controller
-        render={({ field: { onChange, value, ...rest } }) => (
-          <Autocomplete
-            freeSolo
-            multiple
-            loading={loading}
-            onChange={(e, data) => {
-              onChange(data);
-            }}
-            onInputChange={(e, value) =>
-              refetch({
-                query: value,
-              })
-            }
-            value={value || undefined}
-            {...rest}
-            options={contacts}
-            renderInput={(params) => (
-              <TextField
-                {...params}
-                variant="outlined"
-                label="Bcc"
-                inputProps={{
-                  ...params.inputProps,
-                  maxLength: 60,
-                }}
-              />
-            )}
-          />
-        )}
+      <EmailField
         name="element.bcc"
+        loading={loading}
+        contacts={contacts}
+        refetch={refetch}
         control={control}
+        label="Bcc"
       />
     </Stack>
   );
