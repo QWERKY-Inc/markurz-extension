@@ -17,12 +17,28 @@ import {
   GoogleCalendarReminderEnum,
 } from "src/generated/graphql";
 
+const humanizeDuration = require("humanize-duration");
+
 interface GoogleCalendarProps extends StackProps {
   userModuleId: string;
   highlightedText: string;
 }
 
-const TIME_KEYS = [undefined, 5, 15, 30, 60, 120, 3600, 7200, 0];
+const MINUTE = 60000;
+const HOUR = 3.6e6;
+const DAY = 8.64e7;
+
+const TIME_KEYS = [
+  undefined,
+  5 * MINUTE,
+  15 * MINUTE,
+  30 * MINUTE,
+  HOUR,
+  2 * HOUR,
+  DAY,
+  2 * DAY,
+  0,
+];
 
 const GoogleCalendar = (props: GoogleCalendarProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
@@ -93,11 +109,14 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
       <Controller
         render={({ field }) => (
           <TextField select label="Select Repeat" {...field}>
-            {Object.keys(GoogleCalendarRecurrenceEnum).map((key) => (
-              <MenuItem key={key} value={key}>
-                {key}
-              </MenuItem>
-            ))}
+            <MenuItem value="NEVER">Does not repeat</MenuItem>
+            {Object.entries(GoogleCalendarRecurrenceEnum).map(
+              ([key, value]) => (
+                <MenuItem key={key} value={value}>
+                  {key}
+                </MenuItem>
+              )
+            )}
           </TextField>
         )}
         name="element.recurrences"
@@ -110,14 +129,16 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
             <Controller
               render={({ field }) => (
                 <TextField select label="Notification" fullWidth {...field}>
-                  {Object.keys(GoogleCalendarReminderEnum).map((key) => (
-                    <MenuItem key={key} value={key}>
-                      {key}
-                    </MenuItem>
-                  ))}
+                  {Object.entries(GoogleCalendarReminderEnum).map(
+                    ([key, value]) => (
+                      <MenuItem key={key} value={value}>
+                        {key}
+                      </MenuItem>
+                    )
+                  )}
                 </TextField>
               )}
-              name="element.reminders"
+              name="element.reminders.0.method"
               control={control}
             />
           </Grid>
@@ -126,13 +147,22 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
               render={({ field }) => (
                 <TextField select label="Time" fullWidth {...field}>
                   {TIME_KEYS.map((key) => (
-                    <MenuItem key={key ?? "none"} value={key ?? "none"}>
-                      {key ?? "None"}
+                    <MenuItem
+                      key={key !== undefined ? key : "none"}
+                      value={key !== undefined ? key / MINUTE : "none"}
+                    >
+                      {key !== undefined
+                        ? key === 0
+                          ? "At time of event"
+                          : `${humanizeDuration(key, {
+                              units: ["d", "h", "m"],
+                            })} before`
+                        : "None"}
                     </MenuItem>
                   ))}
                 </TextField>
               )}
-              name="element.reminders"
+              name="element.reminders.0.minutes"
               control={control}
             />
           </Grid>
