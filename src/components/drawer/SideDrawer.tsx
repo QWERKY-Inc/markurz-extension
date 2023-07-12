@@ -25,6 +25,7 @@ import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
 import { QUERY_MODULES } from "src/components/drawer/SideDrawer.operations";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
 import { ModuleTypeEnum, OrderByEnum } from "src/generated/graphql";
+import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
 
 interface SideDrawerProps extends DrawerProps {
@@ -137,7 +138,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         },
       }}
       ModalProps={{
-        container: document.getElementById("markurz-root"),
+        container: document.getElementById(MARKURZ_DIV_NAME),
         style: {
           zIndex: 1201,
         },

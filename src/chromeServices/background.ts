@@ -24,12 +24,12 @@ async function setMessage(token: string | null) {
   });
 }
 
-chrome.cookies.onChanged.addListener((reason) => {
+chrome.cookies.onChanged.addListener(async (reason) => {
   if (
     reason.cookie.domain === process.env.REACT_APP_COOKIE_DOMAIN &&
     reason.cookie.name === process.env.REACT_APP_COOKIE_NAME
   ) {
-    setMessage(reason.removed ? null : reason.cookie.value);
+    await setMessage(reason.removed ? null : reason.cookie.value);
   }
 });
 

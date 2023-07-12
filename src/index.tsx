@@ -6,6 +6,7 @@ import React from "react";
 import ReactDOM from "react-dom/client";
 import { apolloClient } from "src/apollo";
 import ExtensionApp from "src/extension/ExtensionApp";
+import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import App from "./App";
 import theme from "./theme";
 
@@ -53,13 +54,13 @@ if (chrome.cookies) {
   );
   // Inject the plugin only in the content
 } else {
-  const prevApp = document.getElementById("markurz-root");
+  const prevApp = document.getElementById(MARKURZ_DIV_NAME);
   // Make sure we don't have doubloons
   if (prevApp) {
     prevApp.outerHTML = "";
   }
   const app = document.createElement("div");
-  app.id = "markurz-root";
+  app.id = MARKURZ_DIV_NAME;
   app.style.position = "absolute";
   app.style.zIndex = "99999";
   document.documentElement.appendChild(app);
@@ -71,6 +72,7 @@ if (chrome.cookies) {
         <ThemeProvider theme={theme}>
           <LocalizationProvider dateAdapter={AdapterMoment}>
             <ScopedCssBaseline sx={{ backgroundColor: "transparent" }}>
+              {process.env.REACT_APP_SIMULATE_LOCALLY && <ExtensionApp />}
               <App />
             </ScopedCssBaseline>
           </LocalizationProvider>

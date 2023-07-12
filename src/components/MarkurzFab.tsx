@@ -2,7 +2,9 @@ import { Fab } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
+import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
+import StorageChange = chrome.storage.StorageChange;
 
 const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
@@ -12,6 +14,7 @@ const MarkurzFab = () => {
   const [showDrawer, setShowDrawer] = useState(false);
   const { token } = useTokenShared();
   const winRef = useRef<Window | null>(null);
+  const [enabled, setEnabled] = useState(false);
 
   const handleHighlight = useCallback(() => {
     if (showDrawer) return;
@@ -30,7 +33,7 @@ const MarkurzFab = () => {
       const positionLeft = rect.left + scrollLeft + rect.width;
 
       setHighlightedText(selectedText);
-      const rootElement = document.getElementById("markurz-root");
+      const rootElement = document.getElementById(MARKURZ_DIV_NAME);
       if (rootElement) {
         rootElement.style.top = `${positionTop}px`;
         rootElement.style.left = `${positionLeft + 20}px`;
@@ -101,11 +104,26 @@ const MarkurzFab = () => {
   );
 
   useEffect(() => {
+    chrome.storage.local.get(["showFab"], (v) => {
+      const shouldShow = "showFab" in v ? v.showFab : true;
+      setEnabled(shouldShow);
+    });
+  }, []);
+
+  const handleStorageChange = (changes: { [p: string]: StorageChange }) => {
+    if ("showFab" in changes) {
+      setEnabled(changes.showFab.newValue);
+    }
+  };
+
+  useEffect(() => {
     if (chrome.extension) {
       chrome.runtime?.onMessage.addListener(handleMessage);
+      chrome.storage.onChanged.addListener(handleStorageChange);
     }
     return () => {
       chrome.runtime?.onMessage.removeListener(handleMessage);
+      chrome.storage.onChanged.removeListener(handleStorageChange);
     };
   }, [handleMessage]);
 
@@ -120,7 +138,7 @@ const MarkurzFab = () => {
         aria-label="create-task"
         size="small"
         sx={{
-          display: showFab ? "" : "none",
+          display: showFab && enabled ? "" : "none",
         }}
         color="primary"
         onClick={handleFabClick}
