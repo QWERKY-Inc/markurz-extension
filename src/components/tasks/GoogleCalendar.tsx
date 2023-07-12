@@ -31,6 +31,7 @@ const DAY = 8.64e7;
 const TIME_KEYS = [
   undefined,
   5 * MINUTE,
+  10 * MINUTE,
   15 * MINUTE,
   30 * MINUTE,
   HOUR,
@@ -109,7 +110,6 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
       <Controller
         render={({ field }) => (
           <TextField select label="Select Repeat" {...field}>
-            <MenuItem value="NEVER">Does not repeat</MenuItem>
             {Object.entries(GoogleCalendarRecurrenceEnum).map(
               ([key, value]) => (
                 <MenuItem key={key} value={value}>
@@ -121,6 +121,9 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         )}
         name="element.recurrences"
         control={control}
+        // We can safely ignore this type error because GraphQl converts a string into an array on send
+        //@ts-ignore
+        defaultValue={GoogleCalendarRecurrenceEnum.Never}
       />
       <Typography color="text.secondary">Notification :</Typography>
       <Box>
@@ -140,6 +143,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
               )}
               name="element.reminders.0.method"
               control={control}
+              defaultValue={GoogleCalendarReminderEnum.Notification}
             />
           </Grid>
           <Grid xs={12} sm={6}>
@@ -164,6 +168,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
               )}
               name="element.reminders.0.minutes"
               control={control}
+              defaultValue={10}
             />
           </Grid>
         </Grid>
