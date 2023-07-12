@@ -3,6 +3,7 @@ import React from "react";
 import {
   MUTATION_CREATE_EVERNOTE_NOTE,
   MUTATION_CREATE_GMAIL_EMAIL,
+  MUTATION_CREATE_GOOGLE_CALENDAR_EVENT,
   MUTATION_CREATE_GOOGLE_TASKS,
   MUTATION_CREATE_JIRA_ISSUE,
   MUTATION_CREATE_NOTION_PAGE,
@@ -11,6 +12,7 @@ import {
 } from "src/components/drawer/SideDrawer.operations";
 import EvernoteIcon from "src/components/icons/EvernoteIcon";
 import GmailIcon from "src/components/icons/GmailIcon";
+import GoogleCalendarIcon from "src/components/icons/GoogleCalendarIcon";
 import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
 import JiraIcon from "src/components/icons/JiraIcon";
 import NotionIcon from "src/components/icons/NotionIcon";
@@ -18,6 +20,7 @@ import TodoistIcon from "src/components/icons/TodoistIcon";
 import TrelloIcon from "src/components/icons/TrelloIcon";
 import Evernote from "src/components/tasks/Evernote";
 import Gmail from "src/components/tasks/Gmail";
+import GoogleCalendar from "src/components/tasks/GoogleCalendar";
 import GoogleTasks from "src/components/tasks/GoogleTasks";
 import Jira from "src/components/tasks/Jira";
 import Notion from "src/components/tasks/Notion";
@@ -52,10 +55,10 @@ export const APPS: {
   },
   [ModuleTypeEnum.GoogleCalendar]: {
     name: "Google Calendar",
-    taskName: "event",
-    icon: <GoogleTasksIcon />,
-    Element: GoogleTasks,
-    mutation: MUTATION_CREATE_GOOGLE_TASKS,
+    taskName: "Event",
+    icon: <GoogleCalendarIcon />,
+    Element: GoogleCalendar,
+    mutation: MUTATION_CREATE_GOOGLE_CALENDAR_EVENT,
   },
   [ModuleTypeEnum.GoogleTasks]: {
     name: "Google Tasks",
