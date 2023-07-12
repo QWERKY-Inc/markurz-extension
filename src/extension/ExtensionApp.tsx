@@ -57,7 +57,7 @@ const ExtensionApp = () => {
   };
 
   return (
-    <Paper elevation={0} square sx={{ m: -1, minWidth: 216, pb: 0.5 }}>
+    <Paper elevation={0} square sx={{ m: -1, minWidth: 256, pb: 0.5 }}>
       <List dense>
         {token && !error && (
           <>
@@ -129,9 +129,10 @@ const ExtensionApp = () => {
             slotProps={{
               typography: {
                 fontSize: 14,
+                flexGrow: 1,
               },
             }}
-            sx={{ ml: 0.5 }}
+            sx={{ ml: 0.5, width: "100%" }}
           />
         </ListItem>
         {!loading && (
