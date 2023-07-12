@@ -134,16 +134,21 @@ const Trello = (props: TrelloProps) => {
         <InfoOutlined fontSize="small" />
         Create a Card in Trello
       </Typography>
-      <TextField
-        label="Title"
-        required
-        {...register("element.name", {
-          required: true,
-          value: highlightedText,
-        })}
-        inputProps={{
-          maxLength: 500,
-        }}
+      <Controller
+        render={({ field }) => (
+          <TextField
+            label="Title"
+            required
+            inputProps={{
+              maxLength: 500,
+            }}
+            {...field}
+          />
+        )}
+        name="element.name"
+        control={control}
+        rules={{ required: true }}
+        defaultValue={highlightedText}
       />
       <TextField
         label="Description"
