@@ -75,7 +75,6 @@ chrome.runtime.onInstalled.addListener(async function () {
       }
     },
   );
-  chrome.contextMenus.onClicked.addListener(genericOnClick);
 
   const content_scripts = chrome.runtime.getManifest().content_scripts;
   // Reloads all the current scripts in the tabs to avoid any issues after an update
@@ -99,5 +98,7 @@ chrome.runtime.onInstalled.addListener(async function () {
     }
   }
 });
+
+chrome.contextMenus.onClicked.addListener(genericOnClick);
 
 export {};
