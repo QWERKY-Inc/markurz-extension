@@ -38,7 +38,7 @@ const ExtensionApp = () => {
   const [fabEnabled, setFabEnabled] = useState<boolean | undefined>(true);
 
   useEffect(() => {
-    chrome.storage.local.get(["showFab"], (v) => {
+    chrome.storage?.local.get(["showFab"], (v) => {
       const shouldShow = "showFab" in v ? v.showFab : true;
       setFabEnabled(shouldShow);
     });
