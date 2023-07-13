@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
-import { useLocation } from "react-use";
 import { apolloClient } from "src/apollo";
 import { APPS } from "src/components/drawer/Apps";
 import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
@@ -44,7 +43,6 @@ const SideDrawer = (props: SideDrawerProps) => {
     reset,
     formState: { isValid, isDirty },
   } = methods;
-  const { href } = useLocation();
   const { token, loading: tokenLoading } = useTokenShared();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
@@ -93,7 +91,7 @@ const SideDrawer = (props: SideDrawerProps) => {
   }, [highlightedText, reset]);
 
   const submit = async (form: FieldValues) => {
-    form.sourceUrl = href;
+    form.sourceUrl = document.location;
     if (selectedApp) {
       setLoading(true);
       try {
