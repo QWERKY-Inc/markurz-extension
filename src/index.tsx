@@ -39,7 +39,7 @@ import theme from "./theme";
 
 if (chrome.cookies) {
   const root = ReactDOM.createRoot(
-    document.getElementById("root") as HTMLElement
+    document.getElementById("root") as HTMLElement,
   );
   root.render(
     <React.StrictMode>
@@ -50,7 +50,7 @@ if (chrome.cookies) {
           </ScopedCssBaseline>
         </ThemeProvider>
       </ApolloProvider>
-    </React.StrictMode>
+    </React.StrictMode>,
   );
   // Inject the plugin only in the content
 } else {
@@ -78,6 +78,6 @@ if (chrome.cookies) {
           </LocalizationProvider>
         </ThemeProvider>
       </ApolloProvider>
-    </React.StrictMode>
+    </React.StrictMode>,
   );
 }

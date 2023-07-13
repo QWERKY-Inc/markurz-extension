@@ -4,17 +4,18 @@ import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
 import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
-import StorageChange = chrome.storage.StorageChange;
 
 const MarkurzFab = () => {
   const [highlightedText, setHighlightedText] = useState("");
   const [showFab, setShowFab] = useState(
-    !!process.env.REACT_APP_SIMULATE_LOCALLY
+    !!process.env.REACT_APP_SIMULATE_LOCALLY,
   );
   const [showDrawer, setShowDrawer] = useState(false);
   const { token } = useTokenShared();
   const winRef = useRef<Window | null>(null);
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(
+    !!process.env.REACT_APP_SIMULATE_LOCALLY,
+  );
 
   const handleHighlight = useCallback(() => {
     if (showDrawer) return;
@@ -49,7 +50,7 @@ const MarkurzFab = () => {
 
   const handleDrawerClose = (
     event: React.KeyboardEvent | React.MouseEvent,
-    reason: "backdropClick" | "escapeKeyDown"
+    reason: "backdropClick" | "escapeKeyDown",
   ) => {
     if (reason !== "backdropClick") {
       setShowDrawer(false);
@@ -95,22 +96,24 @@ const MarkurzFab = () => {
     (message: any) => {
       if (message.type === "OPEN_DRAWER") {
         setHighlightedText(
-          (prevState) => prevState || message.selectionText || document.title
+          (prevState) => prevState || message.selectionText || document.title,
         );
         handleFabClick();
       }
     },
-    [handleFabClick]
+    [handleFabClick],
   );
 
   useEffect(() => {
-    chrome.storage.local.get(["showFab"], (v) => {
+    chrome.storage?.local.get(["showFab"], (v) => {
       const shouldShow = "showFab" in v ? v.showFab : true;
       setEnabled(shouldShow);
     });
   }, []);
 
-  const handleStorageChange = (changes: { [p: string]: StorageChange }) => {
+  const handleStorageChange = (changes: {
+    [p: string]: chrome.storage.StorageChange;
+  }) => {
     if ("showFab" in changes) {
       setEnabled(changes.showFab.newValue);
     }
@@ -119,11 +122,11 @@ const MarkurzFab = () => {
   useEffect(() => {
     if (chrome.extension) {
       chrome.runtime?.onMessage.addListener(handleMessage);
-      chrome.storage.onChanged.addListener(handleStorageChange);
+      chrome.storage?.onChanged.addListener(handleStorageChange);
     }
     return () => {
       chrome.runtime?.onMessage.removeListener(handleMessage);
-      chrome.storage.onChanged.removeListener(handleStorageChange);
+      chrome.storage?.onChanged.removeListener(handleStorageChange);
     };
   }, [handleMessage]);
 

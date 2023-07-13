@@ -1,16 +1,19 @@
-import { InfoOutlined } from "@mui/icons-material";
+import { Close, InfoOutlined } from "@mui/icons-material";
 import {
-  Box,
+  Button,
+  IconButton,
   MenuItem,
   Stack,
   StackProps,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import React from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import moment from "moment";
+import React, { useEffect } from "react";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import {
   CreateGoogleCalendarEventMutationVariables,
   GoogleCalendarRecurrenceEnum,
@@ -29,7 +32,6 @@ const HOUR = 3.6e6;
 const DAY = 8.64e7;
 
 const TIME_KEYS = [
-  undefined,
   5 * MINUTE,
   10 * MINUTE,
   15 * MINUTE,
@@ -43,9 +45,29 @@ const TIME_KEYS = [
 
 const GoogleCalendar = (props: GoogleCalendarProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control } =
-    useFormContext<CreateGoogleCalendarEventMutationVariables>();
+  const {
+    register,
+    control,
+    formState: { errors },
+    clearErrors,
+  } = useFormContext<CreateGoogleCalendarEventMutationVariables>();
   register("userModuleId", { value: userModuleId });
+  const { append, remove, fields, update } = useFieldArray({
+    control,
+    name: "element.reminders",
+  });
+
+  useEffect(() => {
+    // Registers one default value
+    const value = {
+      minutes: TIME_KEYS[1],
+      method: GoogleCalendarReminderEnum.Notification,
+    };
+    register("element.reminders.0", {
+      value,
+    });
+    update(0, value);
+  }, [register, update]);
 
   return (
     <Stack spacing={3} {...stackProps}>
@@ -83,6 +105,8 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
             slotProps={{
               textField: {
                 required: true,
+                error: !!errors.element?.startDate,
+                helperText: errors.element?.startDate?.message?.toString(),
               },
             }}
             label="Start Date"
@@ -91,6 +115,15 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         )}
         name="element.startDate"
         control={control}
+        defaultValue={moment().add(1, "hour").startOf("hour")}
+        rules={{
+          validate(value, formValues) {
+            clearErrors("element.endDate");
+            return value > formValues.element.endDate
+              ? "The start date must be before the end date"
+              : true;
+          },
+        }}
       />
       <Controller
         render={({ field }) => (
@@ -98,6 +131,8 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
             slotProps={{
               textField: {
                 required: true,
+                error: !!errors.element?.endDate,
+                helperText: errors.element?.endDate?.message?.toString(),
               },
             }}
             label="End Date"
@@ -106,6 +141,18 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         )}
         name="element.endDate"
         control={control}
+        defaultValue={moment()
+          .add(1, "hour")
+          .startOf("hour")
+          .add(15, "minutes")}
+        rules={{
+          validate(value, formValues) {
+            clearErrors("element.startDate");
+            return value < formValues.element.startDate
+              ? "The end date must be after the start date"
+              : true;
+          },
+        }}
       />
       <Controller
         render={({ field }) => (
@@ -115,7 +162,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
                 <MenuItem key={key} value={value}>
                   {key}
                 </MenuItem>
-              )
+              ),
             )}
           </TextField>
         )}
@@ -126,53 +173,73 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         defaultValue={GoogleCalendarRecurrenceEnum.Never}
       />
       <Typography color="text.secondary">Notification :</Typography>
-      <Box>
-        <Grid container spacing={2}>
-          <Grid xs={12} sm={6}>
-            <Controller
-              render={({ field }) => (
-                <TextField select label="Notification" fullWidth {...field}>
-                  {Object.entries(GoogleCalendarReminderEnum).map(
-                    ([key, value]) => (
-                      <MenuItem key={key} value={value}>
-                        {key}
-                      </MenuItem>
-                    )
-                  )}
-                </TextField>
-              )}
-              name="element.reminders.0.method"
-              control={control}
-              defaultValue={GoogleCalendarReminderEnum.Notification}
-            />
-          </Grid>
-          <Grid xs={12} sm={6}>
-            <Controller
-              render={({ field }) => (
-                <TextField select label="Time" fullWidth {...field}>
-                  {TIME_KEYS.map((key) => (
-                    <MenuItem
-                      key={key !== undefined ? key : "none"}
-                      value={key !== undefined ? key / MINUTE : "none"}
-                    >
-                      {key !== undefined
-                        ? key === 0
+      <Stack spacing={2}>
+        {fields.map((item, idx) => (
+          <Stack spacing={1} key={item.id} direction="row">
+            <Grid xs>
+              <Controller
+                render={({ field }) => (
+                  <TextField select label="Notification" fullWidth {...field}>
+                    {Object.entries(GoogleCalendarReminderEnum).map(
+                      ([key, value]) => (
+                        <MenuItem key={key} value={value}>
+                          {key}
+                        </MenuItem>
+                      ),
+                    )}
+                  </TextField>
+                )}
+                name={`element.reminders.${idx}.method`}
+                control={control}
+              />
+            </Grid>
+            <Grid xs>
+              <Controller
+                render={({ field }) => (
+                  <TextField select label="Time" fullWidth {...field}>
+                    {TIME_KEYS.map((key) => (
+                      <MenuItem key={key} value={key}>
+                        {key === 0
                           ? "At time of event"
                           : `${humanizeDuration(key, {
                               units: ["d", "h", "m"],
-                            })} before`
-                        : "None"}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-              name="element.reminders.0.minutes"
-              control={control}
-              defaultValue={10}
-            />
-          </Grid>
-        </Grid>
-      </Box>
+                            })} before`}
+                      </MenuItem>
+                    ))}
+                  </TextField>
+                )}
+                name={`element.reminders.${idx}.minutes`}
+                control={control}
+              />
+            </Grid>
+            <Grid xs="auto">
+              <Tooltip title="Remove notification" placement="top">
+                <IconButton onClick={() => remove(idx)}>
+                  <Close />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </Stack>
+        ))}
+        <div>
+          <Button
+            color="inherit"
+            // Calendar cannot handle more than 5 notifications
+            disabled={fields.length >= 5}
+            onClick={() => {
+              // + 1 because we want to skip the 10 minutes, as it is the default
+              if (fields.length + 1 < TIME_KEYS.length) {
+                append({
+                  method: GoogleCalendarReminderEnum.Notification,
+                  minutes: TIME_KEYS[fields.length + 1] as number,
+                });
+              }
+            }}
+          >
+            Add notification
+          </Button>
+        </div>
+      </Stack>
     </Stack>
   );
 };
