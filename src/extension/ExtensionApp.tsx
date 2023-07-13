@@ -135,22 +135,18 @@ const ExtensionApp = () => {
             sx={{ ml: 0.5, width: "100%" }}
           />
         </ListItem>
-        {!loading && (
-          <>
-            <Divider sx={{ my: 0.25 }} />
-            <Box sx={{ px: 2, py: 1 }}>
-              <Button
-                fullWidth
-                variant="contained"
-                color="primary"
-                size="small"
-                onClick={handleOpenDrawerButtonClick}
-              >
-                Mark this page
-              </Button>
-            </Box>
-          </>
-        )}
+        <Divider sx={{ my: 0.25 }} />
+        <Box sx={{ px: 2, py: 1 }}>
+          <Button
+            fullWidth
+            variant="contained"
+            color="primary"
+            size="small"
+            onClick={handleOpenDrawerButtonClick}
+          >
+            Mark this page
+          </Button>
+        </Box>
       </List>
     </Paper>
   );

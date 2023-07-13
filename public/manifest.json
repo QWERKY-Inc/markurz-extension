@@ -17,7 +17,8 @@
     "cookies",
     "tabs",
     "contextMenus",
-    "storage"
+    "storage",
+    "scripting"
   ],
   "background": {
     "service_worker": "./static/js/background.js"
