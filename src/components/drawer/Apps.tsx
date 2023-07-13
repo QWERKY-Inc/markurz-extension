@@ -29,12 +29,12 @@ import Trello from "src/components/tasks/Trello";
 import { ModuleTypeEnum } from "src/generated/graphql";
 
 export const APPS: {
-  [p in ModuleTypeEnum]: {
+  [p in ModuleTypeEnum]?: {
     name: string;
     taskName: string;
     icon: React.JSX.Element;
     Element: <T extends { userModuleId: string; highlightedText: string }>(
-      props: T
+      props: T,
     ) => React.JSX.Element;
     mutation: DocumentNode;
   };
