@@ -68,7 +68,7 @@ const SideDrawer = (props: SideDrawerProps) => {
           },
         ],
       },
-    }
+    },
   );
 
   useEffect(() => {

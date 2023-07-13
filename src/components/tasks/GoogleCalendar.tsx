@@ -11,6 +11,7 @@ import {
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { DateTimePicker } from "@mui/x-date-pickers";
+import moment from "moment";
 import React, { useEffect } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import {
@@ -44,8 +45,12 @@ const TIME_KEYS = [
 
 const GoogleCalendar = (props: GoogleCalendarProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control } =
-    useFormContext<CreateGoogleCalendarEventMutationVariables>();
+  const {
+    register,
+    control,
+    formState: { errors },
+    clearErrors,
+  } = useFormContext<CreateGoogleCalendarEventMutationVariables>();
   register("userModuleId", { value: userModuleId });
   const { append, remove, fields, update } = useFieldArray({
     control,
@@ -55,7 +60,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
   useEffect(() => {
     // Registers one default value
     const value = {
-      minutes: 10,
+      minutes: TIME_KEYS[1],
       method: GoogleCalendarReminderEnum.Notification,
     };
     register("element.reminders.0", {
@@ -100,6 +105,8 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
             slotProps={{
               textField: {
                 required: true,
+                error: !!errors.element?.startDate,
+                helperText: errors.element?.startDate?.message?.toString(),
               },
             }}
             label="Start Date"
@@ -108,6 +115,15 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         )}
         name="element.startDate"
         control={control}
+        defaultValue={moment().add(1, "hour").startOf("hour")}
+        rules={{
+          validate(value, formValues) {
+            clearErrors("element.endDate");
+            return value > formValues.element.endDate
+              ? "The start date must be before the end date"
+              : true;
+          },
+        }}
       />
       <Controller
         render={({ field }) => (
@@ -115,6 +131,8 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
             slotProps={{
               textField: {
                 required: true,
+                error: !!errors.element?.endDate,
+                helperText: errors.element?.endDate?.message?.toString(),
               },
             }}
             label="End Date"
@@ -123,6 +141,18 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         )}
         name="element.endDate"
         control={control}
+        defaultValue={moment()
+          .add(1, "hour")
+          .startOf("hour")
+          .add(15, "minutes")}
+        rules={{
+          validate(value, formValues) {
+            clearErrors("element.startDate");
+            return value < formValues.element.startDate
+              ? "The end date must be after the start date"
+              : true;
+          },
+        }}
       />
       <Controller
         render={({ field }) => (
@@ -168,17 +198,12 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
                 render={({ field }) => (
                   <TextField select label="Time" fullWidth {...field}>
                     {TIME_KEYS.map((key) => (
-                      <MenuItem
-                        key={key !== undefined ? key : "none"}
-                        value={key !== undefined ? key / MINUTE : "none"}
-                      >
-                        {key !== undefined
-                          ? key === 0
-                            ? "At time of event"
-                            : `${humanizeDuration(key, {
-                                units: ["d", "h", "m"],
-                              })} before`
-                          : "None"}
+                      <MenuItem key={key} value={key}>
+                        {key === 0
+                          ? "At time of event"
+                          : `${humanizeDuration(key, {
+                              units: ["d", "h", "m"],
+                            })} before`}
                       </MenuItem>
                     ))}
                   </TextField>
@@ -199,13 +224,14 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         <div>
           <Button
             color="inherit"
-            disabled={fields.length + 2 >= TIME_KEYS.length}
+            // Calendar cannot handle more than 5 notifications
+            disabled={fields.length >= 5}
             onClick={() => {
-              // + 2 because we want to skip the 10 minutes, as it is the default
-              if (fields.length + 2 < TIME_KEYS.length) {
+              // + 1 because we want to skip the 10 minutes, as it is the default
+              if (fields.length + 1 < TIME_KEYS.length) {
                 append({
                   method: GoogleCalendarReminderEnum.Notification,
-                  minutes: (TIME_KEYS[fields.length + 2] as number) / MINUTE,
+                  minutes: TIME_KEYS[fields.length + 1] as number,
                 });
               }
             }}
