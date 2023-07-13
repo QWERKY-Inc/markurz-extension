@@ -4,6 +4,7 @@ import {
   Box,
   Button,
   Divider,
+  FormControlLabel,
   List,
   ListItem,
   ListItemButton,
@@ -11,8 +12,9 @@ import {
   ListItemText,
   Paper,
   Skeleton,
+  Switch,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { genericOnClick } from "src/chromeServices/contextMenu";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
 import { graphql } from "src/generated";
@@ -33,14 +35,29 @@ const ExtensionApp = () => {
   const { data, loading, error } = useQuery(QUERY_ME, {
     skip: !token,
   });
+  const [fabEnabled, setFabEnabled] = useState<boolean | undefined>(true);
+
+  useEffect(() => {
+    chrome.storage.local.get(["showFab"], (v) => {
+      const shouldShow = "showFab" in v ? v.showFab : true;
+      setFabEnabled(shouldShow);
+    });
+  }, []);
 
   const handleOpenDrawerButtonClick = () => {
     genericOnClick({ menuItemId: 0, editable: false, pageUrl: "" });
     window.close();
   };
 
+  const handleSwitchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const showFab = e.target.checked;
+    chrome.storage.local.set({ showFab }, () => {
+      setFabEnabled(showFab);
+    });
+  };
+
   return (
-    <Paper elevation={0} square sx={{ m: -1, minWidth: 216, pb: 0.5 }}>
+    <Paper elevation={0} square sx={{ m: -1, minWidth: 256, pb: 0.5 }}>
       <List dense>
         {token && !error && (
           <>
@@ -97,6 +114,27 @@ const ExtensionApp = () => {
           </ListItemIcon>
           <ListItemText primary="Extension Guide" />
         </ListItemButton>
+        <Divider />
+        <ListItem>
+          <FormControlLabel
+            control={
+              <Switch
+                onChange={handleSwitchChange}
+                disabled={fabEnabled === undefined}
+                checked={fabEnabled}
+              />
+            }
+            label="Floating Action Button"
+            labelPlacement="start"
+            slotProps={{
+              typography: {
+                fontSize: 14,
+                flexGrow: 1,
+              },
+            }}
+            sx={{ ml: 0.5, width: "100%" }}
+          />
+        </ListItem>
         {!loading && (
           <>
             <Divider sx={{ my: 0.25 }} />
