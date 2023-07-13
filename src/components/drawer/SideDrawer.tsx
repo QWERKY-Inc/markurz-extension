@@ -91,7 +91,7 @@ const SideDrawer = (props: SideDrawerProps) => {
   }, [highlightedText, reset]);
 
   const submit = async (form: FieldValues) => {
-    form.sourceUrl = document.location;
+    form.sourceUrl = document.location.href;
     if (selectedApp) {
       setLoading(true);
       try {
