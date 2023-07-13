@@ -13,7 +13,9 @@ const MarkurzFab = () => {
   const [showDrawer, setShowDrawer] = useState(false);
   const { token } = useTokenShared();
   const winRef = useRef<Window | null>(null);
-  const [enabled, setEnabled] = useState(false);
+  const [enabled, setEnabled] = useState(
+    !!process.env.REACT_APP_SIMULATE_LOCALLY,
+  );
 
   const handleHighlight = useCallback(() => {
     if (showDrawer) return;

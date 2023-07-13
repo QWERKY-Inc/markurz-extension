@@ -1,16 +1,18 @@
-import { InfoOutlined } from "@mui/icons-material";
+import { Close, InfoOutlined } from "@mui/icons-material";
 import {
-  Box,
+  Button,
+  IconButton,
   MenuItem,
   Stack,
   StackProps,
   TextField,
+  Tooltip,
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import React from "react";
-import { Controller, useFormContext } from "react-hook-form";
+import React, { useEffect } from "react";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import {
   CreateGoogleCalendarEventMutationVariables,
   GoogleCalendarRecurrenceEnum,
@@ -29,7 +31,6 @@ const HOUR = 3.6e6;
 const DAY = 8.64e7;
 
 const TIME_KEYS = [
-  undefined,
   5 * MINUTE,
   10 * MINUTE,
   15 * MINUTE,
@@ -46,6 +47,22 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
   const { register, control } =
     useFormContext<CreateGoogleCalendarEventMutationVariables>();
   register("userModuleId", { value: userModuleId });
+  const { append, remove, fields, update } = useFieldArray({
+    control,
+    name: "element.reminders",
+  });
+
+  useEffect(() => {
+    // Registers one default value
+    const value = {
+      minutes: 10,
+      method: GoogleCalendarReminderEnum.Notification,
+    };
+    register("element.reminders.0", {
+      value,
+    });
+    update(0, value);
+  }, [register, update]);
 
   return (
     <Stack spacing={3} {...stackProps}>
@@ -115,7 +132,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
                 <MenuItem key={key} value={value}>
                   {key}
                 </MenuItem>
-              )
+              ),
             )}
           </TextField>
         )}
@@ -126,53 +143,77 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         defaultValue={GoogleCalendarRecurrenceEnum.Never}
       />
       <Typography color="text.secondary">Notification :</Typography>
-      <Box>
-        <Grid container spacing={2}>
-          <Grid xs={12} sm={6}>
-            <Controller
-              render={({ field }) => (
-                <TextField select label="Notification" fullWidth {...field}>
-                  {Object.entries(GoogleCalendarReminderEnum).map(
-                    ([key, value]) => (
-                      <MenuItem key={key} value={value}>
-                        {key}
+      <Stack spacing={2}>
+        {fields.map((item, idx) => (
+          <Stack spacing={1} key={item.id} direction="row">
+            <Grid xs>
+              <Controller
+                render={({ field }) => (
+                  <TextField select label="Notification" fullWidth {...field}>
+                    {Object.entries(GoogleCalendarReminderEnum).map(
+                      ([key, value]) => (
+                        <MenuItem key={key} value={value}>
+                          {key}
+                        </MenuItem>
+                      ),
+                    )}
+                  </TextField>
+                )}
+                name={`element.reminders.${idx}.method`}
+                control={control}
+              />
+            </Grid>
+            <Grid xs>
+              <Controller
+                render={({ field }) => (
+                  <TextField select label="Time" fullWidth {...field}>
+                    {TIME_KEYS.map((key) => (
+                      <MenuItem
+                        key={key !== undefined ? key : "none"}
+                        value={key !== undefined ? key / MINUTE : "none"}
+                      >
+                        {key !== undefined
+                          ? key === 0
+                            ? "At time of event"
+                            : `${humanizeDuration(key, {
+                                units: ["d", "h", "m"],
+                              })} before`
+                          : "None"}
                       </MenuItem>
-                    )
-                  )}
-                </TextField>
-              )}
-              name="element.reminders.0.method"
-              control={control}
-              defaultValue={GoogleCalendarReminderEnum.Notification}
-            />
-          </Grid>
-          <Grid xs={12} sm={6}>
-            <Controller
-              render={({ field }) => (
-                <TextField select label="Time" fullWidth {...field}>
-                  {TIME_KEYS.map((key) => (
-                    <MenuItem
-                      key={key !== undefined ? key : "none"}
-                      value={key !== undefined ? key / MINUTE : "none"}
-                    >
-                      {key !== undefined
-                        ? key === 0
-                          ? "At time of event"
-                          : `${humanizeDuration(key, {
-                              units: ["d", "h", "m"],
-                            })} before`
-                        : "None"}
-                    </MenuItem>
-                  ))}
-                </TextField>
-              )}
-              name="element.reminders.0.minutes"
-              control={control}
-              defaultValue={10}
-            />
-          </Grid>
-        </Grid>
-      </Box>
+                    ))}
+                  </TextField>
+                )}
+                name={`element.reminders.${idx}.minutes`}
+                control={control}
+              />
+            </Grid>
+            <Grid xs="auto">
+              <Tooltip title="Remove notification" placement="top">
+                <IconButton onClick={() => remove(idx)}>
+                  <Close />
+                </IconButton>
+              </Tooltip>
+            </Grid>
+          </Stack>
+        ))}
+        <div>
+          <Button
+            color="inherit"
+            disabled={fields.length + 2 >= TIME_KEYS.length}
+            onClick={() => {
+              // + 2 because we want to skip the 10 minutes, as it is the default
+              if (fields.length + 2 < TIME_KEYS.length) {
+                append({
+                  method: GoogleCalendarReminderEnum.Notification,
+                  minutes: (TIME_KEYS[fields.length + 2] as number) / MINUTE,
+                });
+              }
+            }}
+          >
+            Add notification
+          </Button>
+        </div>
+      </Stack>
     </Stack>
   );
 };
