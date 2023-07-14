@@ -37,23 +37,7 @@ import theme from "./theme";
 //   );
 // }
 
-if (chrome.cookies) {
-  const root = ReactDOM.createRoot(
-    document.getElementById("root") as HTMLElement,
-  );
-  root.render(
-    <React.StrictMode>
-      <ApolloProvider client={apolloClient}>
-        <ThemeProvider theme={theme}>
-          <ScopedCssBaseline>
-            <ExtensionApp />
-          </ScopedCssBaseline>
-        </ThemeProvider>
-      </ApolloProvider>
-    </React.StrictMode>,
-  );
-  // Inject the plugin only in the content
-} else {
+function injectExtension() {
   const prevApp = document.getElementById(MARKURZ_DIV_NAME);
   // Make sure we don't have doubloons
   if (prevApp) {
@@ -80,4 +64,24 @@ if (chrome.cookies) {
       </ApolloProvider>
     </React.StrictMode>,
   );
+}
+
+if (chrome.cookies) {
+  const root = ReactDOM.createRoot(
+    document.getElementById("root") as HTMLElement,
+  );
+  root.render(
+    <React.StrictMode>
+      <ApolloProvider client={apolloClient}>
+        <ThemeProvider theme={theme}>
+          <ScopedCssBaseline>
+            <ExtensionApp />
+          </ScopedCssBaseline>
+        </ThemeProvider>
+      </ApolloProvider>
+    </React.StrictMode>,
+  );
+  // Inject the plugin only in the content
+} else {
+  injectExtension();
 }
