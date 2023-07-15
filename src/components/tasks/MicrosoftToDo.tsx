@@ -1,6 +1,11 @@
 import { useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
+import { Circle, InfoOutlined } from "@mui/icons-material";
 import {
+  Autocomplete,
+  Chip,
+  chipClasses,
+  ListItemIcon,
+  ListItemText,
   MenuItem,
   Stack,
   StackProps,
@@ -126,16 +131,74 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
       <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
       </Typography>
-      <TextField select label="Select Category">
-        {loadingCategories && <MenuItem disabled>Loading...</MenuItem>}
-        {!dataTodoCategories?.microsoftTodoCategories.elements?.length &&
-          !loadingCategories && <MenuItem disabled>No items</MenuItem>}
-        {dataTodoCategories?.microsoftTodoCategories.elements?.map((item) => (
-          <MenuItem key={item.id}>{item.displayName}</MenuItem>
-        ))}
-      </TextField>
       <Controller
-        render={({ field }) => <DateTimePicker label="Due date" {...field} />}
+        render={({ field: { onChange, value, ...rest } }) => (
+          <Autocomplete
+            freeSolo
+            multiple
+            {...rest}
+            loading={loadingCategories}
+            onChange={(e, data) => {
+              onChange(data);
+            }}
+            value={value || undefined}
+            options={
+              dataTodoCategories?.microsoftTodoCategories.elements?.map(
+                (o) => o.displayName,
+              ) ?? []
+            }
+            disableCloseOnSelect
+            openOnFocus
+            autoComplete={false}
+            renderInput={(params) => (
+              <TextField {...params} label="Select Category" />
+            )}
+            renderOption={(props, option, { selected }) => {
+              const icon =
+                dataTodoCategories?.microsoftTodoCategories.elements?.find(
+                  (o) => o.displayName === option,
+                );
+              return (
+                <MenuItem selected={selected} {...props}>
+                  {icon && (
+                    <ListItemIcon>
+                      <Circle sx={{ color: icon.color }} />
+                    </ListItemIcon>
+                  )}
+                  <ListItemText>{option}</ListItemText>
+                </MenuItem>
+              );
+            }}
+            renderTags={(value, getTagProps) =>
+              value.map((option, index) => {
+                const icon =
+                  dataTodoCategories?.microsoftTodoCategories.elements?.find(
+                    (o) => o.displayName === option,
+                  );
+                return (
+                  <Chip
+                    sx={{
+                      [`& > .${chipClasses.icon}`]: {
+                        color: icon?.color,
+                      },
+                    }}
+                    icon={icon ? <Circle /> : undefined}
+                    label={option}
+                    size="small"
+                    {...getTagProps({ index })}
+                  />
+                );
+              })
+            }
+          />
+        )}
+        name="element.categoryNames"
+        control={control}
+      />
+      <Controller
+        render={({ field }) => (
+          <DateTimePicker disablePast label="Due date" {...field} />
+        )}
         name="element.dueDate"
         control={control}
       />
