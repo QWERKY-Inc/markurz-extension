@@ -38,6 +38,25 @@ export const MUTATION_CREATE_GOOGLE_CALENDAR_EVENT = graphql(/* GraphQL */ `
   }
 `);
 
+export const MUTATION_CREATE_MICROSOFT_ONENOTE = graphql(/* GraphQL */ `
+  mutation CreateMicrosoftOneNotePage(
+    $element: CreateMicrosoftOneNotePageInput!
+    $userModuleId: ID!
+    $sourceUrl: String!
+    $sourceText: String!
+  ) {
+    create: createMicrosoftOneNotePage(
+      element: $element
+      userModuleId: $userModuleId
+      sourceUrl: $sourceUrl
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
 export const MUTATION_CREATE_MICROSOFT_TODO = graphql(/* GraphQL */ `
   mutation CreateMicrosoftTodoTask(
     $element: CreateMicrosoftTodoTaskInput!
