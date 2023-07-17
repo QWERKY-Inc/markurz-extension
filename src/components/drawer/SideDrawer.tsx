@@ -18,7 +18,6 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
-import { useLocation } from "react-use";
 import { apolloClient } from "src/apollo";
 import { APPS } from "src/components/drawer/Apps";
 import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
@@ -44,7 +43,6 @@ const SideDrawer = (props: SideDrawerProps) => {
     reset,
     formState: { isValid, isDirty },
   } = methods;
-  const { href } = useLocation();
   const { token, loading: tokenLoading } = useTokenShared();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
@@ -93,20 +91,21 @@ const SideDrawer = (props: SideDrawerProps) => {
   }, [highlightedText, reset]);
 
   const submit = async (form: FieldValues) => {
-    form.sourceUrl = href;
-    if (selectedApp) {
+    form.sourceUrl = document.location.href;
+    const appKey = selectedApp?.split("-")[0] as keyof typeof APPS;
+    const currentApp = APPS[appKey];
+    if (currentApp) {
       setLoading(true);
       try {
-        const appKey = selectedApp.split("-")[0] as keyof typeof APPS;
         const { data: result } = await apolloClient.mutate({
           mutation:
             // Split on dash to get the first part which is the APP key, second part being the account
-            APPS[appKey].mutation,
+            currentApp.mutation,
           variables: form,
         });
         setResult({
-          appName: APPS[appKey].name,
-          taskName: APPS[appKey].taskName,
+          appName: currentApp.name,
+          taskName: currentApp.taskName,
           url: result?.create.outputUrl,
         });
       } catch (e) {
@@ -219,36 +218,42 @@ const SideDrawer = (props: SideDrawerProps) => {
                   </ListItemText>
                 </MenuItem>
                 {loadingModules && <MenuItem disabled>Loading...</MenuItem>}
-                {data?.userModules?.elements?.map((userModule) => (
-                  <MenuItem
-                    value={`${userModule.module.type}-${userModule.id}`}
-                    disabled={!userModule.validKey}
-                    key={userModule.id}
-                  >
-                    <ListItemIcon>
-                      {APPS[userModule.module.type].icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      sx={{ "& > span": { display: "flex", gap: 1 } }}
+                {data?.userModules?.elements?.map((userModule) => {
+                  const currentApp = APPS[userModule.module.type];
+                  if (!currentApp) return null;
+                  return (
+                    <MenuItem
+                      value={`${userModule.module.type}-${userModule.id}`}
+                      disabled={!userModule.validKey}
+                      key={userModule.id}
                     >
-                      {APPS[userModule.module.type].name} ({userModule.email}){" "}
-                      {!userModule.validKey && <PowerOff />}
-                    </ListItemText>
-                  </MenuItem>
-                ))}
+                      <ListItemIcon>{currentApp.icon}</ListItemIcon>
+                      <ListItemText
+                        sx={{ "& > span": { display: "flex", gap: 1 } }}
+                      >
+                        {currentApp.name} ({userModule.email}){" "}
+                        {!userModule.validKey && <PowerOff />}
+                      </ListItemText>
+                    </MenuItem>
+                  );
+                })}
               </TextField>
               <TabContext value={selectedApp}>
-                {data?.userModules?.elements?.map((userModule) => (
-                  <TabPanel
-                    key={userModule.id}
-                    value={`${userModule.module.type}-${userModule.id}`}
-                  >
-                    {React.createElement(APPS[userModule.module.type].Element, {
-                      userModuleId: userModule.id,
-                      highlightedText,
-                    })}
-                  </TabPanel>
-                ))}
+                {data?.userModules?.elements?.map((userModule) => {
+                  const currentApp = APPS[userModule.module.type];
+                  if (!currentApp) return null;
+                  return (
+                    <TabPanel
+                      key={userModule.id}
+                      value={`${userModule.module.type}-${userModule.id}`}
+                    >
+                      {React.createElement(currentApp.Element, {
+                        userModuleId: userModule.id,
+                        highlightedText,
+                      })}
+                    </TabPanel>
+                  );
+                })}
               </TabContext>
             </Stack>
             <Paper
