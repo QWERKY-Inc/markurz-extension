@@ -38,6 +38,25 @@ export const MUTATION_CREATE_GOOGLE_CALENDAR_EVENT = graphql(/* GraphQL */ `
   }
 `);
 
+export const MUTATION_CREATE_MICROSOFT_TODO = graphql(/* GraphQL */ `
+  mutation CreateMicrosoftTodoTask(
+    $element: CreateMicrosoftTodoTaskInput!
+    $userModuleId: ID!
+    $sourceUrl: String!
+    $sourceText: String!
+  ) {
+    create: createMicrosoftTodoTask(
+      element: $element
+      userModuleId: $userModuleId
+      sourceUrl: $sourceUrl
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
 export const MUTATION_CREATE_GMAIL_EMAIL = graphql(/* GraphQL */ `
   mutation CreateGmailEmail(
     $element: GmailEmailArgs!
