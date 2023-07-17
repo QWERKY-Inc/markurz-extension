@@ -1,31 +1,26 @@
 import { useQuery } from "@apollo/client";
-import { Circle, InfoOutlined } from "@mui/icons-material";
+import { InfoOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
-  Chip,
-  chipClasses,
-  ListItemIcon,
-  ListItemText,
   MenuItem,
   Stack,
   StackProps,
   TextField,
   Typography,
 } from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers";
-import React from "react";
+import React, { useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
-import { MutationCreateMicrosoftTodoTaskArgs } from "src/generated/graphql";
+import { CreateMicrosoftOneNotePageMutationVariables } from "src/generated/graphql";
 
-interface MicrosoftToDoProps extends StackProps {
+interface MicrosoftOneNoteProps extends StackProps {
   userModuleId: string;
   highlightedText: string;
 }
 
-const QUERY_MICROSOFT_TODO_TASKS = graphql(/* GraphQL */ `
-  query MicrosoftTodoTaskLists($userModuleId: ID!, $take: Int, $skip: Int) {
-    microsoftTodoTaskLists(
+const QUERY_MICROSOFT_ONENOTE_NOTEBOOKS = graphql(/* GraphQL */ `
+  query MicrosoftOneNoteNotebooks($userModuleId: ID!, $take: Int, $skip: Int) {
+    microsoftOneNoteNotebooks(
       userModuleId: $userModuleId
       take: $take
       skip: $skip
@@ -41,9 +36,15 @@ const QUERY_MICROSOFT_TODO_TASKS = graphql(/* GraphQL */ `
   }
 `);
 
-const QUERY_MICROSOFT_TODO_CATEGORIES = graphql(/* GraphQL */ `
-  query MicrosoftTodoCategories($userModuleId: ID!, $take: Int, $skip: Int) {
-    microsoftTodoCategories(
+const QUERY_MICROSOFT_ONENOTE_SECTIONS = graphql(/* GraphQL */ `
+  query MicrosoftOneNoteSections(
+    $userModuleId: ID!
+    $notebookId: ID!
+    $take: Int
+    $skip: Int
+  ) {
+    microsoftOneNoteSections(
+      notebookId: $notebookId
       userModuleId: $userModuleId
       take: $take
       skip: $skip
@@ -51,7 +52,6 @@ const QUERY_MICROSOFT_TODO_CATEGORIES = graphql(/* GraphQL */ `
       elements {
         id
         displayName
-        color
       }
       meta {
         totalCount
@@ -60,12 +60,13 @@ const QUERY_MICROSOFT_TODO_CATEGORIES = graphql(/* GraphQL */ `
   }
 `);
 
-const MicrosoftOneNote = (props: MicrosoftToDoProps) => {
+const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
   const { register, control } =
-    useFormContext<MutationCreateMicrosoftTodoTaskArgs>();
-  const { data: dataTodoTasks, loading: loadingTasks } = useQuery(
-    QUERY_MICROSOFT_TODO_TASKS,
+    useFormContext<CreateMicrosoftOneNotePageMutationVariables>();
+  const [notebookId, setNotebookId] = useState("");
+  const { data: dataNotebooks, loading: loadingNotebooks } = useQuery(
+    QUERY_MICROSOFT_ONENOTE_NOTEBOOKS,
     {
       variables: {
         userModuleId,
@@ -73,11 +74,13 @@ const MicrosoftOneNote = (props: MicrosoftToDoProps) => {
     },
   );
   const { data: dataTodoCategories, loading: loadingCategories } = useQuery(
-    QUERY_MICROSOFT_TODO_CATEGORIES,
+    QUERY_MICROSOFT_ONENOTE_SECTIONS,
     {
       variables: {
         userModuleId,
+        notebookId,
       },
+      skip: !notebookId,
     },
   );
   register("userModuleId", { value: userModuleId });
@@ -91,7 +94,7 @@ const MicrosoftOneNote = (props: MicrosoftToDoProps) => {
       <Controller
         render={({ field }) => (
           <TextField
-            label="Summary"
+            label="Title"
             required
             inputProps={{
               maxLength: 500,
@@ -112,38 +115,33 @@ const MicrosoftOneNote = (props: MicrosoftToDoProps) => {
           maxLength: 2000,
         }}
       />
-      <Controller
-        render={({ field }) => (
-          <TextField {...field} select label="Select List" required>
-            {loadingTasks && <MenuItem disabled>Loading...</MenuItem>}
-            {!dataTodoTasks?.microsoftTodoTaskLists.elements?.length &&
-              !loadingTasks && <MenuItem disabled>No items</MenuItem>}
-            {dataTodoTasks?.microsoftTodoTaskLists.elements?.map((item) => (
-              <MenuItem key={item.id} value={item.id}>
-                {item.displayName}
-              </MenuItem>
-            ))}
-          </TextField>
-        )}
-        name="element.taskListId"
-        control={control}
-      />
-      <Typography color="text.secondary" sx={{ pt: 2 }}>
-        Additional Information (optional)
-      </Typography>
+      <TextField
+        select
+        label="Select Notebook"
+        required
+        value={notebookId}
+        onChange={(e) => setNotebookId(e.target.value)}
+      >
+        {loadingNotebooks && <MenuItem disabled>Loading...</MenuItem>}
+        {!dataNotebooks?.microsoftOneNoteNotebooks.elements?.length &&
+          !loadingNotebooks && <MenuItem disabled>No items</MenuItem>}
+        {dataNotebooks?.microsoftOneNoteNotebooks.elements?.map((item) => (
+          <MenuItem key={item.id} value={item.id}>
+            {item.displayName}
+          </MenuItem>
+        ))}
+      </TextField>
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
           <Autocomplete
-            freeSolo
-            multiple
             {...rest}
             loading={loadingCategories}
             onChange={(e, data) => {
-              onChange(data);
+              onChange(data as string);
             }}
-            value={value || undefined}
+            value={value}
             options={
-              dataTodoCategories?.microsoftTodoCategories.elements?.map(
+              dataTodoCategories?.microsoftOneNoteSections.elements?.map(
                 (o) => o.displayName,
               ) ?? []
             }
@@ -151,55 +149,11 @@ const MicrosoftOneNote = (props: MicrosoftToDoProps) => {
             openOnFocus
             autoComplete={false}
             renderInput={(params) => (
-              <TextField {...params} label="Select Category" />
+              <TextField {...params} required label="Select Section" />
             )}
-            renderOption={(props, option, { selected }) => {
-              const icon =
-                dataTodoCategories?.microsoftTodoCategories.elements?.find(
-                  (o) => o.displayName === option,
-                );
-              return (
-                <MenuItem selected={selected} {...props}>
-                  {icon && (
-                    <ListItemIcon>
-                      <Circle sx={{ color: icon.color }} />
-                    </ListItemIcon>
-                  )}
-                  <ListItemText>{option}</ListItemText>
-                </MenuItem>
-              );
-            }}
-            renderTags={(value, getTagProps) =>
-              value.map((option, index) => {
-                const icon =
-                  dataTodoCategories?.microsoftTodoCategories.elements?.find(
-                    (o) => o.displayName === option,
-                  );
-                return (
-                  <Chip
-                    sx={{
-                      [`& > .${chipClasses.icon}`]: {
-                        color: icon?.color,
-                      },
-                    }}
-                    icon={icon ? <Circle /> : undefined}
-                    label={option}
-                    size="small"
-                    {...getTagProps({ index })}
-                  />
-                );
-              })
-            }
           />
         )}
-        name="element.categoryNames"
-        control={control}
-      />
-      <Controller
-        render={({ field }) => (
-          <DateTimePicker disablePast label="Due date" {...field} />
-        )}
-        name="element.dueDate"
+        name="element.sectionId"
         control={control}
       />
     </Stack>
