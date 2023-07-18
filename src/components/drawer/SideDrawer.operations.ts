@@ -185,7 +185,7 @@ export const QUERY_MODULES = graphql(/* GraphQL */ `
         limitCount
       }
     }
-    userModules(take: $take, order: $order, where: $where) {
+    userModules: newUserModules(take: $take, order: $order, where: $where) {
       elements {
         id
         email
@@ -194,6 +194,7 @@ export const QUERY_MODULES = graphql(/* GraphQL */ `
           type
         }
         validKey
+        status
       }
       meta {
         totalCount

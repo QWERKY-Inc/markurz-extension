@@ -241,7 +241,12 @@ const SideDrawer = (props: SideDrawerProps) => {
                   return (
                     <MenuItem
                       value={`${userModule.module.type}-${userModule.id}`}
-                      disabled={!userModule.validKey}
+                      disabled={
+                        !(
+                          userModule.validKey &&
+                          userModule.status === UserModuleStatusEnum.Active
+                        )
+                      }
                       key={userModule.id}
                     >
                       <ListItemIcon>{currentApp.icon}</ListItemIcon>

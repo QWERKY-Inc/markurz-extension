@@ -94,7 +94,17 @@ const GoogleTasks = (props: GoogleTasksProps) => {
         Additional Information (optional)
       </Typography>
       <Controller
-        render={({ field }) => <DateTimePicker label="Due date" {...field} />}
+        render={({ field }) => (
+          <DateTimePicker
+            slotProps={{
+              actionBar: {
+                actions: ["clear", "accept"],
+              },
+            }}
+            label="Due date"
+            {...field}
+          />
+        )}
         name="element.due"
         control={control}
       />
