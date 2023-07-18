@@ -1,7 +1,8 @@
-import { useLazyQuery } from "@apollo/client";
+import { ApolloError, useLazyQuery } from "@apollo/client";
 import { Add, Close, Link, PowerOff } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
+  Alert,
   Box,
   Button,
   Drawer,
@@ -55,6 +56,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     taskName: string;
     url: string;
   } | null>(null);
+  const [errorMutation, setErrorMutation] = useState("");
 
   const [queryModules, { data, error, loading: loadingModules }] = useLazyQuery(
     QUERY_MODULES,
@@ -92,12 +94,14 @@ const SideDrawer = (props: SideDrawerProps) => {
     // Reset the result if form gets dirty
     if (isDirty) {
       setResult(null);
+      setErrorMutation("");
     }
   }, [isDirty]);
 
   useEffect(() => {
     // If the selection changes reset the result to be ready to get a new url.
     setResult(null);
+    setErrorMutation("");
     reset({
       sourceText: highlightedText,
     });
@@ -123,6 +127,11 @@ const SideDrawer = (props: SideDrawerProps) => {
         });
       } catch (e) {
         console.error(e);
+        if (e instanceof ApolloError) {
+          setErrorMutation(e.message);
+        } else {
+          setErrorMutation((e as Error).toString());
+        }
       } finally {
         setLoading(false);
         // Suppress the dirty state of the form to allow a re-submit
@@ -138,6 +147,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         sourceText: highlightedText,
       });
       setResult(null);
+      setErrorMutation("");
     }
   };
 
@@ -291,6 +301,11 @@ const SideDrawer = (props: SideDrawerProps) => {
                 zIndex: 1,
               }}
             >
+              {errorMutation && (
+                <Alert severity="error" variant="outlined" sx={{ mb: 2 }}>
+                  {errorMutation}
+                </Alert>
+              )}
               <Tooltip
                 title={
                   result
