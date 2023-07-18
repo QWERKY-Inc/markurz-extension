@@ -111,7 +111,7 @@ const Trello = (props: TrelloProps) => {
 
   const getElementLabel = (value: any) => {
     const elem = trelloLabels?.trelloLabels.elements?.find(
-      (o) => o.id === value
+      (o) => o.id === value,
     );
     if (!elem) return null;
     return (
@@ -211,7 +211,7 @@ const Trello = (props: TrelloProps) => {
                 </MenuItem>
               ))}
             {!trelloBoards?.trelloBoards.elements?.find(
-              (o) => o.id === selectedBoard
+              (o) => o.id === selectedBoard,
             )?.lists?.length && (
               <MenuItem disabled>
                 There are no list available to select
@@ -279,6 +279,9 @@ const Trello = (props: TrelloProps) => {
               textField: {
                 size: "small",
               },
+              actionBar: {
+                actions: ["clear", "accept"],
+              },
             }}
             label="Start date"
             {...field}
@@ -293,6 +296,9 @@ const Trello = (props: TrelloProps) => {
             slotProps={{
               textField: {
                 size: "small",
+              },
+              actionBar: {
+                actions: ["clear", "accept"],
               },
             }}
             label="Due date"
