@@ -187,8 +187,8 @@ const SideDrawer = (props: SideDrawerProps) => {
       {!token || error ? (
         <LoggedOutScreen loading={tokenLoading} />
       ) : data?.usage &&
-        data.usage.createdEvent.limitCount &&
-        data.usage.createdEvent.limitCount < data.usage.createdEvent.count ? (
+        typeof data.usage.createdEvent.limitCount === "number" &&
+        data.usage.createdEvent.limitCount <= data.usage.createdEvent.count ? (
         <Limit />
       ) : (
         <FormProvider {...methods}>
