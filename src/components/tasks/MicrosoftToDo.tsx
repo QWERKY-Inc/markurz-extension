@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers";
+import { DatePicker } from "@mui/x-date-pickers";
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
@@ -91,7 +91,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
       <Controller
         render={({ field }) => (
           <TextField
-            label="Summary"
+            label="Title"
             required
             inputProps={{
               maxLength: 500,
@@ -197,7 +197,16 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
       />
       <Controller
         render={({ field }) => (
-          <DateTimePicker disablePast label="Due date" {...field} />
+          <DatePicker
+            slotProps={{
+              actionBar: {
+                actions: ["clear", "accept"],
+              },
+            }}
+            disablePast
+            label="Due date"
+            {...field}
+          />
         )}
         name="element.dueDate"
         control={control}
