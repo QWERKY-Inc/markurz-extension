@@ -1,8 +1,10 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { Circle, InfoOutlined } from "@mui/icons-material";
+import { Circle, Close, InfoOutlined } from "@mui/icons-material";
 import {
   Box,
   Chip,
+  IconButton,
+  InputAdornment,
   ListItemText,
   MenuItem,
   Stack,
@@ -231,6 +233,22 @@ const Trello = (props: TrelloProps) => {
             {...rest}
             label="Select Labels"
             disabled={!selectedBoard}
+            InputProps={{
+              endAdornment: value?.length ? (
+                <InputAdornment position="start">
+                  <IconButton
+                    size="small"
+                    aria-label="clear field"
+                    onClick={() => onChange([])}
+                    edge="start"
+                    disabled={!selectedBoard}
+                    sx={{ marginRight: 1 }}
+                  >
+                    <Close />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            }}
             SelectProps={{
               renderValue: (selected: any) => (
                 <Box
