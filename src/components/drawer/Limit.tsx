@@ -14,14 +14,21 @@ const Limit = () => {
       <Typography variant="h5" align="center">
         You’ve Reached Monthly Limit
       </Typography>
-      <NotFoundIcon color="warning" width={120} height={120} />
+      <NotFoundIcon color="warning" sx={{ width: 120, height: 120 }} />
       <Typography variant="subtitle2" align="center">
         You have reached monthly limit of 30 Mark Sends. If you would like to
         send unlimited tasks, reminders and notes, subscribe to Markurz Plus
         Plan.
       </Typography>
       <div>
-        <Button variant="contained">upgrade</Button>
+        <Button
+          href={`${process.env.REACT_APP_LOGIN_URL}/settings?tab=%2Fbilling-and-plans`}
+          variant="contained"
+          target="_blank"
+          rel="noopener"
+        >
+          Upgrade
+        </Button>
       </div>
     </Stack>
   );
