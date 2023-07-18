@@ -20,10 +20,15 @@ import React, { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { apolloClient } from "src/apollo";
 import { APPS } from "src/components/drawer/Apps";
+import Limit from "src/components/drawer/Limit";
 import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
 import { QUERY_MODULES } from "src/components/drawer/SideDrawer.operations";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import { ModuleTypeEnum, OrderByEnum } from "src/generated/graphql";
+import {
+  ModuleTypeEnum,
+  OrderByEnum,
+  UserModuleStatusEnum,
+} from "src/generated/graphql";
 import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
 
@@ -65,6 +70,14 @@ const SideDrawer = (props: SideDrawerProps) => {
             },
           },
         ],
+        where: {
+          status: {
+            in: [
+              UserModuleStatusEnum.Active,
+              UserModuleStatusEnum.TemporaryDisabled,
+            ],
+          },
+        },
       },
     },
   );
@@ -162,6 +175,10 @@ const SideDrawer = (props: SideDrawerProps) => {
       </Stack>
       {!token || error ? (
         <LoggedOutScreen loading={tokenLoading} />
+      ) : data?.usage &&
+        data.usage.createdEvent.limitCount &&
+        data.usage.createdEvent.limitCount < data.usage.createdEvent.count ? (
+        <Limit />
       ) : (
         <FormProvider {...methods}>
           <form

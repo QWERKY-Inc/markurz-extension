@@ -174,8 +174,18 @@ export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
 `);
 
 export const QUERY_MODULES = graphql(/* GraphQL */ `
-  query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
-    userModules(take: $take, order: $order) {
+  query UserModules(
+    $take: Int
+    $order: [UserModuleOrderBy!]
+    $where: UserModuleWhere
+  ) {
+    usage {
+      createdEvent {
+        count
+        limitCount
+      }
+    }
+    userModules(take: $take, order: $order, where: $where) {
       elements {
         id
         email
