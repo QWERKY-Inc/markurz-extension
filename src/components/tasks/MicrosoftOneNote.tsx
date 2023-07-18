@@ -42,16 +42,18 @@ const QUERY_MICROSOFT_ONENOTE_SECTIONS = graphql(/* GraphQL */ `
     $notebookId: ID!
     $take: Int
     $skip: Int
+    $query: String
   ) {
     microsoftOneNoteSections(
       notebookId: $notebookId
       userModuleId: $userModuleId
       take: $take
       skip: $skip
+      query: $query
     ) {
       elements {
         id
-        displayName
+        label: displayName
       }
       meta {
         totalCount
@@ -62,8 +64,11 @@ const QUERY_MICROSOFT_ONENOTE_SECTIONS = graphql(/* GraphQL */ `
 
 const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control } =
+  const { register, control, setValue } =
     useFormContext<CreateMicrosoftOneNotePageMutationVariables>();
+  const [section, setSection] = useState<null | { id: string; label: string }>(
+    null,
+  );
   const [notebookId, setNotebookId] = useState("");
   const { data: dataNotebooks, loading: loadingNotebooks } = useQuery(
     QUERY_MICROSOFT_ONENOTE_NOTEBOOKS,
@@ -73,16 +78,17 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
       },
     },
   );
-  const { data: dataTodoCategories, loading: loadingCategories } = useQuery(
-    QUERY_MICROSOFT_ONENOTE_SECTIONS,
-    {
-      variables: {
-        userModuleId,
-        notebookId,
-      },
-      skip: !notebookId,
+  const {
+    data: dataTodoSections,
+    loading: loadingSections,
+    refetch,
+  } = useQuery(QUERY_MICROSOFT_ONENOTE_SECTIONS, {
+    variables: {
+      userModuleId,
+      notebookId,
     },
-  );
+    skip: !notebookId,
+  });
   register("userModuleId", { value: userModuleId });
 
   return (
@@ -131,30 +137,25 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
           </MenuItem>
         ))}
       </TextField>
-      <Controller
-        render={({ field: { onChange, value, ...rest } }) => (
-          <Autocomplete
-            {...rest}
-            loading={loadingCategories}
-            onChange={(e, data) => {
-              onChange(data as string);
-            }}
-            value={value}
-            options={
-              dataTodoCategories?.microsoftOneNoteSections.elements?.map(
-                (o) => o.displayName,
-              ) ?? []
-            }
-            disableCloseOnSelect
-            openOnFocus
-            autoComplete={false}
-            renderInput={(params) => (
-              <TextField {...params} required label="Select Section" />
-            )}
-          />
+      <Autocomplete
+        disabled={!notebookId}
+        loading={loadingSections}
+        onChange={(e, data) => {
+          setSection(data);
+          setValue("element.sectionId", data?.id || "");
+        }}
+        onInputChange={async (event, value) => {
+          await refetch({
+            query: value,
+          });
+        }}
+        value={section}
+        options={dataTodoSections?.microsoftOneNoteSections.elements ?? []}
+        openOnFocus
+        autoComplete={false}
+        renderInput={(params) => (
+          <TextField {...params} required label="Select Section" />
         )}
-        name="element.sectionId"
-        control={control}
       />
     </Stack>
   );
