@@ -94,7 +94,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
             label="Title"
             required
             inputProps={{
-              maxLength: 500,
+              maxLength: 255,
             }}
             {...field}
           />
