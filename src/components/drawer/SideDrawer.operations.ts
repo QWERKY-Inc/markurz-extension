@@ -175,6 +175,12 @@ export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
 
 export const QUERY_MODULES = graphql(/* GraphQL */ `
   query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
+    usage {
+      createdEvent {
+        count
+        limitCount
+      }
+    }
     userModules(take: $take, order: $order) {
       elements {
         id
