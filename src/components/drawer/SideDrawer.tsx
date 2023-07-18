@@ -24,7 +24,11 @@ import Limit from "src/components/drawer/Limit";
 import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
 import { QUERY_MODULES } from "src/components/drawer/SideDrawer.operations";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import { ModuleTypeEnum, OrderByEnum } from "src/generated/graphql";
+import {
+  ModuleTypeEnum,
+  OrderByEnum,
+  UserModuleStatusEnum,
+} from "src/generated/graphql";
 import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
 
@@ -66,6 +70,14 @@ const SideDrawer = (props: SideDrawerProps) => {
             },
           },
         ],
+        where: {
+          status: {
+            in: [
+              UserModuleStatusEnum.Active,
+              UserModuleStatusEnum.TemporaryDisabled,
+            ],
+          },
+        },
       },
     },
   );
