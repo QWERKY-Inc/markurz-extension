@@ -137,6 +137,7 @@ const SideDrawer = (props: SideDrawerProps) => {
       reset({
         sourceText: highlightedText,
       });
+      setResult(null);
     }
   };
 
