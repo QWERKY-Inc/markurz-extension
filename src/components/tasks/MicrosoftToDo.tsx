@@ -105,7 +105,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
         defaultValue={highlightedText}
       />
       <TextField
-        label="Description"
+        label="Note"
         multiline
         {...register("element.content")}
         inputProps={{
