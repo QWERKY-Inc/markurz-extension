@@ -23,7 +23,11 @@ import { APPS } from "src/components/drawer/Apps";
 import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
 import { QUERY_MODULES } from "src/components/drawer/SideDrawer.operations";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import { ModuleTypeEnum, OrderByEnum } from "src/generated/graphql";
+import {
+  ModuleTypeEnum,
+  OrderByEnum,
+  UserModuleStatusEnum,
+} from "src/generated/graphql";
 import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
 
@@ -224,7 +228,12 @@ const SideDrawer = (props: SideDrawerProps) => {
                   return (
                     <MenuItem
                       value={`${userModule.module.type}-${userModule.id}`}
-                      disabled={!userModule.validKey}
+                      disabled={
+                        !(
+                          userModule.validKey &&
+                          userModule.status === UserModuleStatusEnum.Active
+                        )
+                      }
                       key={userModule.id}
                     >
                       <ListItemIcon>{currentApp.icon}</ListItemIcon>

@@ -175,7 +175,7 @@ export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
 
 export const QUERY_MODULES = graphql(/* GraphQL */ `
   query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
-    userModules(take: $take, order: $order) {
+    userModules: newUserModules(take: $take, order: $order) {
       elements {
         id
         email
@@ -184,6 +184,7 @@ export const QUERY_MODULES = graphql(/* GraphQL */ `
           type
         }
         validKey
+        status
       }
       meta {
         totalCount
