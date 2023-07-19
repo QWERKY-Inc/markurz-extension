@@ -26,6 +26,9 @@ const Limit = () => {
           variant="contained"
           target="_blank"
           rel="noopener"
+          sx={{
+            color: "text.contrast",
+          }}
         >
           Upgrade
         </Button>
