@@ -27,10 +27,11 @@ const Limit = () => {
           target="_blank"
           rel="noopener"
           sx={{
-            color: "text.contrast",
+            color: (t) => `${t.palette.primary.contrastText} !important`,
+            textDecoration: "none",
           }}
         >
-          Upgrade
+          Update plan
         </Button>
       </div>
     </Stack>

@@ -177,6 +177,10 @@ const SideDrawer = (props: SideDrawerProps) => {
           href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}
           rel="noopener"
           target="_blank"
+          sx={{
+            color: (t) => `${t.palette.primary.main} !important`,
+            textDecoration: "none",
+          }}
         >
           Dashboard
         </Button>
