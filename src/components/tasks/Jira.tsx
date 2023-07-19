@@ -77,16 +77,21 @@ const Jira = (props: JiraProps) => {
         <InfoOutlined fontSize="small" />
         Create an issue in Jira
       </Typography>
-      <TextField
-        label="Summary"
-        required
-        {...register("element.summary", {
-          required: true,
-          value: highlightedText,
-        })}
-        inputProps={{
-          maxLength: 500,
-        }}
+      <Controller
+        render={({ field }) => (
+          <TextField
+            label="Summary"
+            required
+            inputProps={{
+              maxLength: 500,
+            }}
+            {...field}
+          />
+        )}
+        name="element.summary"
+        control={control}
+        rules={{ required: true }}
+        defaultValue={highlightedText}
       />
       <TextField
         label="Description"

@@ -66,16 +66,21 @@ const Todoist = (props: TodoistProps) => {
         <InfoOutlined fontSize="small" />
         Create a Task in Todoist
       </Typography>
-      <TextField
-        label="Title"
-        required
-        {...register("element.title", {
-          required: true,
-          value: highlightedText,
-        })}
-        inputProps={{
-          maxLength: 500,
-        }}
+      <Controller
+        render={({ field }) => (
+          <TextField
+            label="Title"
+            required
+            inputProps={{
+              maxLength: 500,
+            }}
+            {...field}
+          />
+        )}
+        name="element.title"
+        control={control}
+        rules={{ required: true }}
+        defaultValue={highlightedText}
       />
       <TextField
         label="Description"
@@ -146,7 +151,17 @@ const Todoist = (props: TodoistProps) => {
         Additional Information (optional)
       </Typography>
       <Controller
-        render={({ field }) => <DateTimePicker label="Due date" {...field} />}
+        render={({ field }) => (
+          <DateTimePicker
+            slotProps={{
+              actionBar: {
+                actions: ["clear", "accept"],
+              },
+            }}
+            label="Due date"
+            {...field}
+          />
+        )}
         name="element.due"
         control={control}
       />

@@ -1,8 +1,10 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { Circle, InfoOutlined } from "@mui/icons-material";
+import { Circle, Close, InfoOutlined } from "@mui/icons-material";
 import {
   Box,
   Chip,
+  IconButton,
+  InputAdornment,
   ListItemText,
   MenuItem,
   Stack,
@@ -111,7 +113,7 @@ const Trello = (props: TrelloProps) => {
 
   const getElementLabel = (value: any) => {
     const elem = trelloLabels?.trelloLabels.elements?.find(
-      (o) => o.id === value
+      (o) => o.id === value,
     );
     if (!elem) return null;
     return (
@@ -134,16 +136,21 @@ const Trello = (props: TrelloProps) => {
         <InfoOutlined fontSize="small" />
         Create a Card in Trello
       </Typography>
-      <TextField
-        label="Title"
-        required
-        {...register("element.name", {
-          required: true,
-          value: highlightedText,
-        })}
-        inputProps={{
-          maxLength: 500,
-        }}
+      <Controller
+        render={({ field }) => (
+          <TextField
+            label="Title"
+            required
+            inputProps={{
+              maxLength: 500,
+            }}
+            {...field}
+          />
+        )}
+        name="element.name"
+        control={control}
+        rules={{ required: true }}
+        defaultValue={highlightedText}
       />
       <TextField
         label="Description"
@@ -206,7 +213,7 @@ const Trello = (props: TrelloProps) => {
                 </MenuItem>
               ))}
             {!trelloBoards?.trelloBoards.elements?.find(
-              (o) => o.id === selectedBoard
+              (o) => o.id === selectedBoard,
             )?.lists?.length && (
               <MenuItem disabled>
                 There are no list available to select
@@ -226,6 +233,22 @@ const Trello = (props: TrelloProps) => {
             {...rest}
             label="Select Labels"
             disabled={!selectedBoard}
+            InputProps={{
+              endAdornment: value?.length ? (
+                <InputAdornment position="start">
+                  <IconButton
+                    size="small"
+                    aria-label="clear field"
+                    onClick={() => onChange([])}
+                    edge="start"
+                    disabled={!selectedBoard}
+                    sx={{ marginRight: 1 }}
+                  >
+                    <Close />
+                  </IconButton>
+                </InputAdornment>
+              ) : null,
+            }}
             SelectProps={{
               renderValue: (selected: any) => (
                 <Box
@@ -274,6 +297,9 @@ const Trello = (props: TrelloProps) => {
               textField: {
                 size: "small",
               },
+              actionBar: {
+                actions: ["clear", "accept"],
+              },
             }}
             label="Start date"
             {...field}
@@ -288,6 +314,9 @@ const Trello = (props: TrelloProps) => {
             slotProps={{
               textField: {
                 size: "small",
+              },
+              actionBar: {
+                actions: ["clear", "accept"],
               },
             }}
             label="Due date"

@@ -1,35 +1,39 @@
 import { decode } from "next-auth/jwt";
 import { genericOnClick } from "src/chromeServices/contextMenu";
 
-async function setMessage(token: string | null) {
-  const decoded = token
-    ? ((await decode({
-        token,
-        secret: process.env.REACT_APP_NEXTAUTH_SECRET as string,
-      })) as { user: { accessToken: string } })
-    : undefined;
+function broadcastMessageToAllTabs(message: object) {
   chrome.tabs.query({ status: "complete" }, (tabs) => {
     tabs.forEach((tab) => {
       if (tab.id) {
         chrome.tabs
-          .sendMessage(tab.id, { token: decoded?.user?.accessToken || null })
+          .sendMessage(tab.id, message)
           .catch((e) =>
             console.error(
               `Could not send message to the tab [${tab.id}/${tab.title}]`,
-              e
-            )
+              e,
+            ),
           );
       }
     });
   });
 }
 
-chrome.cookies.onChanged.addListener((reason) => {
+async function setToken(token: string | null) {
+  const decoded = token
+    ? ((await decode({
+        token,
+        secret: process.env.REACT_APP_NEXTAUTH_SECRET as string,
+      })) as { user: { accessToken: string } })
+    : undefined;
+  broadcastMessageToAllTabs({ token: decoded?.user?.accessToken || null });
+}
+
+chrome.cookies.onChanged.addListener(async (reason) => {
   if (
     reason.cookie.domain === process.env.REACT_APP_COOKIE_DOMAIN &&
     reason.cookie.name === process.env.REACT_APP_COOKIE_NAME
   ) {
-    setMessage(reason.removed ? null : reason.cookie.value);
+    await setToken(reason.removed ? null : reason.cookie.value);
   }
 });
 
@@ -56,9 +60,7 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   return true;
 });
 
-chrome.contextMenus.onClicked.addListener(genericOnClick);
-
-chrome.runtime.onInstalled.addListener(function () {
+chrome.runtime.onInstalled.addListener(async function () {
   chrome.contextMenus.create(
     {
       title: "Mark with Markurz",
@@ -68,11 +70,35 @@ chrome.runtime.onInstalled.addListener(function () {
     function () {
       if (chrome.runtime.lastError) {
         console.error(
-          "Context menu error: " + chrome.runtime.lastError.message
+          "Context menu error: " + chrome.runtime.lastError.message,
         );
       }
-    }
+    },
   );
+
+  const content_scripts = chrome.runtime.getManifest().content_scripts;
+  // Reloads all the current scripts in the tabs to avoid any issues after an update
+  if (content_scripts) {
+    for (const cs of content_scripts) {
+      for (const tab of await chrome.tabs.query({ url: cs.matches })) {
+        if (tab.id !== undefined) {
+          chrome.scripting
+            .executeScript({
+              target: { tabId: tab.id },
+              files: cs.js || [],
+            })
+            .catch((e) =>
+              console.error(
+                `Failed to reload scripts for tab [${tab.id}/${tab.title}]`,
+                e,
+              ),
+            );
+        }
+      }
+    }
+  }
 });
+
+chrome.contextMenus.onClicked.addListener(genericOnClick);
 
 export {};

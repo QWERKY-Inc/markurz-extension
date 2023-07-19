@@ -19,6 +19,84 @@ export const MUTATION_CREATE_GOOGLE_TASKS = graphql(/* GraphQL */ `
   }
 `);
 
+export const MUTATION_CREATE_GOOGLE_CALENDAR_EVENT = graphql(/* GraphQL */ `
+  mutation CreateGoogleCalendarEvent(
+    $element: GoogleCalendarEventArgs!
+    $userModuleId: ID!
+    $sourceUrl: String!
+    $sourceText: String!
+  ) {
+    create: createGoogleCalendarEvent(
+      element: $element
+      userModuleId: $userModuleId
+      sourceUrl: $sourceUrl
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
+export const MUTATION_CREATE_MICROSOFT_ONENOTE = graphql(/* GraphQL */ `
+  mutation CreateMicrosoftOneNotePage(
+    $element: CreateMicrosoftOneNotePageInput!
+    $userModuleId: ID!
+    $sourceUrl: String!
+    $sourceText: String!
+  ) {
+    create: createMicrosoftOneNotePage(
+      element: $element
+      userModuleId: $userModuleId
+      sourceUrl: $sourceUrl
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
+export const MUTATION_CREATE_MICROSOFT_TODO = graphql(/* GraphQL */ `
+  mutation CreateMicrosoftTodoTask(
+    $element: CreateMicrosoftTodoTaskInput!
+    $userModuleId: ID!
+    $sourceUrl: String!
+    $sourceText: String!
+  ) {
+    create: createMicrosoftTodoTask(
+      element: $element
+      userModuleId: $userModuleId
+      sourceUrl: $sourceUrl
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
+export const MUTATION_CREATE_GMAIL_EMAIL = graphql(/* GraphQL */ `
+  mutation CreateGmailEmail(
+    $element: GmailEmailArgs!
+    $userModuleId: ID!
+    $sourceUrl: String!
+    $sourceText: String!
+    $isDraft: Boolean!
+  ) {
+    create: createGMailEmail(
+      isDraft: $isDraft
+      element: $element
+      userModuleId: $userModuleId
+      sourceUrl: $sourceUrl
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
 export const MUTATION_CREATE_JIRA_ISSUE = graphql(/* GraphQL */ `
   mutation CreateJiraIssue(
     $sourceUrl: String!
@@ -115,8 +193,18 @@ export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
 `);
 
 export const QUERY_MODULES = graphql(/* GraphQL */ `
-  query UserModules($take: Int, $order: [UserModuleOrderBy!]) {
-    userModules(take: $take, order: $order) {
+  query UserModules(
+    $take: Int
+    $order: [UserModuleOrderBy!]
+    $where: UserModuleWhere
+  ) {
+    usage {
+      createdEvent {
+        count
+        limitCount
+      }
+    }
+    userModules: newUserModules(take: $take, order: $order, where: $where) {
       elements {
         id
         email
@@ -125,6 +213,7 @@ export const QUERY_MODULES = graphql(/* GraphQL */ `
           type
         }
         validKey
+        status
       }
       meta {
         totalCount

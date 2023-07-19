@@ -49,16 +49,21 @@ const GoogleTasks = (props: GoogleTasksProps) => {
         <InfoOutlined fontSize="small" />
         Create a Task in Google Tasks
       </Typography>
-      <TextField
-        label="Title"
-        required
-        inputProps={{
-          maxLength: 500,
-        }}
-        {...register("element.title", {
-          required: true,
-          value: highlightedText,
-        })}
+      <Controller
+        render={({ field }) => (
+          <TextField
+            label="Title"
+            required
+            inputProps={{
+              maxLength: 500,
+            }}
+            {...field}
+          />
+        )}
+        name="element.title"
+        control={control}
+        rules={{ required: true }}
+        defaultValue={highlightedText}
       />
       <TextField
         label="Details"
@@ -89,7 +94,17 @@ const GoogleTasks = (props: GoogleTasksProps) => {
         Additional Information (optional)
       </Typography>
       <Controller
-        render={({ field }) => <DateTimePicker label="Due date" {...field} />}
+        render={({ field }) => (
+          <DateTimePicker
+            slotProps={{
+              actionBar: {
+                actions: ["clear", "accept"],
+              },
+            }}
+            label="Due date"
+            {...field}
+          />
+        )}
         name="element.due"
         control={control}
       />

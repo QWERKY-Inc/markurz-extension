@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import React from "react";
-import { useFormContext } from "react-hook-form";
+import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { CreateNotionPageMutationVariables } from "src/generated/graphql";
 
@@ -52,7 +52,7 @@ const QUERY_NOTION_OBJECTS = graphql(/* GraphQL */ `
 
 const Notion = (props: NotionProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, setValue } =
+  const { register, setValue, control } =
     useFormContext<CreateNotionPageMutationVariables>();
   const { data, loading, refetch } = useQuery(QUERY_NOTION_OBJECTS, {
     variables: {
@@ -67,16 +67,21 @@ const Notion = (props: NotionProps) => {
         <InfoOutlined fontSize="small" />
         Create a New Page in Notion
       </Typography>
-      <TextField
-        label="Title"
-        required
-        inputProps={{
-          maxLength: 255,
-        }}
-        {...register("element.title", {
-          required: true,
-          value: highlightedText,
-        })}
+      <Controller
+        render={({ field }) => (
+          <TextField
+            label="Title"
+            required
+            inputProps={{
+              maxLength: 255,
+            }}
+            {...field}
+          />
+        )}
+        name="element.title"
+        control={control}
+        rules={{ required: true }}
+        defaultValue={highlightedText}
       />
       <TextField
         label="Description"

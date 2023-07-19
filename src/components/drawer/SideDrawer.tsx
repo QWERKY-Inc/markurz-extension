@@ -1,7 +1,8 @@
-import { useLazyQuery } from "@apollo/client";
+import { ApolloError, useLazyQuery } from "@apollo/client";
 import { Add, Close, Link, PowerOff } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
+  Alert,
   Box,
   Button,
   Drawer,
@@ -18,13 +19,18 @@ import {
 } from "@mui/material";
 import React, { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
-import { useLocation } from "react-use";
 import { apolloClient } from "src/apollo";
 import { APPS } from "src/components/drawer/Apps";
+import Limit from "src/components/drawer/Limit";
 import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
 import { QUERY_MODULES } from "src/components/drawer/SideDrawer.operations";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import { ModuleTypeEnum, OrderByEnum } from "src/generated/graphql";
+import {
+  ModuleTypeEnum,
+  OrderByEnum,
+  UserModuleStatusEnum,
+} from "src/generated/graphql";
+import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
 
 interface SideDrawerProps extends DrawerProps {
@@ -43,7 +49,6 @@ const SideDrawer = (props: SideDrawerProps) => {
     reset,
     formState: { isValid, isDirty },
   } = methods;
-  const { href } = useLocation();
   const { token, loading: tokenLoading } = useTokenShared();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
@@ -51,21 +56,33 @@ const SideDrawer = (props: SideDrawerProps) => {
     taskName: string;
     url: string;
   } | null>(null);
+  const [errorMutation, setErrorMutation] = useState("");
 
-  const [queryModules, { data, error }] = useLazyQuery(QUERY_MODULES, {
-    // This skip should be there but seems to break global refetch
-    // skip: !token || !drawerProps.open || tokenLoading,
-    variables: {
-      take: 100,
-      order: [
-        {
-          module: {
-            name: OrderByEnum.Asc,
+  const [queryModules, { data, error, loading: loadingModules }] = useLazyQuery(
+    QUERY_MODULES,
+    {
+      // This skip should be there but seems to break global refetch
+      // skip: !token || !drawerProps.open || tokenLoading,
+      variables: {
+        take: 100,
+        order: [
+          {
+            module: {
+              name: OrderByEnum.Asc,
+            },
+          },
+        ],
+        where: {
+          status: {
+            in: [
+              UserModuleStatusEnum.Active,
+              UserModuleStatusEnum.TemporaryDisabled,
+            ],
           },
         },
-      ],
+      },
     },
-  });
+  );
 
   useEffect(() => {
     if (drawerProps.open && token) {
@@ -77,36 +94,44 @@ const SideDrawer = (props: SideDrawerProps) => {
     // Reset the result if form gets dirty
     if (isDirty) {
       setResult(null);
+      setErrorMutation("");
     }
   }, [isDirty]);
 
   useEffect(() => {
     // If the selection changes reset the result to be ready to get a new url.
     setResult(null);
+    setErrorMutation("");
     reset({
       sourceText: highlightedText,
     });
   }, [highlightedText, reset]);
 
   const submit = async (form: FieldValues) => {
-    form.sourceUrl = href;
-    if (selectedApp) {
+    form.sourceUrl = document.location.href;
+    const appKey = selectedApp?.split("-")[0] as keyof typeof APPS;
+    const currentApp = APPS[appKey];
+    if (currentApp) {
       setLoading(true);
       try {
-        const appKey = selectedApp.split("-")[0] as keyof typeof APPS;
         const { data: result } = await apolloClient.mutate({
           mutation:
             // Split on dash to get the first part which is the APP key, second part being the account
-            APPS[appKey].mutation,
+            currentApp.mutation,
           variables: form,
         });
         setResult({
-          appName: APPS[appKey].name,
-          taskName: APPS[appKey].taskName,
+          appName: currentApp.name,
+          taskName: currentApp.taskName,
           url: result?.create.outputUrl,
         });
       } catch (e) {
         console.error(e);
+        if (e instanceof ApolloError) {
+          setErrorMutation(e.message);
+        } else {
+          setErrorMutation((e as Error).toString());
+        }
       } finally {
         setLoading(false);
         // Suppress the dirty state of the form to allow a re-submit
@@ -121,6 +146,8 @@ const SideDrawer = (props: SideDrawerProps) => {
       reset({
         sourceText: highlightedText,
       });
+      setResult(null);
+      setErrorMutation("");
     }
   };
 
@@ -134,7 +161,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         },
       }}
       ModalProps={{
-        container: document.getElementById("markurz-root"),
+        container: document.getElementById(MARKURZ_DIV_NAME),
         style: {
           zIndex: 1201,
         },
@@ -150,6 +177,10 @@ const SideDrawer = (props: SideDrawerProps) => {
           href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}
           rel="noopener"
           target="_blank"
+          sx={{
+            color: (t) => `${t.palette.primary.main} !important`,
+            textDecoration: "none",
+          }}
         >
           Dashboard
         </Button>
@@ -159,6 +190,10 @@ const SideDrawer = (props: SideDrawerProps) => {
       </Stack>
       {!token || error ? (
         <LoggedOutScreen loading={tokenLoading} />
+      ) : data?.usage &&
+        typeof data.usage.createdEvent.limitCount === "number" &&
+        data.usage.createdEvent.limitCount <= data.usage.createdEvent.count ? (
+        <Limit />
       ) : (
         <FormProvider {...methods}>
           <form
@@ -214,36 +249,48 @@ const SideDrawer = (props: SideDrawerProps) => {
                     Connect More Apps
                   </ListItemText>
                 </MenuItem>
-                {data?.userModules?.elements?.map((userModule) => (
-                  <MenuItem
-                    value={`${userModule.module.type}-${userModule.id}`}
-                    disabled={!userModule.validKey}
-                    key={userModule.id}
-                  >
-                    <ListItemIcon>
-                      {APPS[userModule.module.type].icon}
-                    </ListItemIcon>
-                    <ListItemText
-                      sx={{ "& > span": { display: "flex", gap: 1 } }}
+                {loadingModules && <MenuItem disabled>Loading...</MenuItem>}
+                {data?.userModules?.elements?.map((userModule) => {
+                  const currentApp = APPS[userModule.module.type];
+                  if (!currentApp) return null;
+                  return (
+                    <MenuItem
+                      value={`${userModule.module.type}-${userModule.id}`}
+                      disabled={
+                        !(
+                          userModule.validKey &&
+                          userModule.status === UserModuleStatusEnum.Active
+                        )
+                      }
+                      key={userModule.id}
                     >
-                      {APPS[userModule.module.type].name} ({userModule.email}){" "}
-                      {!userModule.validKey && <PowerOff />}
-                    </ListItemText>
-                  </MenuItem>
-                ))}
+                      <ListItemIcon>{currentApp.icon}</ListItemIcon>
+                      <ListItemText
+                        sx={{ "& > span": { display: "flex", gap: 1 } }}
+                      >
+                        {currentApp.name} ({userModule.email}){" "}
+                        {!userModule.validKey && <PowerOff />}
+                      </ListItemText>
+                    </MenuItem>
+                  );
+                })}
               </TextField>
               <TabContext value={selectedApp}>
-                {data?.userModules?.elements?.map((userModule) => (
-                  <TabPanel
-                    key={userModule.id}
-                    value={`${userModule.module.type}-${userModule.id}`}
-                  >
-                    {React.createElement(APPS[userModule.module.type].Element, {
-                      userModuleId: userModule.id,
-                      highlightedText,
-                    })}
-                  </TabPanel>
-                ))}
+                {data?.userModules?.elements?.map((userModule) => {
+                  const currentApp = APPS[userModule.module.type];
+                  if (!currentApp) return null;
+                  return (
+                    <TabPanel
+                      key={userModule.id}
+                      value={`${userModule.module.type}-${userModule.id}`}
+                    >
+                      {React.createElement(currentApp.Element, {
+                        userModuleId: userModule.id,
+                        highlightedText,
+                      })}
+                    </TabPanel>
+                  );
+                })}
               </TabContext>
             </Stack>
             <Paper
@@ -258,6 +305,11 @@ const SideDrawer = (props: SideDrawerProps) => {
                 zIndex: 1,
               }}
             >
+              {errorMutation && (
+                <Alert severity="error" variant="outlined" sx={{ mb: 2 }}>
+                  {errorMutation}
+                </Alert>
+              )}
               <Tooltip
                 title={
                   result
