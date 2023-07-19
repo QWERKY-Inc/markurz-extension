@@ -61,7 +61,7 @@
   "devDependencies": {
     "@graphql-codegen/cli": "4.0.1",
     "@graphql-codegen/client-preset": "4.0.1",
-    "@types/chrome": "0.0.239",
+    "@types/chrome": "0.0.241",
     "@types/semver": "7.5.0",
     "humanize-duration-ts": "2.1.1",
     "prettier": "3.0.0",
