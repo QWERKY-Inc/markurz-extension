@@ -1,15 +1,15 @@
-import { Close, InfoOutlined } from '@mui/icons-material';
-import { Button, IconButton, MenuItem, Stack, StackProps, TextField, Tooltip, Typography } from '@mui/material';
-import Grid from '@mui/material/Unstable_Grid2';
-import { DateTimePicker } from '@mui/x-date-pickers';
-import moment from 'moment';
-import React, { useEffect } from 'react';
-import { Controller, useFieldArray, useFormContext } from 'react-hook-form';
+import { Close, InfoOutlined } from "@mui/icons-material";
+import { Button, IconButton, MenuItem, Stack, StackProps, TextField, Tooltip, Typography } from "@mui/material";
+import Grid from "@mui/material/Unstable_Grid2";
+import { DateTimePicker } from "@mui/x-date-pickers";
+import moment from "moment";
+import React, { useEffect } from "react";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import {
   CreateGoogleCalendarEventMutationVariables,
   GoogleCalendarRecurrenceEnum,
   GoogleCalendarReminderEnum,
-} from 'src/generated/graphql';
+} from "src/generated/graphql";
 
 const humanizeDuration = require("humanize-duration");
 
