@@ -1,5 +1,5 @@
-import { useQuery } from '@apollo/client';
-import { CableRounded, InfoOutlined, SpeedRounded } from '@mui/icons-material';
+import { useQuery } from "@apollo/client";
+import { CableRounded, InfoOutlined, SpeedRounded } from "@mui/icons-material";
 import {
   Box,
   Button,
@@ -13,12 +13,12 @@ import {
   Paper,
   Skeleton,
   Switch,
-} from '@mui/material';
-import React, { useEffect, useState } from 'react';
-import { genericOnClick } from 'src/chromeServices/contextMenu';
-import MarkurzIcon from 'src/components/icons/MarkurzIcon';
-import { graphql } from 'src/generated';
-import { useTokenShared } from 'src/lib/token';
+} from "@mui/material";
+import React, { useEffect, useState } from "react";
+import { genericOnClick } from "src/chromeServices/contextMenu";
+import MarkurzIcon from "src/components/icons/MarkurzIcon";
+import { graphql } from "src/generated";
+import { useTokenShared } from "src/lib/token";
 
 const QUERY_ME = graphql(/* GraphQL */ `
   query Me {
