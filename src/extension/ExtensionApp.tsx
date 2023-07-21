@@ -1,5 +1,5 @@
-import { useQuery } from "@apollo/client";
-import { CableRounded, InfoOutlined, SpeedRounded } from "@mui/icons-material";
+import { useQuery } from '@apollo/client';
+import { CableRounded, InfoOutlined, SpeedRounded } from '@mui/icons-material';
 import {
   Box,
   Button,
@@ -13,12 +13,12 @@ import {
   Paper,
   Skeleton,
   Switch,
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { genericOnClick } from "src/chromeServices/contextMenu";
-import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import { graphql } from "src/generated";
-import { useTokenShared } from "src/lib/token";
+} from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { genericOnClick } from 'src/chromeServices/contextMenu';
+import MarkurzIcon from 'src/components/icons/MarkurzIcon';
+import { graphql } from 'src/generated';
+import { useTokenShared } from 'src/lib/token';
 
 const QUERY_ME = graphql(/* GraphQL */ `
   query Me {
@@ -83,7 +83,7 @@ const ExtensionApp = () => {
               <ListItemText primary="Dashboard" />
             </ListItemButton>
             <ListItemButton
-              href={`${process.env.REACT_APP_LOGIN_URL}/dashboard/apps`}
+              href={`${process.env.REACT_APP_LOGIN_URL}/dashboard?tab=/apps`}
               target="_blank"
               rel="noreferrer"
             >
@@ -93,7 +93,7 @@ const ExtensionApp = () => {
               <ListItemText primary="Connect Apps" />
             </ListItemButton>
             <ListItemButton
-              href={`${process.env.REACT_APP_LOGIN_URL}/dashboard/marks`}
+              href={`${process.env.REACT_APP_LOGIN_URL}/dashboard?tab=/marks`}
               target="_blank"
               rel="noreferrer"
             >
