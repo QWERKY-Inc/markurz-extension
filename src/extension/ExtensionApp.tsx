@@ -83,7 +83,7 @@ const ExtensionApp = () => {
               <ListItemText primary="Dashboard" />
             </ListItemButton>
             <ListItemButton
-              href={`${process.env.REACT_APP_LOGIN_URL}/dashboard/apps`}
+              href={`${process.env.REACT_APP_LOGIN_URL}/dashboard?tab=/apps`}
               target="_blank"
               rel="noreferrer"
             >
@@ -93,7 +93,7 @@ const ExtensionApp = () => {
               <ListItemText primary="Connect Apps" />
             </ListItemButton>
             <ListItemButton
-              href={`${process.env.REACT_APP_LOGIN_URL}/dashboard/marks`}
+              href={`${process.env.REACT_APP_LOGIN_URL}/dashboard?tab=/marks`}
               target="_blank"
               rel="noreferrer"
             >
