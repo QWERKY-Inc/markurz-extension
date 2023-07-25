@@ -1,4 +1,4 @@
-import { graphql } from "src/generated";
+import { graphql } from 'src/generated';
 
 export const MUTATION_CREATE_GOOGLE_TASKS = graphql(/* GraphQL */ `
   mutation CreateGoogleTasksTask(
@@ -181,6 +181,25 @@ export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
     $sourceText: String!
   ) {
     create: createEvernoteNote(
+      sourceUrl: $sourceUrl
+      userModuleId: $userModuleId
+      element: $element
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
+export const MUTATION_CREATE_ASANA_TASK = graphql(/* GraphQL */ `
+  mutation CreateAsanaTask(
+    $sourceUrl: String!
+    $userModuleId: ID!
+    $element: CreateAsanaTaskInput!
+    $sourceText: String!
+  ) {
+    create: createAsanaTask(
       sourceUrl: $sourceUrl
       userModuleId: $userModuleId
       element: $element
