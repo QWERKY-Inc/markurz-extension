@@ -1,11 +1,17 @@
-import { useLazyQuery, useQuery } from '@apollo/client';
-import { InfoOutlined } from '@mui/icons-material';
-import { MenuItem, Stack, StackProps, TextField, Typography } from '@mui/material';
-import { DateTimePicker } from '@mui/x-date-pickers';
-import React, { useEffect, useState } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
-import { graphql } from 'src/generated';
-import { MutationCreateAsanaTaskArgs } from 'src/generated/graphql';
+import { useLazyQuery, useQuery } from "@apollo/client";
+import { InfoOutlined } from "@mui/icons-material";
+import {
+  MenuItem,
+  Stack,
+  StackProps,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { DateTimePicker } from "@mui/x-date-pickers";
+import { useEffect, useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+import { graphql } from "src/generated";
+import { MutationCreateAsanaTaskArgs } from "src/generated/graphql";
 
 interface AsanaProps extends StackProps {
   userModuleId: string;
@@ -47,30 +53,35 @@ const QUERY_ASANA_SECTIONS = graphql(/* GraphQL */ `
 
 const Asana = (props: AsanaProps) => {
   const { userModuleId, highlightedText } = props;
-  const { register, control } =
-    useFormContext<MutationCreateAsanaTaskArgs>();
-  const [selectedWorkspace, setSelectedWorkspace] = useState("")
-  const [selectedProject, setSelectedProject] = useState("")
+  const { register, control } = useFormContext<MutationCreateAsanaTaskArgs>();
+  const [selectedWorkspace, setSelectedWorkspace] = useState("");
+  const [selectedProject, setSelectedProject] = useState("");
   const { data: asanaWorkspacesData } = useQuery(QUERY_ASANA_WORKSPACES, {
     variables: {
       userModuleId,
     },
   });
-  const [fetchAsanaProjects,  {data: asanaProjectsData}] = useLazyQuery(QUERY_ASANA_PROJECTS);
-  const [fetchAsanaSections,  {data: asanaSectionsData}] = useLazyQuery(QUERY_ASANA_SECTIONS);
+  const [fetchAsanaProjects, { data: asanaProjectsData }] =
+    useLazyQuery(QUERY_ASANA_PROJECTS);
+  const [fetchAsanaSections, { data: asanaSectionsData }] =
+    useLazyQuery(QUERY_ASANA_SECTIONS);
   register("userModuleId", { value: userModuleId });
 
   useEffect(() => {
     if (selectedWorkspace) {
-      fetchAsanaProjects({variables: {userModuleId, workspaceId: selectedWorkspace}})
+      fetchAsanaProjects({
+        variables: { userModuleId, workspaceId: selectedWorkspace },
+      });
     }
-  }, [selectedWorkspace, fetchAsanaProjects, userModuleId])
+  }, [selectedWorkspace, fetchAsanaProjects, userModuleId]);
 
   useEffect(() => {
     if (selectedProject) {
-      fetchAsanaSections({variables: {userModuleId, projectId: selectedProject}})
+      fetchAsanaSections({
+        variables: { userModuleId, projectId: selectedProject },
+      });
     }
-  }, [selectedProject, fetchAsanaSections, userModuleId])
+  }, [selectedProject, fetchAsanaSections, userModuleId]);
 
   return (
     <Stack spacing={3} {...props}>
@@ -103,16 +114,28 @@ const Asana = (props: AsanaProps) => {
         }}
       />
       <Controller
-        render={({field: {onChange, ...rest}}) => (
-          <TextField {...rest} label="Select Workspace"  select required onChange={(e) => {onChange(e.target.value); setSelectedWorkspace(e.target.value)}} >
-            {asanaWorkspacesData?.asanaWorkspaces?.elements?.map((workspace) => (
-              <MenuItem key={workspace.id} value={workspace.id}>
-                {workspace.name}
-              </MenuItem>
-            ))}
+        render={({ field: { onChange, ...rest } }) => (
+          <TextField
+            {...rest}
+            label="Select Workspace"
+            select
+            required
+            onChange={(e) => {
+              onChange(e.target.value);
+              setSelectedWorkspace(e.target.value);
+            }}
+          >
+            {asanaWorkspacesData?.asanaWorkspaces?.elements?.map(
+              (workspace) => (
+                <MenuItem key={workspace.id} value={workspace.id}>
+                  {workspace.name}
+                </MenuItem>
+              ),
+            )}
             {!asanaWorkspacesData?.asanaWorkspaces?.elements && (
               <MenuItem disabled>
-                There are no workspace available to select. Please create a workspace in Asana.
+                There are no workspace available to select. Please create a
+                workspace in Asana.
               </MenuItem>
             )}
           </TextField>
@@ -120,11 +143,20 @@ const Asana = (props: AsanaProps) => {
         name="element.workspaceId"
         rules={{ required: true }}
         control={control}
-
       />
       <Controller
-        render={({field: {onChange, ...rest}}) => (
-          <TextField {...rest} label="Select Project" select required disabled={!selectedWorkspace} onChange={(e) => {onChange(e.target.value); setSelectedProject(e.target.value)}}>
+        render={({ field: { onChange, ...rest } }) => (
+          <TextField
+            {...rest}
+            label="Select Project"
+            select
+            required
+            disabled={!selectedWorkspace}
+            onChange={(e) => {
+              onChange(e.target.value);
+              setSelectedProject(e.target.value);
+            }}
+          >
             {asanaProjectsData?.asanaProjects.elements?.map((project) => (
               <MenuItem key={project.id} value={project.id}>
                 {project.name}
@@ -132,7 +164,8 @@ const Asana = (props: AsanaProps) => {
             ))}
             {!asanaProjectsData?.asanaProjects.elements?.length && (
               <MenuItem disabled>
-                There are no projects available to select. Please create a project in Asana.
+                There are no projects available to select. Please create a
+                project in Asana.
               </MenuItem>
             )}
           </TextField>
@@ -142,7 +175,7 @@ const Asana = (props: AsanaProps) => {
         control={control}
       />
       <Controller
-        render={({field}) => (
+        render={({ field }) => (
           <TextField
             {...field}
             label="Select Section"
@@ -157,7 +190,8 @@ const Asana = (props: AsanaProps) => {
             ))}
             {!asanaSectionsData?.asanaSections.elements?.length && (
               <MenuItem disabled>
-                There are no sections available to select. Please create a section in Asana.
+                There are no sections available to select. Please create a
+                section in Asana.
               </MenuItem>
             )}
           </TextField>
