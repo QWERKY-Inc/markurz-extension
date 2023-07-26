@@ -1,4 +1,4 @@
-import { graphql } from 'src/generated';
+import { graphql } from "src/generated";
 
 export const MUTATION_CREATE_GOOGLE_TASKS = graphql(/* GraphQL */ `
   mutation CreateGoogleTasksTask(
