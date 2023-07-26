@@ -180,7 +180,7 @@ const Asana = (props: AsanaProps) => {
             {...field}
             label="Select Section"
             select
-            //required
+            required
             disabled={!selectedProject}
           >
             {asanaSectionsData?.asanaSections.elements?.map((section) => (
