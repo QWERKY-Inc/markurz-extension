@@ -21,13 +21,13 @@ const QUERY_SLACK_RESOURCES = graphql(/* GraphQL */ `
     slackChannels(userModuleId: $userModuleId) {
       elements {
         id
-        isMember
         name
       }
     }
     slackUsers(userModuleId: $userModuleId) {
       elements {
         id
+        isUser
         name
       }
     }
@@ -84,14 +84,17 @@ const Slack = (props: SlackProps) => {
           }
         }}
         openOnFocus
+        disableClearable={true}
         loading={loading}
-        getOptionLabel={(o) => o.name || "Untitled"}
+        getOptionLabel={(o) =>
+          `${o.name} ${o.isUser ? "(you)" : ""}` || "Untitled"
+        }
         groupBy={(o) => o.group || "Untitled"}
         options={
           data
             ? [
                 ...(data?.slackChannels.elements?.map((elem) => {
-                  return { ...elem, group: "Channels" };
+                  return { ...elem, isUser: undefined, group: "Channels" };
                 }) ?? []),
                 ...(data.slackUsers.elements?.map((elem) => {
                   return { ...elem, group: "Direct messages" };
