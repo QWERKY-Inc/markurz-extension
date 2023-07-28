@@ -1,6 +1,7 @@
 import { DocumentNode } from "@apollo/client";
 import React from "react";
 import {
+  MUTATION_CREATE_ASANA_TASK,
   MUTATION_CREATE_EVERNOTE_NOTE,
   MUTATION_CREATE_GMAIL_EMAIL,
   MUTATION_CREATE_GOOGLE_CALENDAR_EVENT,
@@ -12,6 +13,7 @@ import {
   MUTATION_CREATE_TODOIST_TASK,
   MUTATION_CREATE_TRELLO_CARD,
 } from "src/components/drawer/SideDrawer.operations";
+import AsanaIcon from "src/components/icons/AsanaIcon";
 import EvernoteIcon from "src/components/icons/EvernoteIcon";
 import GmailIcon from "src/components/icons/GmailIcon";
 import GoogleCalendarIcon from "src/components/icons/GoogleCalendarIcon";
@@ -22,6 +24,7 @@ import MicrosoftTodoIcon from "src/components/icons/MicrosoftTodoIcon";
 import NotionIcon from "src/components/icons/NotionIcon";
 import TodoistIcon from "src/components/icons/TodoistIcon";
 import TrelloIcon from "src/components/icons/TrelloIcon";
+import Asana from "src/components/tasks/Asana";
 import Evernote from "src/components/tasks/Evernote";
 import Gmail from "src/components/tasks/Gmail";
 import GoogleCalendar from "src/components/tasks/GoogleCalendar";
@@ -45,6 +48,13 @@ export const APPS: {
     mutation: DocumentNode;
   };
 } = {
+  [ModuleTypeEnum.Asana]: {
+    name: "Asana",
+    taskName: "Task",
+    icon: <AsanaIcon />,
+    Element: Asana,
+    mutation: MUTATION_CREATE_ASANA_TASK,
+  },
   [ModuleTypeEnum.Evernote]: {
     name: "Evernote",
     taskName: "Note",
