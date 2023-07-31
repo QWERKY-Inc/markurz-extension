@@ -211,6 +211,25 @@ export const MUTATION_CREATE_ASANA_TASK = graphql(/* GraphQL */ `
   }
 `);
 
+export const MUTATION_CREATE_MONDAY_ITEM = graphql(/* GraphQL */ `
+  mutation CreateMondayItem(
+    $sourceUrl: String!
+    $userModuleId: ID!
+    $element: MondayItemArgs!
+    $sourceText: String!
+  ) {
+    create: createMondayItem(
+      sourceUrl: $sourceUrl
+      userModuleId: $userModuleId
+      element: $element
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
 export const QUERY_MODULES = graphql(/* GraphQL */ `
   query UserModules(
     $take: Int

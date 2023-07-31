@@ -1,5 +1,5 @@
-import { DocumentNode } from "@apollo/client";
-import React from "react";
+import { DocumentNode } from '@apollo/client';
+import React from 'react';
 import {
   MUTATION_CREATE_ASANA_TASK,
   MUTATION_CREATE_EVERNOTE_NOTE,
@@ -9,33 +9,36 @@ import {
   MUTATION_CREATE_JIRA_ISSUE,
   MUTATION_CREATE_MICROSOFT_ONENOTE,
   MUTATION_CREATE_MICROSOFT_TODO,
+  MUTATION_CREATE_MONDAY_ITEM,
   MUTATION_CREATE_NOTION_PAGE,
   MUTATION_CREATE_TODOIST_TASK,
   MUTATION_CREATE_TRELLO_CARD,
-} from "src/components/drawer/SideDrawer.operations";
-import AsanaIcon from "src/components/icons/AsanaIcon";
-import EvernoteIcon from "src/components/icons/EvernoteIcon";
-import GmailIcon from "src/components/icons/GmailIcon";
-import GoogleCalendarIcon from "src/components/icons/GoogleCalendarIcon";
-import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
-import JiraIcon from "src/components/icons/JiraIcon";
-import MicrosoftOneNoteIcon from "src/components/icons/MicrosoftOneNoteIcon";
-import MicrosoftTodoIcon from "src/components/icons/MicrosoftTodoIcon";
-import NotionIcon from "src/components/icons/NotionIcon";
-import TodoistIcon from "src/components/icons/TodoistIcon";
-import TrelloIcon from "src/components/icons/TrelloIcon";
-import Asana from "src/components/tasks/Asana";
-import Evernote from "src/components/tasks/Evernote";
-import Gmail from "src/components/tasks/Gmail";
-import GoogleCalendar from "src/components/tasks/GoogleCalendar";
-import GoogleTasks from "src/components/tasks/GoogleTasks";
-import Jira from "src/components/tasks/Jira";
-import MicrosoftOneNote from "src/components/tasks/MicrosoftOneNote";
-import MicrosoftToDo from "src/components/tasks/MicrosoftToDo";
-import Notion from "src/components/tasks/Notion";
-import Todoist from "src/components/tasks/Todoist";
-import Trello from "src/components/tasks/Trello";
-import { ModuleTypeEnum } from "src/generated/graphql";
+} from 'src/components/drawer/SideDrawer.operations';
+import AsanaIcon from 'src/components/icons/AsanaIcon';
+import EvernoteIcon from 'src/components/icons/EvernoteIcon';
+import GmailIcon from 'src/components/icons/GmailIcon';
+import GoogleCalendarIcon from 'src/components/icons/GoogleCalendarIcon';
+import GoogleTasksIcon from 'src/components/icons/GoogleTasksIcon';
+import JiraIcon from 'src/components/icons/JiraIcon';
+import MicrosoftOneNoteIcon from 'src/components/icons/MicrosoftOneNoteIcon';
+import MicrosoftTodoIcon from 'src/components/icons/MicrosoftTodoIcon';
+import MondayIcon from 'src/components/icons/MondayIcon';
+import NotionIcon from 'src/components/icons/NotionIcon';
+import TodoistIcon from 'src/components/icons/TodoistIcon';
+import TrelloIcon from 'src/components/icons/TrelloIcon';
+import Asana from 'src/components/tasks/Asana';
+import Evernote from 'src/components/tasks/Evernote';
+import Gmail from 'src/components/tasks/Gmail';
+import GoogleCalendar from 'src/components/tasks/GoogleCalendar';
+import GoogleTasks from 'src/components/tasks/GoogleTasks';
+import Jira from 'src/components/tasks/Jira';
+import MicrosoftOneNote from 'src/components/tasks/MicrosoftOneNote';
+import MicrosoftToDo from 'src/components/tasks/MicrosoftToDo';
+import Monday from 'src/components/tasks/Monday';
+import Notion from 'src/components/tasks/Notion';
+import Todoist from 'src/components/tasks/Todoist';
+import Trello from 'src/components/tasks/Trello';
+import { ModuleTypeEnum } from 'src/generated/graphql';
 
 export const APPS: {
   [p in ModuleTypeEnum]?: {
@@ -103,6 +106,13 @@ export const APPS: {
     icon: <MicrosoftTodoIcon />,
     Element: MicrosoftToDo,
     mutation: MUTATION_CREATE_MICROSOFT_TODO,
+  },
+  [ModuleTypeEnum.Monday]: {
+    name: "Monday",
+    taskName: "issue",
+    icon: <MondayIcon />,
+    Element: Monday,
+    mutation: MUTATION_CREATE_MONDAY_ITEM,
   },
   [ModuleTypeEnum.Notion]: {
     name: "Notion",
