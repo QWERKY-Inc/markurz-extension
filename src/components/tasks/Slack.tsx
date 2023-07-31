@@ -1,9 +1,18 @@
-import { useQuery } from '@apollo/client';
-import { InfoOutlined } from '@mui/icons-material';
-import { Autocomplete, Stack, StackProps, TextField, Typography } from '@mui/material';
-import { Controller, useFormContext } from 'react-hook-form';
-import { graphql } from 'src/generated';
-import { CreateSlackMessageMutationVariables, SlackMessageReceiverTypeEnum } from 'src/generated/graphql';
+import { useQuery } from "@apollo/client";
+import { InfoOutlined } from "@mui/icons-material";
+import {
+  Autocomplete,
+  Stack,
+  StackProps,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { Controller, useFormContext } from "react-hook-form";
+import { graphql } from "src/generated";
+import {
+  CreateSlackMessageMutationVariables,
+  SlackMessageReceiverTypeEnum,
+} from "src/generated/graphql";
 
 interface SlackProps extends StackProps {
   userModuleId: string;
@@ -22,6 +31,8 @@ const QUERY_SLACK_RESOURCES = graphql(/* GraphQL */ `
       elements {
         id
         isUser
+        email
+        isBot
         name
       }
     }
@@ -39,14 +50,13 @@ const Slack = (props: SlackProps) => {
   });
   register("userModuleId", { value: userModuleId });
 
-
   const setReceiverTypeValue = (typename: string | undefined) => {
-    if (typename === 'SlackChannel') {
+    if (typename === "SlackChannel") {
       setValue("element.receiverType", SlackMessageReceiverTypeEnum.Channel);
-    } else if (typename === 'SlackUser') {
+    } else if (typename === "SlackUser") {
       setValue("element.receiverType", SlackMessageReceiverTypeEnum.User);
     }
-  }
+  };
 
   return (
     <Stack spacing={2} {...stackProps}>
@@ -81,9 +91,17 @@ const Slack = (props: SlackProps) => {
       />
 
       <Autocomplete
+        filterOptions={(options, state) => {
+          const inputValue = state.inputValue.toLowerCase();
+          return options.filter(
+            (o) =>
+              o.name.toLowerCase().includes(inputValue) ||
+              o.email?.toLowerCase().includes(inputValue),
+          );
+        }}
         onChange={(_, data) => {
           if (data) {
-            setReceiverTypeValue(data.__typename)
+            setReceiverTypeValue(data.__typename);
             setValue("element.receiverId", data.id);
           }
         }}
@@ -91,18 +109,27 @@ const Slack = (props: SlackProps) => {
         disableClearable={true}
         loading={loading}
         getOptionLabel={(o) =>
-          `${o.name} ${o.isUser ? "(you)" : ""}` || "Untitled"
+          `${o.name} ${
+            o.__typename === "SlackUser" && o.email ? `(${o.email})` : ""
+          }` || "Untitled"
         }
         groupBy={(o) => o.group || "Untitled"}
         options={
           data
             ? [
                 ...(data?.slackChannels.elements?.map((elem) => {
-                  return { ...elem, isUser: undefined, group: "Channels" };
+                  return {
+                    ...elem,
+                    email: undefined,
+                    isUser: undefined,
+                    group: "Channels",
+                  };
                 }) ?? []),
-                ...(data.slackUsers.elements?.map((elem) => {
-                  return { ...elem, group: "Direct messages" };
-                }) ?? []),
+                ...(data.slackUsers.elements
+                  ?.filter((elem) => !elem.isBot)
+                  .map((elem) => {
+                    return { ...elem, group: "Direct messages" };
+                  }) ?? []),
               ]
             : []
         }
