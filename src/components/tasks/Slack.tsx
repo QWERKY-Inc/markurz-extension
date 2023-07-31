@@ -1,15 +1,9 @@
-import { useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
-import {
-  Autocomplete,
-  Stack,
-  StackProps,
-  TextField,
-  Typography,
-} from "@mui/material";
-import { Controller, useFormContext } from "react-hook-form";
-import { graphql } from "src/generated";
-import { CreateSlackMessageMutationVariables } from "src/generated/graphql";
+import { useQuery } from '@apollo/client';
+import { InfoOutlined } from '@mui/icons-material';
+import { Autocomplete, Stack, StackProps, TextField, Typography } from '@mui/material';
+import { Controller, useFormContext } from 'react-hook-form';
+import { graphql } from 'src/generated';
+import { CreateSlackMessageMutationVariables, SlackMessageReceiverTypeEnum } from 'src/generated/graphql';
 
 interface SlackProps extends StackProps {
   userModuleId: string;
@@ -44,6 +38,15 @@ const Slack = (props: SlackProps) => {
     },
   });
   register("userModuleId", { value: userModuleId });
+
+
+  const setReceiverTypeValue = (typename: string | undefined) => {
+    if (typename === 'SlackChannel') {
+      setValue("element.receiverType", SlackMessageReceiverTypeEnum.Channel);
+    } else if (typename === 'SlackUser') {
+      setValue("element.receiverType", SlackMessageReceiverTypeEnum.User);
+    }
+  }
 
   return (
     <Stack spacing={2} {...stackProps}>
@@ -80,7 +83,8 @@ const Slack = (props: SlackProps) => {
       <Autocomplete
         onChange={(_, data) => {
           if (data) {
-            setValue("element.channelIdOrUserId", data.id);
+            setReceiverTypeValue(data.__typename)
+            setValue("element.receiverId", data.id);
           }
         }}
         openOnFocus
