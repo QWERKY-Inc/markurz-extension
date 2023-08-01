@@ -192,6 +192,44 @@ export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
   }
 `);
 
+export const MUTATION_CREATE_ASANA_TASK = graphql(/* GraphQL */ `
+  mutation CreateAsanaTask(
+    $sourceUrl: String!
+    $userModuleId: ID!
+    $element: CreateAsanaTaskInput!
+    $sourceText: String!
+  ) {
+    create: createAsanaTask(
+      sourceUrl: $sourceUrl
+      userModuleId: $userModuleId
+      element: $element
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
+export const MUTATION_CREATE_SLACK_MESSAGE = graphql(/* GraphQL */ `
+  mutation CreateSlackMessage(
+    $sourceUrl: String!
+    $userModuleId: ID!
+    $element: SlackMessageArgs!
+    $sourceText: String!
+  ) {
+    create: createSlackMessage(
+      sourceUrl: $sourceUrl
+      userModuleId: $userModuleId
+      element: $element
+      sourceText: $sourceText
+    ) {
+      id
+      outputUrl
+    }
+  }
+`);
+
 export const QUERY_MODULES = graphql(/* GraphQL */ `
   query UserModules(
     $take: Int
