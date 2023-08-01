@@ -1,7 +1,7 @@
 import { useLazyQuery, useQuery } from '@apollo/client';
 import { ChevronRight, ExpandMore, FolderOpenOutlined, InfoOutlined, SpaceDashboardOutlined } from '@mui/icons-material';
 import { TreeItem, TreeItemProps, TreeView } from '@mui/lab';
-import { Autocomplete, Box, MenuItem, Paper, Stack, StackProps, SvgIconProps, TextField, Typography } from '@mui/material';
+import { Autocomplete, Box, ClickAwayListener, MenuItem, Paper, Stack, StackProps, SvgIconProps, TextField, Typography } from '@mui/material';
 import { useEffect, useState } from 'react';
 import { Controller, useFormContext } from 'react-hook-form';
 import { graphql } from 'src/generated';
@@ -182,48 +182,45 @@ const Monday = (props: MondayProps) => {
           </MenuItem>
         )}
       </TextField>
-      {/* <ClickAwayListener onClickAway={() => setOpenAutocomplete(false)}> */}
-        <Autocomplete
-          disablePortal
-          options={[]}
-          renderInput={(params) => <TextField {...params} label="Select Group" />}
-          open={openAutocomplete}
-          onOpen={() => setOpenAutocomplete(true)}
-          openOnFocus
-          slotProps={{
-            popper: {
-              sx: {
-                marginLeft: `16px !important`,
-              },
-            },
-          }}
-          PaperComponent={() => (
-            <Paper sx={{ px: 1, py: 2 }}>
-              <TreeView
-                defaultCollapseIcon={<ExpandMore />}
-                defaultExpandIcon={<ChevronRight />}
-              >
-                {
-                  mondayResourcesData?.mondayResources.boards.elements?.map((board) => (
-                    <StyledTreeItem nodeId={board.id.toString()} labelText={board.name} labelIcon={SpaceDashboardOutlined} />
-                  ))
-                }
-                {
-                  mondayResourcesData?.mondayResources.folders.elements?.map((folder) => (
-                    <StyledTreeItem nodeId={folder.id?.toString() || 'Default'} labelText={folder.name} labelIcon={FolderOpenOutlined} >
-                      {
-                        folder.boards.elements?.map((board) => (
-                          <StyledTreeItem nodeId={board.id.toString()} labelText={board.name} labelIcon={SpaceDashboardOutlined} />
-                        ))
-                      }
-                    </StyledTreeItem>
-                  ))
-                }
-              </TreeView>
-            </Paper>
-          )}
-        />
-      {/* </ClickAwayListener> */}
+      <ClickAwayListener onClickAway={() => setOpenAutocomplete(false)}>
+        <span>
+          <Autocomplete
+            options={[]}
+            renderInput={(params) => <TextField {...params} label="Select Group" />}
+            open={openAutocomplete}
+            onOpen={() => setOpenAutocomplete(true)}
+            //onBlur={(e) => {console.log(e.currentTarget === e.target); e.currentTarget === e.target ? setOpenAutocomplete(true) : setOpenAutocomplete(false)}}
+            openOnFocus
+            disableClearable
+            disableCloseOnSelect
+            PaperComponent={() => (
+              <Paper sx={{ px: 1, py: 2 }}>
+                <TreeView
+                  defaultCollapseIcon={<ExpandMore />}
+                  defaultExpandIcon={<ChevronRight />}
+                >
+                  {
+                    mondayResourcesData?.mondayResources.boards.elements?.map((board) => (
+                      <StyledTreeItem nodeId={board.id.toString()} labelText={board.name} labelIcon={SpaceDashboardOutlined} />
+                    ))
+                  }
+                  {
+                    mondayResourcesData?.mondayResources.folders.elements?.map((folder) => (
+                      <StyledTreeItem nodeId={folder.id?.toString() || 'Default'} labelText={folder.name} labelIcon={FolderOpenOutlined} >
+                        {
+                          folder.boards.elements?.map((board) => (
+                            <StyledTreeItem nodeId={board.id.toString()} labelText={board.name} labelIcon={SpaceDashboardOutlined} />
+                          ))
+                        }
+                      </StyledTreeItem>
+                    ))
+                  }
+                </TreeView>
+              </Paper>
+            )}
+          />
+        </span>
+      </ClickAwayListener>
     </Stack>
   );
 };
