@@ -10,6 +10,7 @@ import {
   MUTATION_CREATE_MICROSOFT_ONENOTE,
   MUTATION_CREATE_MICROSOFT_TODO,
   MUTATION_CREATE_NOTION_PAGE,
+  MUTATION_CREATE_SLACK_MESSAGE,
   MUTATION_CREATE_TODOIST_TASK,
   MUTATION_CREATE_TRELLO_CARD,
 } from "src/components/drawer/SideDrawer.operations";
@@ -22,6 +23,7 @@ import JiraIcon from "src/components/icons/JiraIcon";
 import MicrosoftOneNoteIcon from "src/components/icons/MicrosoftOneNoteIcon";
 import MicrosoftTodoIcon from "src/components/icons/MicrosoftTodoIcon";
 import NotionIcon from "src/components/icons/NotionIcon";
+import SlackIcon from "src/components/icons/SlackIcon";
 import TodoistIcon from "src/components/icons/TodoistIcon";
 import TrelloIcon from "src/components/icons/TrelloIcon";
 import Asana from "src/components/tasks/Asana";
@@ -33,6 +35,7 @@ import Jira from "src/components/tasks/Jira";
 import MicrosoftOneNote from "src/components/tasks/MicrosoftOneNote";
 import MicrosoftToDo from "src/components/tasks/MicrosoftToDo";
 import Notion from "src/components/tasks/Notion";
+import Slack from "src/components/tasks/Slack";
 import Todoist from "src/components/tasks/Todoist";
 import Trello from "src/components/tasks/Trello";
 import { ModuleTypeEnum } from "src/generated/graphql";
@@ -46,6 +49,7 @@ export const APPS: {
       props: T,
     ) => React.JSX.Element;
     mutation: DocumentNode;
+    missingUrlTooltipMessage?: string;
   };
 } = {
   [ModuleTypeEnum.Asana]: {
@@ -110,6 +114,15 @@ export const APPS: {
     icon: <NotionIcon />,
     Element: Notion,
     mutation: MUTATION_CREATE_NOTION_PAGE,
+  },
+  [ModuleTypeEnum.Slack]: {
+    name: "Slack",
+    taskName: "Message",
+    icon: <SlackIcon />,
+    Element: Slack,
+    mutation: MUTATION_CREATE_SLACK_MESSAGE,
+    missingUrlTooltipMessage:
+      "DMs sent to other user cannot be viewed by the sender due to DM being sent to Markurz app in Slack app messages.",
   },
   [ModuleTypeEnum.Todoist]: {
     name: "Todoist",

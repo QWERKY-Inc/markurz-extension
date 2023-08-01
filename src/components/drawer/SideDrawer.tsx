@@ -55,6 +55,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     appName: string;
     taskName: string;
     url: string;
+    tooltipMessage?: string;
   } | null>(null);
   const [errorMutation, setErrorMutation] = useState("");
 
@@ -124,6 +125,11 @@ const SideDrawer = (props: SideDrawerProps) => {
           appName: currentApp.name,
           taskName: currentApp.taskName,
           url: result?.create.outputUrl,
+          tooltipMessage: result?.create
+            ? result?.create.outputUrl
+              ? `${currentApp.taskName} created! Click to check and input additional information in ${currentApp.taskName}`
+              : currentApp.missingUrlTooltipMessage
+            : undefined,
         });
       } catch (e) {
         console.error(e);
@@ -310,30 +316,25 @@ const SideDrawer = (props: SideDrawerProps) => {
                   {errorMutation}
                 </Alert>
               )}
-              <Tooltip
-                title={
-                  result
-                    ? `${result.taskName} created! Click to check and input additional information in ${result.appName}`
-                    : null
-                }
-                placement="top"
-              >
-                <LoadingButton
-                  fullWidth
-                  disabled={!isValid}
-                  startIcon={result ? <Link /> : undefined}
-                  variant="contained"
-                  type={result ? "button" : "submit"}
-                  loading={loading}
-                  color={result ? "secondary" : "primary"}
-                  href={result?.url || ""}
-                  rel="noopener"
-                  target="_blank"
-                >
-                  {result
-                    ? `Link to ${result.appName} ${result.taskName}`
-                    : "Send"}
-                </LoadingButton>
+              <Tooltip title={result?.tooltipMessage || null} placement="top">
+                <span>
+                  <LoadingButton
+                    fullWidth
+                    disabled={!isValid || (!!result && !result.url)}
+                    startIcon={result ? <Link /> : undefined}
+                    variant="contained"
+                    type={result ? "button" : "submit"}
+                    loading={loading}
+                    color={result ? "secondary" : "primary"}
+                    href={result?.url || ""}
+                    rel="noopener"
+                    target="_blank"
+                  >
+                    {result
+                      ? `Link to ${result.appName} ${result.taskName}`
+                      : "Send"}
+                  </LoadingButton>
+                </span>
               </Tooltip>
             </Paper>
           </form>
