@@ -1,11 +1,57 @@
-import { useLazyQuery, useQuery } from '@apollo/client';
-import { ChevronRight, ExpandMore, FolderOpenOutlined, InfoOutlined, SpaceDashboardOutlined } from '@mui/icons-material';
-import { TreeItem, TreeItemProps, TreeView } from '@mui/lab';
-import { Autocomplete, Box, ClickAwayListener, MenuItem, Paper, Stack, StackProps, SvgIconProps, TextField, Typography } from '@mui/material';
-import { useEffect, useState } from 'react';
-import { Controller, useFormContext } from 'react-hook-form';
-import { graphql } from 'src/generated';
-import { MutationCreateMondayItemArgs } from 'src/generated/graphql';
+import { useLazyQuery, useQuery } from "@apollo/client";
+import {
+  ChevronRight,
+  ExpandMore,
+  FolderOpenOutlined,
+  FormatListBulletedOutlined,
+  InfoOutlined,
+  SpaceDashboardOutlined,
+} from "@mui/icons-material";
+import { TreeItem, TreeItemProps, TreeView } from "@mui/lab";
+import {
+  Autocomplete,
+  Box,
+  ClickAwayListener,
+  MenuItem,
+  Paper,
+  Stack,
+  StackProps,
+  SvgIconProps,
+  TextField,
+  Typography,
+} from "@mui/material";
+import { useEffect, useState } from "react";
+import { Controller, useFormContext } from "react-hook-form";
+import { graphql } from "src/generated";
+import { MondayFolderColorEnum, MutationCreateMondayItemArgs } from "src/generated/graphql";
+
+interface PaginatedGroups {
+  elements?:
+  | {
+      id: string;
+      name: string;
+    }[]
+  | null
+  | undefined;
+}
+
+interface PaginatedBoards {
+    elements?: ({
+        id: number;
+        name: string;
+        groups: PaginatedGroups;
+    }[] | null | undefined);
+}
+
+interface PaginatedFolders {
+    elements?: {
+        id?: number | null | undefined;
+        name: string;
+        color?: MondayFolderColorEnum | null | undefined;
+        boards: PaginatedBoards;
+        folders?: PaginatedFolders;
+    }[] | null | undefined;
+}
 
 interface MondayProps extends StackProps {
   userModuleId: string;
@@ -16,7 +62,7 @@ function StyledTreeItem(
   props: TreeItemProps & {
     labelIcon: React.ElementType<SvgIconProps>;
     labelText: string;
-  }
+  },
 ) {
   const { labelIcon, labelText, ...other } = props;
 
@@ -57,8 +103,8 @@ const QUERY_MONDAY_WORKSPACES = graphql(/* GraphQL */ `
 `);
 
 const QUERY_MONDAY_RESOURCES = graphql(/* GraphQL */ `
-  query MondayResources($userModuleId: ID!, $workspaceIds: [Int]) {
-    mondayResources(userModuleId: $userModuleId, workspaceIds: $workspaceIds) {
+  query MondayResources($userModuleId: ID!, $workspaceId: ID!) {
+    mondayResources(userModuleId: $userModuleId, workspaceId: $workspaceId) {
       boards {
         elements {
           id
@@ -115,8 +161,7 @@ const QUERY_MONDAY_RESOURCES = graphql(/* GraphQL */ `
 
 const Monday = (props: MondayProps) => {
   const { userModuleId, highlightedText } = props;
-  const { register, control } =
-    useFormContext<MutationCreateMondayItemArgs>();
+  const { register, control } = useFormContext<MutationCreateMondayItemArgs>();
 
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
   const [openAutocomplete, setOpenAutocomplete] = useState(false);
@@ -125,16 +170,57 @@ const Monday = (props: MondayProps) => {
       userModuleId,
     },
   });
-  const [fetchMondayResources, { data: mondayResourcesData }] =
-    useLazyQuery(QUERY_MONDAY_RESOURCES);
+  const [fetchMondayResources, { data: mondayResourcesData }] = useLazyQuery(
+    QUERY_MONDAY_RESOURCES,
+  );
   register("userModuleId", { value: userModuleId });
 
   useEffect(() => {
     if (selectedWorkspace) {
-      console.log('dasads')
-      fetchMondayResources({variables: { userModuleId, workspaceIds: [+selectedWorkspace]}})
+      fetchMondayResources({
+        variables: { userModuleId, workspaceId: selectedWorkspace },
+      });
     }
-  }, [selectedWorkspace, fetchMondayResources, userModuleId])
+  }, [selectedWorkspace, fetchMondayResources, userModuleId]);
+
+  const generateGroupTree = (groups: PaginatedGroups) => {
+    return groups.elements?.map((group) => (
+      <StyledTreeItem
+        nodeId={group.id}
+        labelText={group.name}
+        labelIcon={FormatListBulletedOutlined}
+      />
+    ));
+  };
+
+  const generateBoardTree = (boards: PaginatedBoards | undefined) => {
+    return boards?.elements?.map(
+      (board) => (
+        <StyledTreeItem
+          nodeId={board.id.toString()}
+          labelText={board.name}
+          labelIcon={SpaceDashboardOutlined}
+        >
+          { generateGroupTree(board.groups) }
+        </StyledTreeItem>
+      ),
+    )
+  };
+
+  const generateFolderTree = (folders: PaginatedFolders | undefined) => {
+    return folders?.elements?.map(
+      (folder) => (
+        <StyledTreeItem
+          nodeId={folder.id?.toString() || "Default"}
+          labelText={folder.name}
+          labelIcon={FolderOpenOutlined}
+        >
+          { generateFolderTree(folder.folders) }
+          { generateBoardTree(folder.boards) }
+        </StyledTreeItem>
+      ),
+    )
+  };
 
   return (
     <Stack spacing={2} {...props}>
@@ -170,13 +256,20 @@ const Monday = (props: MondayProps) => {
         select
         label="Select Workspace"
         required
-        onChange={(e) => {setSelectedWorkspace(e.target.value);} }
+        onChange={(e) => {
+          setSelectedWorkspace(e.target.value);
+        }}
       >
-        {mondayWorkspacesData?.mondayWorkspaces.elements?.map((mondayWorkspaceElement) => (
-          <MenuItem key={mondayWorkspaceElement.id || 'Default'} value={mondayWorkspaceElement.id || undefined}>
-            {mondayWorkspaceElement.name}
-          </MenuItem>
-        )) ?? (
+        {mondayWorkspacesData?.mondayWorkspaces.elements?.map(
+          (mondayWorkspaceElement) => (
+            <MenuItem
+              key={mondayWorkspaceElement.id}
+              value={mondayWorkspaceElement.id}
+            >
+              {mondayWorkspaceElement.name}
+            </MenuItem>
+          ),
+        ) ?? (
           <MenuItem disabled>
             There are no workspace available to select
           </MenuItem>
@@ -186,36 +279,25 @@ const Monday = (props: MondayProps) => {
         <span>
           <Autocomplete
             options={[]}
-            renderInput={(params) => <TextField {...params} label="Select Group" />}
+            renderInput={(params) => (
+              <TextField {...params} label="Select Group" />
+            )}
             open={openAutocomplete}
             onOpen={() => setOpenAutocomplete(true)}
-            //onBlur={(e) => {console.log(e.currentTarget === e.target); e.currentTarget === e.target ? setOpenAutocomplete(true) : setOpenAutocomplete(false)}}
             openOnFocus
             disableClearable
             disableCloseOnSelect
             PaperComponent={() => (
               <Paper sx={{ px: 1, py: 2 }}>
-                <TreeView
-                  defaultCollapseIcon={<ExpandMore />}
-                  defaultExpandIcon={<ChevronRight />}
-                >
-                  {
-                    mondayResourcesData?.mondayResources.boards.elements?.map((board) => (
-                      <StyledTreeItem nodeId={board.id.toString()} labelText={board.name} labelIcon={SpaceDashboardOutlined} />
-                    ))
-                  }
-                  {
-                    mondayResourcesData?.mondayResources.folders.elements?.map((folder) => (
-                      <StyledTreeItem nodeId={folder.id?.toString() || 'Default'} labelText={folder.name} labelIcon={FolderOpenOutlined} >
-                        {
-                          folder.boards.elements?.map((board) => (
-                            <StyledTreeItem nodeId={board.id.toString()} labelText={board.name} labelIcon={SpaceDashboardOutlined} />
-                          ))
-                        }
-                      </StyledTreeItem>
-                    ))
-                  }
-                </TreeView>
+                {
+                  <TreeView
+                    defaultCollapseIcon={<ExpandMore />}
+                    defaultExpandIcon={<ChevronRight />}
+                  >
+                    { generateBoardTree(mondayResourcesData?.mondayResources.boards) }
+                    { generateFolderTree(mondayResourcesData?.mondayResources.folders ) }
+                  </TreeView>
+                }
               </Paper>
             )}
           />
