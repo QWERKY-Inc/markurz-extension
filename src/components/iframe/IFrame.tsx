@@ -16,7 +16,7 @@ const IFrame = ({
   });
 
   return (
-    <iframe {...props} ref={setContentRef}>
+    <iframe title="markurz-frame" {...props} ref={setContentRef}>
       {mountNode &&
         createPortal(
           <CacheProvider value={cache}>{children}</CacheProvider>,
