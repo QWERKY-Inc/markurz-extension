@@ -215,16 +215,20 @@ const Monday = (props: MondayProps) => {
   };
 
   const generateBoardTree = (boards: PaginatedBoards | undefined) => {
-    return boards?.elements?.map((board) => (
-      <StyledTreeItem
-        key={board.id}
-        nodeId={board.id}
-        labelText={board.name}
-        labelIcon={SpaceDashboardOutlined}
-      >
-        {generateGroupTree(board.groups, board)}
-      </StyledTreeItem>
-    ));
+    return boards?.elements?.length ? (
+      boards?.elements?.map((board) => (
+        <StyledTreeItem
+          key={board.id}
+          nodeId={board.id}
+          labelText={board.name}
+          labelIcon={SpaceDashboardOutlined}
+        >
+          {generateGroupTree(board.groups, board)}
+        </StyledTreeItem>
+      ))
+    ) : (
+      <TreeItem nodeId='disabled' disabled label='There are no boards and groups available to select. Please add a board in this folder.' />
+    );
   };
 
   const generateFolderTree = (folders: PaginatedFolders | undefined) => {
@@ -239,6 +243,28 @@ const Monday = (props: MondayProps) => {
         {generateBoardTree(folder.boards)}
       </StyledTreeItem>
     ));
+  };
+
+  const generateTreeView = () => {
+    if (mondayResourcesLoading) {
+      return <Typography sx={{ paddingLeft: 1 }}>Loading...</Typography>;
+    }
+    if (
+      !mondayResourcesData?.mondayResources.folders.elements?.length &&
+      !mondayResourcesData?.mondayResources.boards.elements?.length
+    ) {
+      return (<Typography color='text.disabled' sx={{paddingLeft: '16px'}}>There are no boards and groups available to select. Please add a board in this workspace.</Typography>)
+    }
+    return (
+      <TreeView
+        defaultCollapseIcon={<ExpandMore />}
+        defaultExpandIcon={<ChevronRight />}
+        sx={{ width: "calc(100% - 16px)" }}
+      >
+        {generateFolderTree(mondayResourcesData?.mondayResources.folders)}
+        {generateBoardTree(mondayResourcesData?.mondayResources.boards)}
+      </TreeView>
+    );
   };
 
   return (
@@ -313,24 +339,7 @@ const Monday = (props: MondayProps) => {
             disableClearable
             disableCloseOnSelect
             PaperComponent={() => (
-              <Paper sx={{ px: 1, py: 2 }}>
-                {!mondayResourcesLoading ? (
-                  <TreeView
-                    defaultCollapseIcon={<ExpandMore />}
-                    defaultExpandIcon={<ChevronRight />}
-                    sx={{ width: "calc(100% - 16px)" }}
-                  >
-                    {generateFolderTree(
-                      mondayResourcesData?.mondayResources.folders,
-                    )}
-                    {generateBoardTree(
-                      mondayResourcesData?.mondayResources.boards,
-                    )}
-                  </TreeView>
-                ) : (
-                  <Typography sx={{ paddingLeft: 1 }}>Loading...</Typography>
-                )}
-              </Paper>
+              <Paper sx={{ px: 1, py: 2 }}>{generateTreeView()}</Paper>
             )}
           />
         </Box>
