@@ -5,7 +5,6 @@ import {
   Alert,
   Box,
   Button,
-  Drawer,
   DrawerProps,
   IconButton,
   ListItemIcon,
@@ -30,7 +29,6 @@ import {
   OrderByEnum,
   UserModuleStatusEnum,
 } from "src/generated/graphql";
-import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
 
 interface SideDrawerProps extends DrawerProps {
@@ -158,21 +156,13 @@ const SideDrawer = (props: SideDrawerProps) => {
   };
 
   return (
-    <Drawer
-      anchor="right"
+    <Paper
       sx={{
-        "& .MuiDrawer-paper": {
-          width: { xs: 375, sm: 420 },
-          maxWidth: "100vw",
-        },
+        width: "100%",
+        maxWidth: "100vw",
+        height: "100%",
+        overflow: "hidden",
       }}
-      ModalProps={{
-        container: document.getElementById(MARKURZ_DIV_NAME),
-        style: {
-          zIndex: 1201,
-        },
-      }}
-      {...drawerProps}
     >
       <Stack spacing={1} p={2} direction="row" alignItems="center">
         <Box flexGrow={1}>
@@ -206,7 +196,11 @@ const SideDrawer = (props: SideDrawerProps) => {
             onSubmit={handleSubmit(submit)}
             style={{ height: "100%", display: "flex", flexDirection: "column" }}
           >
-            <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
+            <Stack
+              spacing={3}
+              p={2}
+              sx={{ flexGrow: 1, overflowY: "auto", mb: 10 }}
+            >
               <Typography
                 variant="h5"
                 component="p"
@@ -340,7 +334,7 @@ const SideDrawer = (props: SideDrawerProps) => {
           </form>
         </FormProvider>
       )}
-    </Drawer>
+    </Paper>
   );
 };
 

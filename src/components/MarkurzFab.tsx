@@ -1,7 +1,8 @@
-import { Fab } from "@mui/material";
+import { Fab, Fade } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
+import IFrame from "src/components/iframe/IFrame";
 import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
 
@@ -132,11 +133,27 @@ const MarkurzFab = () => {
 
   return (
     <>
-      <SideDrawer
-        highlightedText={highlightedText}
-        open={showDrawer}
-        onClose={handleDrawerClose}
-      />
+      <IFrame
+        style={{
+          position: "fixed",
+          top: 0,
+          right: 0,
+          width: 425,
+          height: "100vh",
+          border: "none",
+          background: "transparent",
+        }}
+      >
+        <Fade in={showDrawer}>
+          <div>
+            <SideDrawer
+              highlightedText={highlightedText}
+              open={showDrawer}
+              onClose={handleDrawerClose}
+            />
+          </div>
+        </Fade>
+      </IFrame>
       <Fab
         aria-label="create-task"
         size="small"

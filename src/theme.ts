@@ -5,7 +5,7 @@ import { createTheme, responsiveFontSizes } from "@mui/material";
 const theme = createTheme({
   typography: {
     fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(
-      ","
+      ",",
     ),
     // We ignore because for some reason this didn't get exposed in TS
     // @ts-ignore
