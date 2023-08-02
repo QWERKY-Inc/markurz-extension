@@ -174,7 +174,8 @@ const Trello = (props: TrelloProps) => {
         ))}
         {!data?.trelloWorkspaces.elements?.length && (
           <MenuItem disabled>
-            There are no workspace available to select
+            There are no workspaces available to select. Please create a
+            workspace in Trello.
           </MenuItem>
         )}
       </TextField>
@@ -182,8 +183,8 @@ const Trello = (props: TrelloProps) => {
         select
         label="Select Board"
         required
-        disabled={!trelloBoards?.trelloBoards.elements?.length}
         onChange={(e) => setSelectedBoard(e.target.value)}
+        disabled={!selectedWorkspace}
       >
         {trelloBoards?.trelloBoards.elements?.map((board) => (
           <MenuItem key={board.id} value={board.id}>
@@ -191,7 +192,10 @@ const Trello = (props: TrelloProps) => {
           </MenuItem>
         ))}
         {!trelloBoards?.trelloBoards.elements?.length && (
-          <MenuItem disabled>There are no boards available to select</MenuItem>
+          <MenuItem disabled>
+            There are no boards available to select. Please create a board in
+            Trello.
+          </MenuItem>
         )}
       </TextField>
       <Controller
@@ -216,7 +220,8 @@ const Trello = (props: TrelloProps) => {
               (o) => o.id === selectedBoard,
             )?.lists?.length && (
               <MenuItem disabled>
-                There are no list available to select
+                There are no lists available to select. Please create a list in
+                Trello.
               </MenuItem>
             )}
           </TextField>
@@ -282,6 +287,12 @@ const Trello = (props: TrelloProps) => {
                 <ListItemText primary={trelloLabel.label} />
               </MenuItem>
             ))}
+            {!trelloLabels?.trelloLabels.elements?.length && (
+              <MenuItem disabled>
+                There are no labels available to select. Please create labels in
+                Trello.
+              </MenuItem>
+            )}
           </TextField>
         )}
         name="element.labelIds"
