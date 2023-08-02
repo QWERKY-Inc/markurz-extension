@@ -23,36 +23,41 @@ import {
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
-import { MondayFolderColorEnum, MutationCreateMondayItemArgs } from "src/generated/graphql";
+import {
+  MondayFolderColorEnum,
+  MutationCreateMondayItemArgs,
+} from "src/generated/graphql";
 
 interface Group {
   id: string;
   name: string;
+  board?: Board;
 }
 
 interface PaginatedGroups {
-  elements?:
-  | Group[]
-  | null
-  | undefined;
+  elements?: Group[] | null | undefined;
+}
+
+interface Board {
+  id: string;
+  name: string;
 }
 
 interface PaginatedBoards {
-    elements?: ({
-        id: string;
-        name: string;
-        groups: PaginatedGroups;
-    }[] | null | undefined);
+  elements?: (Board & { groups: PaginatedGroups })[] | null | undefined;
 }
 
 interface PaginatedFolders {
-    elements?: {
-        id?: number | null | undefined;
+  elements?:
+    | {
+        id: string;
         name: string;
         color?: MondayFolderColorEnum | null | undefined;
         boards: PaginatedBoards;
         folders?: PaginatedFolders;
-    }[] | null | undefined;
+      }[]
+    | null
+    | undefined;
 }
 
 interface MondayProps extends StackProps {
@@ -163,43 +168,46 @@ const QUERY_MONDAY_RESOURCES = graphql(/* GraphQL */ `
 
 const Monday = (props: MondayProps) => {
   const { userModuleId, highlightedText } = props;
-  const { register, setValue, control } = useFormContext<MutationCreateMondayItemArgs>();
+  const { register, setValue, control } =
+    useFormContext<MutationCreateMondayItemArgs>();
 
-  const [selectedWorkspace, setSelectedWorkspace] = useState<string>();
+  const [selectedWorkspace, setSelectedWorkspace] = useState("");
+  const [selectedGroup, setSelectedGroup] = useState<Group>({
+    id: "",
+    name: "",
+  });
   const [openAutocomplete, setOpenAutocomplete] = useState(false);
-  const [selectedGroup, setSelectedGroup] = useState<Group>();
   const { data: mondayWorkspacesData } = useQuery(QUERY_MONDAY_WORKSPACES, {
     variables: {
       userModuleId,
     },
   });
-  const [fetchMondayResources, { data: mondayResourcesData }] = useLazyQuery(
-    QUERY_MONDAY_RESOURCES,
-  );
+  const [
+    fetchMondayResources,
+    { data: mondayResourcesData, loading: mondayResourcesLoading },
+  ] = useLazyQuery(QUERY_MONDAY_RESOURCES);
   register("userModuleId", { value: userModuleId });
 
   useEffect(() => {
     if (selectedWorkspace) {
+      setSelectedGroup({ id: "", name: "" });
       fetchMondayResources({
         variables: { userModuleId, workspaceId: selectedWorkspace },
       });
     }
   }, [selectedWorkspace, fetchMondayResources, userModuleId]);
 
-  useEffect(() => {
-    console.log(selectedGroup);
-  }, [selectedGroup])
-
-  const generateGroupTree = (groups: PaginatedGroups, boardId: string) => {
+  const generateGroupTree = (groups: PaginatedGroups, board: Board) => {
     return groups.elements?.map((group) => (
       <StyledTreeItem
-        nodeId={group.id}
+        key={`${board.id}-${group.id}`}
+        nodeId={`${board.id}-${group.id}`}
         labelText={group.name}
         labelIcon={FormatListBulletedOutlined}
-        onClick={() => { 
-          setValue("element.boardId", boardId);
+        onClick={() => {
+          setValue("element.boardId", board.id);
           setValue("element.groupId", group.id);
-          setSelectedGroup(group);
+          setSelectedGroup({ ...group, board });
           setOpenAutocomplete(false);
         }}
       />
@@ -207,32 +215,30 @@ const Monday = (props: MondayProps) => {
   };
 
   const generateBoardTree = (boards: PaginatedBoards | undefined) => {
-    return boards?.elements?.map(
-      (board) => (
-        <StyledTreeItem
-          nodeId={board.id.toString()}
-          labelText={board.name}
-          labelIcon={SpaceDashboardOutlined}
-        >
-          { generateGroupTree(board.groups, board.id.toString()) }
-        </StyledTreeItem>
-      ),
-    )
+    return boards?.elements?.map((board) => (
+      <StyledTreeItem
+        key={board.id}
+        nodeId={board.id}
+        labelText={board.name}
+        labelIcon={SpaceDashboardOutlined}
+      >
+        {generateGroupTree(board.groups, board)}
+      </StyledTreeItem>
+    ));
   };
 
   const generateFolderTree = (folders: PaginatedFolders | undefined) => {
-    return folders?.elements?.map(
-      (folder) => (
-        <StyledTreeItem
-          nodeId={folder.id?.toString() || "Default"}
-          labelText={folder.name}
-          labelIcon={FolderOpenOutlined}
-        >
-          { generateFolderTree(folder.folders) }
-          { generateBoardTree(folder.boards) }
-        </StyledTreeItem>
-      ),
-    )
+    return folders?.elements?.map((folder) => (
+      <StyledTreeItem
+        key={folder.id}
+        nodeId={folder.id}
+        labelText={folder.name}
+        labelIcon={FolderOpenOutlined}
+      >
+        {generateFolderTree(folder.folders)}
+        {generateBoardTree(folder.boards)}
+      </StyledTreeItem>
+    ));
   };
 
   return (
@@ -269,6 +275,7 @@ const Monday = (props: MondayProps) => {
         select
         label="Select Workspace"
         required
+        value={selectedWorkspace}
         onChange={(e) => {
           setSelectedWorkspace(e.target.value);
         }}
@@ -289,36 +296,44 @@ const Monday = (props: MondayProps) => {
         )}
       </TextField>
       <ClickAwayListener onClickAway={() => setOpenAutocomplete(false)}>
-        <span>
+        <Box>
           <Autocomplete
             options={[]}
             renderInput={(params) => (
-              <TextField {...params} label="Select Group" required />
+              <TextField {...params} label="Select Board > Group" required />
             )}
             open={openAutocomplete}
             onOpen={() => setOpenAutocomplete(true)}
             value={selectedGroup}
-            getOptionLabel={(o) => o.name}
+            getOptionLabel={(o) =>
+              o.name.length ? `${o.board?.name} > ${o.name}` : ""
+            }
             disabled={!selectedWorkspace}
             openOnFocus
             disableClearable
             disableCloseOnSelect
             PaperComponent={() => (
               <Paper sx={{ px: 1, py: 2 }}>
-                {
+                {!mondayResourcesLoading ? (
                   <TreeView
                     defaultCollapseIcon={<ExpandMore />}
                     defaultExpandIcon={<ChevronRight />}
-                    sx={{width: "calc(100% - 16px)"}}
+                    sx={{ width: "calc(100% - 16px)" }}
                   >
-                    { generateBoardTree(mondayResourcesData?.mondayResources.boards) }
-                    { generateFolderTree(mondayResourcesData?.mondayResources.folders ) }
+                    {generateFolderTree(
+                      mondayResourcesData?.mondayResources.folders,
+                    )}
+                    {generateBoardTree(
+                      mondayResourcesData?.mondayResources.boards,
+                    )}
                   </TreeView>
-                }
+                ) : (
+                  <Typography sx={{ paddingLeft: 1 }}>Loading...</Typography>
+                )}
               </Paper>
             )}
           />
-        </span>
+        </Box>
       </ClickAwayListener>
     </Stack>
   );
