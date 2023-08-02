@@ -25,19 +25,21 @@ import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MondayFolderColorEnum, MutationCreateMondayItemArgs } from "src/generated/graphql";
 
+interface Group {
+  id: string;
+  name: string;
+}
+
 interface PaginatedGroups {
   elements?:
-  | {
-      id: string;
-      name: string;
-    }[]
+  | Group[]
   | null
   | undefined;
 }
 
 interface PaginatedBoards {
     elements?: ({
-        id: number;
+        id: string;
         name: string;
         groups: PaginatedGroups;
     }[] | null | undefined);
@@ -161,10 +163,11 @@ const QUERY_MONDAY_RESOURCES = graphql(/* GraphQL */ `
 
 const Monday = (props: MondayProps) => {
   const { userModuleId, highlightedText } = props;
-  const { register, control } = useFormContext<MutationCreateMondayItemArgs>();
+  const { register, setValue, control } = useFormContext<MutationCreateMondayItemArgs>();
 
-  const [selectedWorkspace, setSelectedWorkspace] = useState("");
+  const [selectedWorkspace, setSelectedWorkspace] = useState<string>();
   const [openAutocomplete, setOpenAutocomplete] = useState(false);
+  const [selectedGroup, setSelectedGroup] = useState<Group>();
   const { data: mondayWorkspacesData } = useQuery(QUERY_MONDAY_WORKSPACES, {
     variables: {
       userModuleId,
@@ -183,12 +186,22 @@ const Monday = (props: MondayProps) => {
     }
   }, [selectedWorkspace, fetchMondayResources, userModuleId]);
 
-  const generateGroupTree = (groups: PaginatedGroups) => {
+  useEffect(() => {
+    console.log(selectedGroup);
+  }, [selectedGroup])
+
+  const generateGroupTree = (groups: PaginatedGroups, boardId: string) => {
     return groups.elements?.map((group) => (
       <StyledTreeItem
         nodeId={group.id}
         labelText={group.name}
         labelIcon={FormatListBulletedOutlined}
+        onClick={() => { 
+          setValue("element.boardId", boardId);
+          setValue("element.groupId", group.id);
+          setSelectedGroup(group);
+          setOpenAutocomplete(false);
+        }}
       />
     ));
   };
@@ -201,7 +214,7 @@ const Monday = (props: MondayProps) => {
           labelText={board.name}
           labelIcon={SpaceDashboardOutlined}
         >
-          { generateGroupTree(board.groups) }
+          { generateGroupTree(board.groups, board.id.toString()) }
         </StyledTreeItem>
       ),
     )
@@ -280,10 +293,13 @@ const Monday = (props: MondayProps) => {
           <Autocomplete
             options={[]}
             renderInput={(params) => (
-              <TextField {...params} label="Select Group" />
+              <TextField {...params} label="Select Group" required />
             )}
             open={openAutocomplete}
             onOpen={() => setOpenAutocomplete(true)}
+            value={selectedGroup}
+            getOptionLabel={(o) => o.name}
+            disabled={!selectedWorkspace}
             openOnFocus
             disableClearable
             disableCloseOnSelect
@@ -293,6 +309,7 @@ const Monday = (props: MondayProps) => {
                   <TreeView
                     defaultCollapseIcon={<ExpandMore />}
                     defaultExpandIcon={<ChevronRight />}
+                    sx={{width: "calc(100% - 16px)"}}
                   >
                     { generateBoardTree(mondayResourcesData?.mondayResources.boards) }
                     { generateFolderTree(mondayResourcesData?.mondayResources.folders ) }
