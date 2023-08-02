@@ -1,4 +1,4 @@
-import { Fab, Fade } from "@mui/material";
+import { Fab } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
@@ -136,25 +136,25 @@ const MarkurzFab = () => {
       <IFrame
         style={{
           position: "fixed",
-          top: 0,
-          right: 0,
+          top: 8,
+          right: 8,
+          bottom: 8,
           width: 425,
-          height: "100vh",
+          height: "calc(100vh - 16px)",
           border: "none",
-          background: "transparent",
           pointerEvents: showDrawer ? "auto" : "none",
+          visibility: showDrawer ? "visible" : "hidden",
+          boxShadow:
+            "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
+          borderRadius: 4,
+          background: "white",
         }}
       >
-        <Fade in={showDrawer}>
-          <div>
-            <meta name="color-scheme" content="light dark" />
-            <SideDrawer
-              highlightedText={highlightedText}
-              open={showDrawer}
-              onClose={handleDrawerClose}
-            />
-          </div>
-        </Fade>
+        <SideDrawer
+          highlightedText={highlightedText}
+          open={showDrawer}
+          onClose={handleDrawerClose}
+        />
       </IFrame>
       <Fab
         aria-label="create-task"

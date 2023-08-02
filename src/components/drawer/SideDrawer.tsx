@@ -156,7 +156,7 @@ const SideDrawer = (props: SideDrawerProps) => {
   };
 
   return (
-    <Paper
+    <Box
       sx={{
         width: "100%",
         maxWidth: "100vw",
@@ -334,7 +334,7 @@ const SideDrawer = (props: SideDrawerProps) => {
           </form>
         </FormProvider>
       )}
-    </Paper>
+    </Box>
   );
 };
 
