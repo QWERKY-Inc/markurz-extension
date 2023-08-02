@@ -142,10 +142,12 @@ const MarkurzFab = () => {
           height: "100vh",
           border: "none",
           background: "transparent",
+          pointerEvents: showDrawer ? "auto" : "none",
         }}
       >
         <Fade in={showDrawer}>
           <div>
+            <meta name="color-scheme" content="light dark" />
             <SideDrawer
               highlightedText={highlightedText}
               open={showDrawer}

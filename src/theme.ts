@@ -11,6 +11,9 @@ const theme = createTheme({
     // @ts-ignore
     pxToRem: (size) => `${size}px`,
   },
+  palette: {
+    mode: "light",
+  },
 });
 
 theme.components = {

@@ -16,7 +16,7 @@ const IFrame = ({
   });
 
   return (
-    <iframe {...props} allowTransparency ref={setContentRef}>
+    <iframe {...props} ref={setContentRef}>
       {mountNode &&
         createPortal(
           <CacheProvider value={cache}>{children}</CacheProvider>,
