@@ -22,8 +22,10 @@ import {
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { StyledTreeItem } from "src/components/formComponents/styledTreeItem";
-import { graphql } from "src/generated";
+import { getFragmentData, graphql } from "src/generated";
 import {
+  FragmentPaginatedBoardsFieldsFragment,
+  FragmentPaginatedBoardsFieldsFragmentDoc,
   MondayFolderColorEnum,
   MutationCreateMondayItemArgs,
 } from "src/generated/graphql";
@@ -35,7 +37,7 @@ interface Group {
 }
 
 interface PaginatedGroups {
-  elements?: Group[] | null | undefined;
+  elements?: Group[] | null;
 }
 
 interface Board {
@@ -44,7 +46,7 @@ interface Board {
 }
 
 interface PaginatedBoards {
-  elements?: (Board & { groups: PaginatedGroups })[] | null | undefined;
+  elements?: (Board & { groups: PaginatedGroups })[] | null;
 }
 
 interface PaginatedFolders {
@@ -52,12 +54,15 @@ interface PaginatedFolders {
     | {
         id: string;
         name: string;
-        color?: MondayFolderColorEnum | null | undefined;
-        boards: PaginatedBoards;
+        color?: MondayFolderColorEnum | null;
         folders?: PaginatedFolders;
+        boards: { __typename?: "PaginatedMondayBoards" } & {
+          " $fragmentRefs"?: {
+            FragmentPaginatedBoardsFieldsFragment: FragmentPaginatedBoardsFieldsFragment;
+          };
+        };
       }[]
-    | null
-    | undefined;
+    | null;
 }
 
 interface MondayProps extends StackProps {
@@ -76,54 +81,40 @@ const QUERY_MONDAY_WORKSPACES = graphql(/* GraphQL */ `
   }
 `);
 
+export const FRAGMENT_PAGINATED_BOARD_FIELDS = graphql(/* GraphQL */ `
+  fragment FragmentPaginatedBoardsFields on PaginatedMondayBoards {
+    elements {
+      id
+      name
+      groups {
+        elements {
+          id
+          name
+        }
+      }
+    }
+  }
+`);
+
 const QUERY_MONDAY_RESOURCES = graphql(/* GraphQL */ `
   query MondayResources($userModuleId: ID!, $workspaceId: ID!) {
     mondayResources(userModuleId: $userModuleId, workspaceId: $workspaceId) {
       boards {
-        elements {
-          id
-          name
-          groups {
-            elements {
-              id
-              name
-            }
-          }
-        }
+        ...FragmentPaginatedBoardsFields
       }
       folders {
         elements {
           id
           name
-          color
           boards {
-            elements {
-              id
-              name
-              groups {
-                elements {
-                  id
-                  name
-                }
-              }
-            }
+            ...FragmentPaginatedBoardsFields
           }
           folders {
             elements {
               id
               name
-              color
               boards {
-                elements {
-                  id
-                  name
-                  groups {
-                    elements {
-                      id
-                      name
-                    }
-                  }
-                }
+                ...FragmentPaginatedBoardsFields
               }
             }
           }
@@ -144,6 +135,7 @@ const Monday = (props: MondayProps) => {
     name: "",
   });
   const [openAutocomplete, setOpenAutocomplete] = useState(false);
+
   const { data: mondayWorkspacesData } = useQuery(QUERY_MONDAY_WORKSPACES, {
     variables: {
       userModuleId,
@@ -164,6 +156,10 @@ const Monday = (props: MondayProps) => {
     }
   }, [selectedWorkspace, fetchMondayResources, userModuleId]);
 
+  useEffect(() => {
+    console.log(mondayResourcesData?.mondayResources.boards);
+  }, [mondayResourcesData]);
+
   const generateGroupTree = (groups: PaginatedGroups, board: Board) => {
     return groups.elements?.map((group) => (
       <StyledTreeItem
@@ -181,7 +177,7 @@ const Monday = (props: MondayProps) => {
     ));
   };
 
-  const generateBoardTree = (boards: PaginatedBoards | undefined) => {
+  const generateBoardTree = (boards: PaginatedBoards | undefined | null) => {
     return boards?.elements?.length ? (
       boards?.elements?.map((board) => (
         <StyledTreeItem
@@ -202,27 +198,36 @@ const Monday = (props: MondayProps) => {
     );
   };
 
-  const generateFolderTree = (folders: PaginatedFolders | undefined) => {
-    return folders?.elements?.map((folder) => (
-      <StyledTreeItem
-        key={folder.id}
-        nodeId={folder.id}
-        labelText={folder.name}
-        labelIcon={FolderOpenOutlined}
-      >
-        {generateFolderTree(folder.folders)}
-        {generateBoardTree(folder.boards)}
-      </StyledTreeItem>
-    ));
-  };
+  const generateFolderTree = (folders: PaginatedFolders | undefined) =>
+    folders?.elements?.map((folder) => {
+      const paginatedBoards = getFragmentData(
+        FragmentPaginatedBoardsFieldsFragmentDoc,
+        folder.boards,
+      );
+      return (
+        <StyledTreeItem
+          key={folder.id}
+          nodeId={folder.id}
+          labelText={folder.name}
+          labelIcon={FolderOpenOutlined}
+        >
+          {generateFolderTree(folder.folders)}
+          {generateBoardTree(paginatedBoards)}
+        </StyledTreeItem>
+      );
+    });
 
   const generateTreeView = () => {
     if (mondayResourcesLoading) {
       return <Typography sx={{ paddingLeft: 1 }}>Loading...</Typography>;
     }
+    const paginatedBoards = getFragmentData(
+      FragmentPaginatedBoardsFieldsFragmentDoc,
+      mondayResourcesData?.mondayResources.boards,
+    );
     if (
       !mondayResourcesData?.mondayResources.folders.elements?.length &&
-      !mondayResourcesData?.mondayResources.boards.elements?.length
+      !paginatedBoards?.elements?.length
     ) {
       return (
         <Typography color="text.disabled" sx={{ paddingLeft: "16px" }}>
@@ -238,7 +243,7 @@ const Monday = (props: MondayProps) => {
         sx={{ width: "calc(100% - 16px)" }}
       >
         {generateFolderTree(mondayResourcesData?.mondayResources.folders)}
-        {generateBoardTree(mondayResourcesData?.mondayResources.boards)}
+        {generateBoardTree(paginatedBoards)}
       </TreeView>
     );
   };

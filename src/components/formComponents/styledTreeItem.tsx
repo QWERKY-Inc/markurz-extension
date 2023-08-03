@@ -7,7 +7,7 @@ export function StyledTreeItem(
     labelText: string;
   },
 ) {
-  const { labelIcon, labelText, ...other } = props;
+  const { labelIcon, labelText, ...treeItemProps } = props;
 
   return (
     <TreeItem
@@ -29,7 +29,7 @@ export function StyledTreeItem(
           </Typography>
         </Box>
       }
-      {...other}
+      {...treeItemProps}
     />
   );
 }
