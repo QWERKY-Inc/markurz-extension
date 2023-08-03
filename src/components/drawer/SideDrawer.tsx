@@ -119,6 +119,7 @@ const SideDrawer = (props: SideDrawerProps) => {
             currentApp.mutation,
           variables: form,
         });
+        setErrorMutation("");
         setResult({
           appName: currentApp.name,
           taskName: currentApp.taskName,
