@@ -46,7 +46,9 @@ const MarkurzFab = () => {
 
   const handleFabClick = useCallback(() => {
     setShowDrawer(true);
-    setShowFab(false);
+    if (!process.env.REACT_APP_SIMULATE_LOCALLY) {
+      setShowFab(false);
+    }
   }, []);
 
   const handleDrawerClose = (
