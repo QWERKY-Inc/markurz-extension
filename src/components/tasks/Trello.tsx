@@ -370,7 +370,6 @@ const Trello = (props: TrelloProps) => {
         name="element.memberIds"
         control={control}
       />
-
       <Controller
         render={({ field }) => (
           <DateTimePicker
