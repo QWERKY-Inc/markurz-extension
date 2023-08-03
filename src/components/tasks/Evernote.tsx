@@ -20,7 +20,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { StyledTreeItem } from "src/components/formComponents/styledTreeItem";
 import { graphql } from "src/generated";
@@ -125,8 +125,6 @@ const Evernote = (props: EvernoteProps) => {
       [],
     );
   }, [dataNotebooks?.evernoteNotebooks.elements]);
-
-  console.log("tree", tree);
 
   return (
     <Stack spacing={2} {...stackProps}>
