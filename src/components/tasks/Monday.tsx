@@ -24,10 +24,10 @@ import { Controller, useFormContext } from "react-hook-form";
 import { StyledTreeItem } from "src/components/formComponents/styledTreeItem";
 import { getFragmentData, graphql } from "src/generated";
 import {
-  FragmentPaginatedBoardsFieldsFragment,
+  FragmentFolderFieldsFragment,
+  FragmentFolderFieldsFragmentDoc,
   FragmentPaginatedBoardsFieldsFragmentDoc,
-  MondayFolderColorEnum,
-  MutationCreateMondayItemArgs,
+  MutationCreateMondayItemArgs
 } from "src/generated/graphql";
 
 interface Group {
@@ -51,17 +51,12 @@ interface PaginatedBoards {
 
 interface PaginatedFolders {
   elements?:
-    | {
-        id: string;
-        name: string;
-        color?: MondayFolderColorEnum | null;
-        folders?: PaginatedFolders;
-        boards: { __typename?: "PaginatedMondayBoards" } & {
-          " $fragmentRefs"?: {
-            FragmentPaginatedBoardsFieldsFragment: FragmentPaginatedBoardsFieldsFragment;
-          };
-        };
-      }[]
+    | (
+        {
+          folders?: PaginatedFolders
+        } & {
+          " $fragmentRefs"?: { FragmentFolderFieldsFragment: FragmentFolderFieldsFragment; }
+        } )[]
     | null;
 }
 
@@ -96,6 +91,16 @@ export const FRAGMENT_PAGINATED_BOARD_FIELDS = graphql(/* GraphQL */ `
   }
 `);
 
+export const FRAGMENT_FOLDER_FIELDS = graphql(/* GraphQL */ `
+  fragment FragmentFolderFields on MondayFolder {
+    id
+    name
+    boards {
+      ...FragmentPaginatedBoardsFields
+    }
+  }
+`);
+
 const QUERY_MONDAY_RESOURCES = graphql(/* GraphQL */ `
   query MondayResources($userModuleId: ID!, $workspaceId: ID!) {
     mondayResources(userModuleId: $userModuleId, workspaceId: $workspaceId) {
@@ -104,18 +109,10 @@ const QUERY_MONDAY_RESOURCES = graphql(/* GraphQL */ `
       }
       folders {
         elements {
-          id
-          name
-          boards {
-            ...FragmentPaginatedBoardsFields
-          }
+          ...FragmentFolderFields
           folders {
             elements {
-              id
-              name
-              boards {
-                ...FragmentPaginatedBoardsFields
-              }
+              ...FragmentFolderFields
             }
           }
         }
@@ -200,15 +197,19 @@ const Monday = (props: MondayProps) => {
 
   const generateFolderTree = (folders: PaginatedFolders | undefined) =>
     folders?.elements?.map((folder) => {
+      const folderFragment = getFragmentData(
+        FragmentFolderFieldsFragmentDoc,
+        folder,
+      );
       const paginatedBoards = getFragmentData(
         FragmentPaginatedBoardsFieldsFragmentDoc,
-        folder.boards,
+        folderFragment.boards,
       );
       return (
         <StyledTreeItem
-          key={folder.id}
-          nodeId={folder.id}
-          labelText={folder.name}
+          key={folderFragment.id}
+          nodeId={folderFragment.id}
+          labelText={folderFragment.name}
           labelIcon={FolderOpenOutlined}
         >
           {generateFolderTree(folder.folders)}
