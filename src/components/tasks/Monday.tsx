@@ -7,7 +7,7 @@ import {
   InfoOutlined,
   SpaceDashboardOutlined,
 } from "@mui/icons-material";
-import { TreeItem, TreeItemProps, TreeView } from "@mui/lab";
+import { TreeItem, TreeView } from "@mui/lab";
 import {
   Autocomplete,
   Box,
@@ -16,12 +16,12 @@ import {
   Paper,
   Stack,
   StackProps,
-  SvgIconProps,
   TextField,
   Typography,
 } from "@mui/material";
 import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import { StyledTreeItem } from "src/components/formComponents/styledTreeItem";
 import { graphql } from "src/generated";
 import {
   MondayFolderColorEnum,
@@ -63,39 +63,6 @@ interface PaginatedFolders {
 interface MondayProps extends StackProps {
   userModuleId: string;
   highlightedText: string;
-}
-
-function StyledTreeItem(
-  props: TreeItemProps & {
-    labelIcon: React.ElementType<SvgIconProps>;
-    labelText: string;
-  },
-) {
-  const { labelIcon, labelText, ...other } = props;
-
-  return (
-    <TreeItem
-      label={
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            p: 0.5,
-            pr: 0,
-          }}
-        >
-          <Box component={labelIcon} color="inherit" sx={{ mr: 1 }} />
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: "inherit", flexGrow: 1 }}
-          >
-            {labelText}
-          </Typography>
-        </Box>
-      }
-      {...other}
-    />
-  );
 }
 
 const QUERY_MONDAY_WORKSPACES = graphql(/* GraphQL */ `
@@ -227,7 +194,11 @@ const Monday = (props: MondayProps) => {
         </StyledTreeItem>
       ))
     ) : (
-      <TreeItem nodeId='disabled' disabled label='There are no boards and groups available to select. Please add a board in this folder.' />
+      <TreeItem
+        nodeId="disabled"
+        disabled
+        label="There are no boards and groups available to select. Please add a board in this folder."
+      />
     );
   };
 
@@ -253,7 +224,12 @@ const Monday = (props: MondayProps) => {
       !mondayResourcesData?.mondayResources.folders.elements?.length &&
       !mondayResourcesData?.mondayResources.boards.elements?.length
     ) {
-      return (<Typography color='text.disabled' sx={{paddingLeft: '16px'}}>There are no boards and groups available to select. Please add a board in this workspace.</Typography>)
+      return (
+        <Typography color="text.disabled" sx={{ paddingLeft: "16px" }}>
+          There are no boards and groups available to select. Please add a board
+          in this workspace.
+        </Typography>
+      );
     }
     return (
       <TreeView

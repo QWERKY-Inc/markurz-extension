@@ -8,7 +8,7 @@ import {
 } from "@mui/icons-material";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
-import { TreeItem, TreeItemProps, TreeView } from "@mui/lab";
+import { TreeView } from "@mui/lab";
 import {
   Autocomplete,
   Box,
@@ -17,51 +17,18 @@ import {
   Paper,
   Stack,
   StackProps,
-  SvgIconProps,
   TextField,
   Typography,
 } from "@mui/material";
 import React, { useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import { StyledTreeItem } from "src/components/formComponents/styledTreeItem";
 import { graphql } from "src/generated";
 import { MutationCreateEvernoteNoteArgs } from "src/generated/graphql";
 
 interface EvernoteProps extends StackProps {
   userModuleId: string;
   highlightedText: string;
-}
-
-function StyledTreeItem(
-  props: TreeItemProps & {
-    labelIcon: React.ElementType<SvgIconProps>;
-    labelText: string;
-  }
-) {
-  const { labelIcon, labelText, ...other } = props;
-
-  return (
-    <TreeItem
-      label={
-        <Box
-          sx={{
-            display: "flex",
-            alignItems: "center",
-            p: 0.5,
-            pr: 0,
-          }}
-        >
-          <Box component={labelIcon} color="inherit" sx={{ mr: 1 }} />
-          <Typography
-            variant="body2"
-            sx={{ fontWeight: "inherit", flexGrow: 1 }}
-          >
-            {labelText}
-          </Typography>
-        </Box>
-      }
-      {...other}
-    />
-  );
 }
 
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
@@ -124,7 +91,7 @@ const Evernote = (props: EvernoteProps) => {
   const selectedNotebookId = watch("element.notebookId");
   const selectedNotebook = dataNotebooks?.evernoteNotebooks.elements
     ? dataNotebooks.evernoteNotebooks.elements.find(
-        (o) => o.id === selectedNotebookId
+        (o) => o.id === selectedNotebookId,
       )
     : null;
   const [open, setOpen] = useState(false);
@@ -155,7 +122,7 @@ const Evernote = (props: EvernoteProps) => {
           return [...acc, new NodeElement({ id, name: curr.name })];
         }
       },
-      []
+      [],
     );
   }, [dataNotebooks?.evernoteNotebooks.elements]);
 
