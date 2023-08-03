@@ -84,6 +84,13 @@ theme.components = {
       },
     },
   },
+  MuiMenuItem: {
+    styleOverrides: {
+      root: {
+        textWrap: "wrap",
+      },
+    },
+  },
 };
 
 export default responsiveFontSizes(theme);
