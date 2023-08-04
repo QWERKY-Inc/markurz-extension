@@ -194,7 +194,6 @@ const SideDrawer = (props: SideDrawerProps) => {
       ) : (
         <FormProvider {...methods}>
           <form
-            onSubmit={handleSubmit(submit)}
             style={{ height: "100%", display: "flex", flexDirection: "column" }}
           >
             <Stack
@@ -318,12 +317,17 @@ const SideDrawer = (props: SideDrawerProps) => {
                     disabled={!isValid || (!!result && !result.url)}
                     startIcon={result ? <Link /> : undefined}
                     variant="contained"
-                    type={result ? "button" : "submit"}
+                    type="button"
                     loading={loading}
                     color={result ? "secondary" : "primary"}
                     href={result?.url || ""}
                     rel="noopener"
                     target="_blank"
+                    onClick={() => {
+                      if (!result) {
+                        handleSubmit(submit)();
+                      }
+                    }}
                   >
                     {result
                       ? `Link to ${result.appName} ${result.taskName}`
