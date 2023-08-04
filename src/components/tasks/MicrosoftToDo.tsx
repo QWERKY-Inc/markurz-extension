@@ -127,6 +127,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
         )}
         name="element.taskListId"
         control={control}
+        defaultValue=""
       />
       <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
