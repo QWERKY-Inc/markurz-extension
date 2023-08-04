@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { CreateMicrosoftOneNotePageMutationVariables } from "src/generated/graphql";
@@ -64,7 +64,7 @@ const QUERY_MICROSOFT_ONENOTE_SECTIONS = graphql(/* GraphQL */ `
 
 const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control, setValue } =
+  const { register, control, setValue, resetField } =
     useFormContext<CreateMicrosoftOneNotePageMutationVariables>();
   const [section, setSection] = useState<null | { id: string; label: string }>(
     null,
@@ -90,6 +90,13 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
     skip: !notebookId,
   });
   register("userModuleId", { value: userModuleId });
+  register("element.sectionId", { required: true });
+
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.title", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
 
   return (
     <Stack spacing={3} {...stackProps}>
