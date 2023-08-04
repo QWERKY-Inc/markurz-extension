@@ -88,7 +88,7 @@ const Jira = (props: JiraProps) => {
   const siteId = watch("element.siteId");
   const projectKey = watch("element.projectKey");
   const [queryJiraData, { data }] = useLazyQuery(QUERY_JIRA_DATA);
-  const [fetchUserData, { refetch: refetchUserData, data: usersData }] =
+  const [fetchUserData, { refetch: refetchUserData, data: usersData, loading: userDataLoading }] =
     useLazyQuery(QUERY_JIRA_USERS);
   const { data: dataSites } = useQuery(QUERY_JIRA_SITES, {
     variables: {
@@ -275,17 +275,18 @@ const Jira = (props: JiraProps) => {
             {...rest}
             value={usersData?.jiraUsers.elements?.find(
               (elem) => elem.id === value,
-            )}
-            onChange={(_, data) => onChange(data?.id ?? undefined)}
+            ) ?? null}
             options={usersData?.jiraUsers.elements ?? []}
             getOptionLabel={(o) => o.displayName}
             renderInput={(params) => (
               <TextField {...params} label="Select Assignee" />
             )}
+            disabled={!projectKey}
+            loading={userDataLoading}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            onChange={(_, data) => onChange(data?.id ?? undefined)}
             onInputChange={(_, value) => {
-              if (value) {
-                refetchUserData({ query: value });
-              }
+              refetchUserData({ query: value });
             }}
           />
         )}
