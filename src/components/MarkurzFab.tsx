@@ -141,7 +141,7 @@ const MarkurzFab = () => {
           top: 8,
           right: 8,
           bottom: 8,
-          width: 425,
+          width: 525,
           height: "calc(100vh - 16px)",
           border: "none",
           pointerEvents: showDrawer ? "auto" : "none",
