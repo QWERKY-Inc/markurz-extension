@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect } from "react";
+import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateJiraIssueArgs } from "src/generated/graphql";
@@ -79,22 +79,22 @@ const Jira = (props: JiraProps) => {
         },
       });
     }
-  }, [siteId, userModuleId]);
+  }, [queryJiraData, siteId, userModuleId]);
 
   useEffect(() => {
     if (highlightedText) {
       resetField("element.summary", { defaultValue: highlightedText });
     }
-  }, [highlightedText]);
+  }, [resetField, highlightedText]);
 
   useEffect(() => {
     resetField("element.projectKey");
     resetField("element.labels");
-  }, [siteId]);
+  }, [resetField, siteId]);
 
   useEffect(() => {
     resetField("element.issueTypeId");
-  }, [projectKey]);
+  }, [resetField, projectKey]);
 
   return (
     <Stack spacing={3} {...stackProps}>
