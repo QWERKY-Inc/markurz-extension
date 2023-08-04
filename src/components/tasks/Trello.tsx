@@ -71,7 +71,7 @@ const QUERY_TRELLO_LABELS = graphql(/* GraphQL */ `
 `);
 
 const Trello = (props: TrelloProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId, highlightedText, ...stackProps } = props;
   const { register, control, resetField } =
     useFormContext<CreateTrelloCardMutationVariables>();
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
@@ -86,6 +86,7 @@ const Trello = (props: TrelloProps) => {
   const [fetchTrelloLabels, { data: trelloLabels }] =
     useLazyQuery(QUERY_TRELLO_LABELS);
   register("userModuleId", { value: userModuleId });
+  register("element.listId", { required: true });
 
   useEffect(() => {
     if (selectedWorkspace) {
@@ -99,9 +100,17 @@ const Trello = (props: TrelloProps) => {
   }, [selectedWorkspace, fetchTrelloBoards, userModuleId]);
 
   useEffect(() => {
+    if (highlightedText) {
+      resetField("element.name", { defaultValue: highlightedText });
+    }
+  }, [highlightedText]);
+
+  useEffect(() => {
     if (selectedBoard) {
       // If the selected board changes we need to reset the labels since they belong to a specific board
       resetField("element.labelIds");
+      // And list id since it depends on the board too
+      resetField("element.listId");
       fetchTrelloLabels({
         variables: {
           userModuleId,
@@ -131,7 +140,7 @@ const Trello = (props: TrelloProps) => {
   };
 
   return (
-    <Stack spacing={3} {...props}>
+    <Stack spacing={3} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create a Card in Trello
@@ -166,6 +175,7 @@ const Trello = (props: TrelloProps) => {
         label="Select Workspace"
         required
         onChange={(e) => setSelectedWorkspace(e.target.value)}
+        value={selectedWorkspace}
       >
         {data?.trelloWorkspaces.elements?.map((trelloWorkspaces) => (
           <MenuItem key={trelloWorkspaces.id} value={trelloWorkspaces.id}>
@@ -184,6 +194,7 @@ const Trello = (props: TrelloProps) => {
         label="Select Board"
         required
         onChange={(e) => setSelectedBoard(e.target.value)}
+        value={selectedBoard}
         disabled={!selectedWorkspace}
       >
         {trelloBoards?.trelloBoards.elements?.map((board) => (
@@ -228,6 +239,8 @@ const Trello = (props: TrelloProps) => {
         )}
         name="element.listId"
         control={control}
+        rules={{ required: true }}
+        defaultValue=""
       />
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
