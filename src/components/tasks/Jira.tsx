@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { InfoOutlined } from "@mui/icons-material";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateJiraIssueArgs } from "src/generated/graphql";
@@ -40,10 +40,15 @@ const QUERY_JIRA_DATA = graphql(/* GraphQL */ `
 
 const QUERY_JIRA_SITES = graphql(/* GraphQL */ `
   query JiraSites($userModuleId: ID!) {
-    JiraSites(userModuleId: $userModuleId) {
-      id
-      name
-      url
+    jiraSitesNew(userModuleId: $userModuleId) {
+      elements {
+        id
+        name
+        url
+      }
+      meta {
+        totalCount
+      }
     }
   }
 `);
@@ -53,23 +58,34 @@ const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Jira = (props: JiraProps) => {
   const { userModuleId, highlightedText } = props;
-  const { register, control, watch } =
+  const { register, control, watch, resetField } =
     useFormContext<MutationCreateJiraIssueArgs>();
   const siteId = watch("element.siteId");
   const projectKey = watch("element.projectKey");
-  const { data } = useQuery(QUERY_JIRA_DATA, {
-    variables: {
-      userModuleId,
-      siteId,
-    },
-    skip: !siteId,
-  });
+  const [queryJiraData, { data }] = useLazyQuery(QUERY_JIRA_DATA);
   const { data: dataSites } = useQuery(QUERY_JIRA_SITES, {
     variables: {
       userModuleId,
     },
   });
   register("userModuleId", { value: userModuleId });
+
+  useEffect(() => {
+    if (siteId && userModuleId) {
+      queryJiraData({
+        variables: {
+          userModuleId,
+          siteId,
+        },
+      });
+    }
+  }, [siteId, userModuleId]);
+
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.summary", { defaultValue: highlightedText });
+    }
+  }, [highlightedText]);
 
   return (
     <Stack spacing={3} {...props}>
@@ -104,12 +120,12 @@ const Jira = (props: JiraProps) => {
       <Controller
         render={({ field }) => (
           <TextField label="Select Site" select required {...field}>
-            {dataSites?.JiraSites.map((jiraSite) => (
+            {dataSites?.jiraSitesNew.elements?.map((jiraSite) => (
               <MenuItem key={jiraSite.id} value={jiraSite.id}>
                 {jiraSite.name}
               </MenuItem>
             ))}
-            {!dataSites?.JiraSites.length && (
+            {!dataSites?.jiraSitesNew.elements?.length && (
               <MenuItem disabled>
                 There are no sites available to select
               </MenuItem>
@@ -118,6 +134,7 @@ const Jira = (props: JiraProps) => {
         )}
         name="element.siteId"
         control={control}
+        rules={{ required: true }}
       />
       <Controller
         render={({ field }) => (
@@ -137,16 +154,11 @@ const Jira = (props: JiraProps) => {
         )}
         name="element.projectKey"
         control={control}
+        rules={{ required: true }}
       />
       <Controller
         render={({ field }) => (
-          <TextField
-            label="Select Type"
-            select
-            required
-            disabled={!projectKey}
-            {...field}
-          >
+          <TextField label="Select Type" select required {...field}>
             {data?.jiraInformation.projects
               .find((o) => o.key === projectKey)
               ?.issueTypes.map((issueType) => (
@@ -164,6 +176,7 @@ const Jira = (props: JiraProps) => {
         )}
         name="element.issueTypeId"
         control={control}
+        rules={{ required: true }}
       />
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
