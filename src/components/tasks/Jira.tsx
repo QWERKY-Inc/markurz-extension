@@ -57,7 +57,7 @@ const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
 const Jira = (props: JiraProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId, highlightedText, ...stackProps } = props;
   const { register, control, watch, resetField } =
     useFormContext<MutationCreateJiraIssueArgs>();
   const siteId = watch("element.siteId");
@@ -87,8 +87,16 @@ const Jira = (props: JiraProps) => {
     }
   }, [highlightedText]);
 
+  useEffect(() => {
+    resetField("element.projectKey");
+  }, [siteId]);
+
+  useEffect(() => {
+    resetField("element.issueTypeId");
+  }, [projectKey]);
+
   return (
-    <Stack spacing={3} {...props}>
+    <Stack spacing={3} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create an issue in Jira
@@ -135,10 +143,17 @@ const Jira = (props: JiraProps) => {
         name="element.siteId"
         control={control}
         rules={{ required: true }}
+        defaultValue=""
       />
       <Controller
         render={({ field }) => (
-          <TextField label="Select Project" select required {...field}>
+          <TextField
+            label="Select Project"
+            disabled={!siteId}
+            select
+            required
+            {...field}
+          >
             {data?.jiraInformation.projects.map((project) => (
               <MenuItem key={project.id} value={project.key}>
                 {project.name}
@@ -155,10 +170,17 @@ const Jira = (props: JiraProps) => {
         name="element.projectKey"
         control={control}
         rules={{ required: true }}
+        defaultValue=""
       />
       <Controller
         render={({ field }) => (
-          <TextField label="Select Type" select required {...field}>
+          <TextField
+            label="Select Type"
+            select
+            required
+            disabled={!projectKey}
+            {...field}
+          >
             {data?.jiraInformation.projects
               .find((o) => o.key === projectKey)
               ?.issueTypes.map((issueType) => (
@@ -177,6 +199,7 @@ const Jira = (props: JiraProps) => {
         name="element.issueTypeId"
         control={control}
         rules={{ required: true }}
+        defaultValue=""
       />
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
