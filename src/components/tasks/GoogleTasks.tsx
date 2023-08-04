@@ -33,7 +33,7 @@ const QUERY_GOOGLE_TASKS_LIST = graphql(/* GraphQL */ `
 `);
 
 const GoogleTasks = (props: GoogleTasksProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId, highlightedText, ...stackProps } = props;
   const { register, control } =
     useFormContext<MutationCreateGoogleTasksTaskArgs>();
   const { data } = useQuery(QUERY_GOOGLE_TASKS_LIST, {
@@ -44,7 +44,7 @@ const GoogleTasks = (props: GoogleTasksProps) => {
   register("userModuleId", { value: userModuleId });
 
   return (
-    <Stack spacing={2} {...props}>
+    <Stack spacing={2} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create a Task in Google Tasks
@@ -89,6 +89,7 @@ const GoogleTasks = (props: GoogleTasksProps) => {
         )}
         name="element.googleTaskListId"
         control={control}
+        defaultValue=""
       />
       <Typography color="text.secondary">
         Additional Information (optional)
@@ -107,6 +108,7 @@ const GoogleTasks = (props: GoogleTasksProps) => {
         )}
         name="element.due"
         control={control}
+        defaultValue={null}
       />
     </Stack>
   );
