@@ -89,6 +89,7 @@ const Jira = (props: JiraProps) => {
 
   useEffect(() => {
     resetField("element.projectKey");
+    resetField("element.labels");
   }, [siteId]);
 
   useEffect(() => {
@@ -231,6 +232,7 @@ const Jira = (props: JiraProps) => {
         )}
         name="element.labels"
         control={control}
+        defaultValue={[]}
       />
     </Stack>
   );
