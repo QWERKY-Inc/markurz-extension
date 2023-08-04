@@ -190,6 +190,7 @@ const Jira = (props: JiraProps) => {
             renderInput={(params) => (
               <TextField {...params} variant="outlined" label="Select Labels" />
             )}
+            disableCloseOnSelect
           />
         )}
         name="element.labels"

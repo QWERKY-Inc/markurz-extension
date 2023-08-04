@@ -106,7 +106,7 @@ const Slack = (props: SlackProps) => {
           }
         }}
         openOnFocus
-        disableClearable={true}
+        disableClearable
         loading={loading}
         getOptionLabel={(o) =>
           `${o.name} ${
