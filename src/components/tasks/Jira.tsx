@@ -53,6 +53,31 @@ const QUERY_JIRA_SITES = graphql(/* GraphQL */ `
   }
 `);
 
+const QUERY_JIRA_USERS = graphql(/* GraphQL */ `
+  query JiraUsers(
+    $userModuleId: ID!
+    $siteId: ID!
+    $take: Int
+    $projectKey: String!
+    $query: String
+  ) {
+    jiraUsers(
+      userModuleId: $userModuleId
+      siteId: $siteId
+      take: $take
+      projectKey: $projectKey
+      query: $query
+    ) {
+      elements {
+        id
+        displayName
+        active
+        accountType
+      }
+    }
+  }
+`);
+
 const icon = <CheckBoxOutlineBlankIcon fontSize="small" />;
 const checkedIcon = <CheckBoxIcon fontSize="small" />;
 
@@ -63,6 +88,8 @@ const Jira = (props: JiraProps) => {
   const siteId = watch("element.siteId");
   const projectKey = watch("element.projectKey");
   const [queryJiraData, { data }] = useLazyQuery(QUERY_JIRA_DATA);
+  const [fetchUserData, { refetch: refetchUserData, data: usersData }] =
+    useLazyQuery(QUERY_JIRA_USERS);
   const { data: dataSites } = useQuery(QUERY_JIRA_SITES, {
     variables: {
       userModuleId,
@@ -94,7 +121,10 @@ const Jira = (props: JiraProps) => {
 
   useEffect(() => {
     resetField("element.issueTypeId");
-  }, [resetField, projectKey]);
+    if (userModuleId && siteId && projectKey) {
+      fetchUserData({ variables: { userModuleId, siteId, projectKey } });
+    }
+  }, [resetField, fetchUserData, userModuleId, siteId, projectKey]);
 
   return (
     <Stack spacing={3} {...stackProps}>
@@ -233,6 +263,32 @@ const Jira = (props: JiraProps) => {
         name="element.labels"
         control={control}
         defaultValue={[]}
+      />
+      <Typography color="text.secondary" sx={{ pt: 2 }}>
+        Additional Information (optional)
+      </Typography>
+      <Controller
+        name="element.assigneeId"
+        control={control}
+        render={({ field: { onChange, value, ...rest } }) => (
+          <Autocomplete
+            {...rest}
+            value={usersData?.jiraUsers.elements?.find(
+              (elem) => elem.id === value,
+            )}
+            onChange={(_, data) => onChange(data?.id ?? undefined)}
+            options={usersData?.jiraUsers.elements ?? []}
+            getOptionLabel={(o) => o.displayName}
+            renderInput={(params) => (
+              <TextField {...params} label="Select Assignee" />
+            )}
+            onInputChange={(_, value) => {
+              if (value) {
+                refetchUserData({ query: value });
+              }
+            }}
+          />
+        )}
       />
     </Stack>
   );
