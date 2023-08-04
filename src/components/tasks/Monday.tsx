@@ -31,8 +31,8 @@ import {
 } from "src/generated/graphql";
 
 interface Group {
-  id: string;
-  name: string;
+  id: string | null;
+  name: string | null;
   board?: Board;
 }
 
@@ -127,10 +127,7 @@ const Monday = (props: MondayProps) => {
     useFormContext<MutationCreateMondayItemArgs>();
 
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState<Group>({
-    id: "",
-    name: "",
-  });
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [openAutocomplete, setOpenAutocomplete] = useState(false);
 
   const { data: mondayWorkspacesData } = useQuery(QUERY_MONDAY_WORKSPACES, {
@@ -162,11 +159,11 @@ const Monday = (props: MondayProps) => {
       <StyledTreeItem
         key={`${board.id}-${group.id}`}
         nodeId={`${board.id}-${group.id}`}
-        labelText={group.name}
+        labelText={group.name || 'No group name'}
         labelIcon={FormatListBulletedOutlined}
         onClick={() => {
           setValue("element.boardId", board.id);
-          setValue("element.groupId", group.id);
+          if (group.id) setValue("element.groupId", group.id);
           setSelectedGroup({ ...group, board });
           setOpenAutocomplete(false);
         }}
@@ -312,9 +309,9 @@ const Monday = (props: MondayProps) => {
             )}
             open={openAutocomplete}
             onOpen={() => setOpenAutocomplete(true)}
-            value={selectedGroup}
+            value={selectedGroup ?? {id: null, name: null}}
             getOptionLabel={(o) =>
-              o.name.length ? `${o.board?.name} > ${o.name}` : ""
+              o?.name ? `${o.board?.name} > ${o.name}` : ""
             }
             disabled={!selectedWorkspace}
             openOnFocus
