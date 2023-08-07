@@ -49,7 +49,7 @@ const QUERY_TODOIST_INFOS = graphql(/* GraphQL */ `
 `);
 
 const Todoist = (props: TodoistProps) => {
-  const { userModuleId, highlightedText } = props;
+  const { userModuleId, highlightedText, ...stackProps } = props;
   const { register, control, watch } =
     useFormContext<MutationCreateTodoistTaskArgs>();
   const { data } = useQuery(QUERY_TODOIST_INFOS, {
@@ -61,7 +61,7 @@ const Todoist = (props: TodoistProps) => {
   register("userModuleId", { value: userModuleId });
 
   return (
-    <Stack spacing={2} {...props}>
+    <Stack spacing={2} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create a Task in Todoist
@@ -93,6 +93,9 @@ const Todoist = (props: TodoistProps) => {
       <Controller
         render={({ field }) => (
           <TextField select label="Select Project" required {...field}>
+            {!data?.todoistProjects?.elements?.length && (
+              <MenuItem disabled>No projects available</MenuItem>
+            )}
             {data?.todoistProjects.elements?.map((todoistProject) => (
               <MenuItem key={todoistProject.id} value={todoistProject.id}>
                 {todoistProject.title}
@@ -102,6 +105,8 @@ const Todoist = (props: TodoistProps) => {
         )}
         name="element.todoistProjectId"
         control={control}
+        rules={{ required: true }}
+        defaultValue=""
       />
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
@@ -114,7 +119,7 @@ const Todoist = (props: TodoistProps) => {
             onChange={(e, data) => {
               onChange(data);
             }}
-            value={value || undefined}
+            value={value || []}
             {...rest}
             options={
               data?.todoistLabels.elements?.map((element) => element.title) ??
@@ -146,6 +151,7 @@ const Todoist = (props: TodoistProps) => {
         )}
         name="element.labels"
         control={control}
+        defaultValue={null}
       />
       <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
@@ -164,6 +170,7 @@ const Todoist = (props: TodoistProps) => {
         )}
         name="element.due"
         control={control}
+        defaultValue={null}
       />
     </Stack>
   );
