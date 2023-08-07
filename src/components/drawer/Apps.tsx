@@ -9,6 +9,7 @@ import {
   MUTATION_CREATE_JIRA_ISSUE,
   MUTATION_CREATE_MICROSOFT_ONENOTE,
   MUTATION_CREATE_MICROSOFT_TODO,
+  MUTATION_CREATE_MONDAY_ITEM,
   MUTATION_CREATE_NOTION_PAGE,
   MUTATION_CREATE_SLACK_MESSAGE,
   MUTATION_CREATE_TODOIST_TASK,
@@ -22,6 +23,7 @@ import GoogleTasksIcon from "src/components/icons/GoogleTasksIcon";
 import JiraIcon from "src/components/icons/JiraIcon";
 import MicrosoftOneNoteIcon from "src/components/icons/MicrosoftOneNoteIcon";
 import MicrosoftTodoIcon from "src/components/icons/MicrosoftTodoIcon";
+import MondayIcon from "src/components/icons/MondayIcon";
 import NotionIcon from "src/components/icons/NotionIcon";
 import SlackIcon from "src/components/icons/SlackIcon";
 import TodoistIcon from "src/components/icons/TodoistIcon";
@@ -34,6 +36,7 @@ import GoogleTasks from "src/components/tasks/GoogleTasks";
 import Jira from "src/components/tasks/Jira";
 import MicrosoftOneNote from "src/components/tasks/MicrosoftOneNote";
 import MicrosoftToDo from "src/components/tasks/MicrosoftToDo";
+import Monday from "src/components/tasks/Monday";
 import Notion from "src/components/tasks/Notion";
 import Slack from "src/components/tasks/Slack";
 import Todoist from "src/components/tasks/Todoist";
@@ -107,6 +110,13 @@ export const APPS: {
     icon: <MicrosoftTodoIcon />,
     Element: MicrosoftToDo,
     mutation: MUTATION_CREATE_MICROSOFT_TODO,
+  },
+  [ModuleTypeEnum.Monday]: {
+    name: "Monday",
+    taskName: "issue",
+    icon: <MondayIcon />,
+    Element: Monday,
+    mutation: MUTATION_CREATE_MONDAY_ITEM,
   },
   [ModuleTypeEnum.Notion]: {
     name: "Notion",
