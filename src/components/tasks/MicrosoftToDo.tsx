@@ -128,6 +128,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
         name="element.taskListId"
         control={control}
         defaultValue=""
+        rules={{ required: true }}
       />
       <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
@@ -142,7 +143,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
             onChange={(e, data) => {
               onChange(data);
             }}
-            value={value || undefined}
+            value={value || []}
             options={
               dataTodoCategories?.microsoftTodoCategories.elements?.map(
                 (o) => o.displayName,
@@ -195,6 +196,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
         )}
         name="element.categoryNames"
         control={control}
+        defaultValue={null}
       />
       <Controller
         render={({ field }) => (
@@ -211,6 +213,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
         )}
         name="element.dueDate"
         control={control}
+        defaultValue={null}
       />
     </Stack>
   );
