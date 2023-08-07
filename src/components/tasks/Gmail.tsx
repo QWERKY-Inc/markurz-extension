@@ -58,7 +58,7 @@ const EmailField = (
     refetch: <T extends Partial<object>>(args: T) => void;
     label: string;
     required?: boolean;
-  }
+  },
 ) => {
   const {
     control,
@@ -70,7 +70,7 @@ const EmailField = (
   const [inputValue, setInputValue] = useState("");
   const errObjPath = resolveObjectPath<FieldError>(
     controllerProps.name,
-    errors
+    errors,
   );
 
   return (
@@ -152,7 +152,7 @@ const EmailField = (
 
 const Gmail = (props: GmailProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control } =
+  const { register, control, watch } =
     useFormContext<CreateGmailEmailMutationVariables>();
   const { data, loading, refetch } = useQuery(QUERY_CONTACTS, {
     variables: {
@@ -161,6 +161,7 @@ const Gmail = (props: GmailProps) => {
       take: 10,
     },
   });
+  const isDraft = watch("isDraft");
   const contacts = useMemo(() => {
     return data?.googlePeopleContacts.elements?.map((o) => o.email) || [];
   }, [data?.googlePeopleContacts.elements]);
@@ -238,7 +239,8 @@ const Gmail = (props: GmailProps) => {
         contacts={contacts}
         refetch={refetch}
         label="To"
-        required
+        required={!isDraft}
+        rules={{ required: !isDraft }}
       />
       <EmailField
         name="element.cc"
