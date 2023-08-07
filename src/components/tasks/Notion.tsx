@@ -10,7 +10,10 @@ import {
 import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
-import { CreateNotionPageMutationVariables } from "src/generated/graphql";
+import {
+  CreateNotionPageMutationVariables,
+  NotionObjectTypeEnum,
+} from "src/generated/graphql";
 
 interface NotionProps extends StackProps {
   userModuleId: string;
@@ -60,6 +63,8 @@ const Notion = (props: NotionProps) => {
     },
   });
   register("userModuleId", { value: userModuleId });
+  register("element.parentId", { required: true });
+  register("element.parentType", { required: true });
 
   return (
     <Stack spacing={2} {...stackProps}>
@@ -93,10 +98,14 @@ const Notion = (props: NotionProps) => {
       />
       <Autocomplete
         onChange={(e, data) => {
-          if (data) {
-            setValue("element.parentId", data.id);
-            setValue("element.parentType", data.parentType);
-          }
+          setValue("element.parentId", data?.id || "");
+          setValue(
+            "element.parentType",
+            data?.parentType || NotionObjectTypeEnum.Page,
+            {
+              shouldValidate: true,
+            },
+          );
         }}
         filterOptions={(x) => x}
         onInputChange={async (event, value) => {
@@ -116,6 +125,13 @@ const Notion = (props: NotionProps) => {
               ]
             : []
         }
+        renderOption={(props, option) => {
+          return (
+            <li {...props} key={option.id}>
+              {option.title || "Untitled"}
+            </li>
+          );
+        }}
         renderInput={(params) => (
           <TextField
             {...params}
