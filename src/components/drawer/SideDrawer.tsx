@@ -1,6 +1,6 @@
-import { ApolloError, useLazyQuery } from "@apollo/client";
-import { Add, Close, Link, PowerOff } from "@mui/icons-material";
-import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
+import { ApolloError, useLazyQuery } from '@apollo/client';
+import { Add, Close, Link, PowerOff } from '@mui/icons-material';
+import { LoadingButton, TabContext, TabPanel } from '@mui/lab';
 import {
   Alert,
   Box,
@@ -15,21 +15,17 @@ import {
   TextField,
   Tooltip,
   Typography,
-} from "@mui/material";
-import React, { useEffect, useState } from "react";
-import { FieldValues, FormProvider, useForm } from "react-hook-form";
-import { apolloClient } from "src/apollo";
-import { APPS } from "src/components/drawer/Apps";
-import Limit from "src/components/drawer/Limit";
-import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
-import { QUERY_MODULES } from "src/components/drawer/SideDrawer.operations";
-import MarkurzIcon from "src/components/icons/MarkurzIcon";
-import {
-  ModuleTypeEnum,
-  OrderByEnum,
-  UserModuleStatusEnum,
-} from "src/generated/graphql";
-import { useTokenShared } from "src/lib/token";
+} from '@mui/material';
+import React, { useEffect, useState } from 'react';
+import { FieldValues, FormProvider, useForm } from 'react-hook-form';
+import { apolloClient } from 'src/apollo';
+import { APPS } from 'src/components/drawer/Apps';
+import Limit from 'src/components/drawer/Limit';
+import LoggedOutScreen from 'src/components/drawer/LoggedOutScreen';
+import { QUERY_MODULES } from 'src/components/drawer/SideDrawer.operations';
+import MarkurzIcon from 'src/components/icons/MarkurzIcon';
+import { ModuleTypeEnum, OrderByEnum, UserModuleStatusEnum } from 'src/generated/graphql';
+import { useTokenShared } from 'src/lib/token';
 
 interface SideDrawerProps extends DrawerProps {
   highlightedText: string;
@@ -104,6 +100,8 @@ const SideDrawer = (props: SideDrawerProps) => {
     setErrorMutation("");
   }, [highlightedText, reset]);
 
+  const capitalizeFirstCharacter = (value: string): string => value.charAt(0).toUpperCase() + value.slice(1);
+
   const submit = async (form: FieldValues) => {
     form.sourceUrl = document.location.href;
     const appKey = selectedApp?.split("-")[0] as keyof typeof APPS;
@@ -124,7 +122,7 @@ const SideDrawer = (props: SideDrawerProps) => {
           url: result?.create.outputUrl,
           tooltipMessage: result?.create
             ? result?.create.outputUrl
-              ? `${currentApp.taskName} created! Click to check and input additional information in ${currentApp.taskName}`
+              ? `${capitalizeFirstCharacter(currentApp.taskName)} created! Click to check and input additional information in ${currentApp.taskName}`
               : currentApp.missingUrlTooltipMessage
             : undefined,
         });
