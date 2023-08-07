@@ -171,9 +171,12 @@ const Monday = (props: MondayProps) => {
     ));
   };
 
-  const generateBoardTree = (boards: PaginatedBoards | undefined | null) => {
-    return boards?.elements?.length ? (
-      boards?.elements?.map((board) => (
+  const generateBoardTree = (
+    boards: PaginatedBoards | undefined | null,
+    hasFolder: boolean,
+  ) => {
+    if (boards?.elements?.length) {
+      return boards?.elements?.map((board) => (
         <StyledTreeItem
           key={board.id}
           nodeId={board.id}
@@ -182,14 +185,16 @@ const Monday = (props: MondayProps) => {
         >
           {generateGroupTree(board.groups, board)}
         </StyledTreeItem>
-      ))
-    ) : (
-      <TreeItem
-        nodeId="disabled"
-        disabled
-        label="There are no boards and groups available to select. Please add a board in this folder."
-      />
-    );
+      ));
+    } else if (hasFolder) {
+      return (
+        <TreeItem
+          nodeId="disabled"
+          disabled
+          label="There are no boards and groups available to select. Please add a board in this folder."
+        />
+      );
+    }
   };
 
   const generateFolderTree = (folders: PaginatedFolders | undefined) =>
@@ -210,7 +215,7 @@ const Monday = (props: MondayProps) => {
           labelIcon={FolderOpenOutlined}
         >
           {generateFolderTree(folder.folders)}
-          {generateBoardTree(paginatedBoards)}
+          {generateBoardTree(paginatedBoards, true)}
         </StyledTreeItem>
       );
     });
@@ -241,7 +246,7 @@ const Monday = (props: MondayProps) => {
         sx={{ width: "calc(100% - 16px)" }}
       >
         {generateFolderTree(mondayResourcesData?.mondayResources.folders)}
-        {generateBoardTree(paginatedBoards)}
+        {generateBoardTree(paginatedBoards, false)}
       </TreeView>
     );
   };
