@@ -151,7 +151,7 @@ const Monday = (props: MondayProps) => {
         variables: { userModuleId, workspaceId: selectedWorkspace },
       });
     }
-  }, [selectedWorkspace, fetchMondayResources, userModuleId]);
+  }, [selectedWorkspace, fetchMondayResources, userModuleId, resetField]);
 
   const generateGroupTree = (groups: PaginatedGroups, board: Board) => {
     return groups.elements?.map((group) => (
