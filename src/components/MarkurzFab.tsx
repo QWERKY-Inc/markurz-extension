@@ -2,6 +2,7 @@ import { Fab } from "@mui/material";
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import SideDrawer from "src/components/drawer/SideDrawer";
 import MarkurzIcon from "src/components/icons/MarkurzIcon";
+import IFrame from "src/components/iframe/IFrame";
 import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
 
@@ -45,7 +46,9 @@ const MarkurzFab = () => {
 
   const handleFabClick = useCallback(() => {
     setShowDrawer(true);
-    setShowFab(false);
+    if (!process.env.REACT_APP_SIMULATE_LOCALLY) {
+      setShowFab(false);
+    }
   }, []);
 
   const handleDrawerClose = (
@@ -132,11 +135,29 @@ const MarkurzFab = () => {
 
   return (
     <>
-      <SideDrawer
-        highlightedText={highlightedText}
-        open={showDrawer}
-        onClose={handleDrawerClose}
-      />
+      <IFrame
+        style={{
+          position: "fixed",
+          top: 8,
+          right: 8,
+          bottom: 8,
+          width: 525,
+          height: "calc(100vh - 16px)",
+          border: "none",
+          pointerEvents: showDrawer ? "auto" : "none",
+          visibility: showDrawer ? "visible" : "hidden",
+          boxShadow:
+            "0px 2px 1px -1px rgba(0,0,0,0.2), 0px 1px 1px 0px rgba(0,0,0,0.14), 0px 1px 3px 0px rgba(0,0,0,0.12)",
+          borderRadius: 4,
+          background: "white",
+        }}
+      >
+        <SideDrawer
+          highlightedText={highlightedText}
+          open={showDrawer}
+          onClose={handleDrawerClose}
+        />
+      </IFrame>
       <Fab
         aria-label="create-task"
         size="small"

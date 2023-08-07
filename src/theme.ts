@@ -5,11 +5,14 @@ import { createTheme, responsiveFontSizes } from "@mui/material";
 const theme = createTheme({
   typography: {
     fontFamily: ["Inter", "Roboto", "Helvetica", "Arial", "sans-serif"].join(
-      ","
+      ",",
     ),
     // We ignore because for some reason this didn't get exposed in TS
     // @ts-ignore
     pxToRem: (size) => `${size}px`,
+  },
+  palette: {
+    mode: "light",
   },
 });
 
@@ -78,6 +81,13 @@ theme.components = {
     styleOverrides: {
       root: {
         background: "none",
+      },
+    },
+  },
+  MuiMenuItem: {
+    styleOverrides: {
+      root: {
+        textWrap: "wrap",
       },
     },
   },

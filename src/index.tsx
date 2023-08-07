@@ -46,7 +46,7 @@ function injectExtension() {
   const app = document.createElement("div");
   app.id = MARKURZ_DIV_NAME;
   app.style.position = "absolute";
-  app.style.zIndex = "99999";
+  app.style.zIndex = "2147483647";
   document.documentElement.appendChild(app);
 
   const root = ReactDOM.createRoot(app);
