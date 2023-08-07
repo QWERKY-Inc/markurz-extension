@@ -90,6 +90,7 @@ const GoogleTasks = (props: GoogleTasksProps) => {
         name="element.googleTaskListId"
         control={control}
         defaultValue=""
+        rules={{ required: true }}
       />
       <Typography color="text.secondary">
         Additional Information (optional)
