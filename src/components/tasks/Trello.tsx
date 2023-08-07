@@ -91,8 +91,12 @@ const QUERY_TRELLO_MEMBERS = graphql(/* GraphQL */ `
 
 const Trello = (props: TrelloProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control, resetField } =
-    useFormContext<CreateTrelloCardMutationVariables>();
+  const {
+    register,
+    control,
+    resetField,
+    formState: { errors },
+  } = useFormContext<CreateTrelloCardMutationVariables>();
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
   const [selectedBoard, setSelectedBoard] = useState("");
   const { data } = useQuery(QUERY_TRELLO_WORKSPACES, {
@@ -390,6 +394,8 @@ const Trello = (props: TrelloProps) => {
             slotProps={{
               textField: {
                 size: "small",
+                error: !!errors.element?.start,
+                helperText: errors.element?.start?.message?.toString(),
               },
               actionBar: {
                 actions: ["clear", "accept"],
@@ -402,6 +408,12 @@ const Trello = (props: TrelloProps) => {
         name="element.start"
         control={control}
         defaultValue={null}
+        rules={{
+          validate(value) {
+            if (value && !value.isValid()) return "Invalid date";
+            return true;
+          },
+        }}
       />
       <Controller
         render={({ field }) => (
@@ -409,6 +421,8 @@ const Trello = (props: TrelloProps) => {
             slotProps={{
               textField: {
                 size: "small",
+                error: !!errors.element?.due,
+                helperText: errors.element?.due?.message?.toString(),
               },
               actionBar: {
                 actions: ["clear", "accept"],
@@ -421,6 +435,12 @@ const Trello = (props: TrelloProps) => {
         name="element.due"
         control={control}
         defaultValue={null}
+        rules={{
+          validate(value) {
+            if (value && !value.isValid()) return "Invalid date";
+            return true;
+          },
+        }}
       />
     </Stack>
   );
