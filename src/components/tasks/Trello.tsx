@@ -124,7 +124,7 @@ const Trello = (props: TrelloProps) => {
     if (highlightedText) {
       resetField("element.name", { defaultValue: highlightedText });
     }
-  }, [highlightedText]);
+  }, [resetField, highlightedText]);
 
   useEffect(() => {
     if (selectedBoard) {
