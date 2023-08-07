@@ -1,7 +1,15 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { Circle, Close, InfoOutlined } from "@mui/icons-material";
 import {
+  CheckBox,
+  CheckBoxOutlineBlank,
+  Circle,
+  Close,
+  InfoOutlined,
+} from "@mui/icons-material";
+import {
+  Autocomplete,
   Box,
+  Checkbox,
   Chip,
   IconButton,
   InputAdornment,
@@ -13,7 +21,7 @@ import {
   Typography,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { CreateTrelloCardMutationVariables } from "src/generated/graphql";
@@ -70,6 +78,17 @@ const QUERY_TRELLO_LABELS = graphql(/* GraphQL */ `
   }
 `);
 
+const QUERY_TRELLO_MEMBERS = graphql(/* GraphQL */ `
+  query TrelloMembers($userModuleId: ID!, $trelloBoardId: ID!) {
+    trelloMembers(userModuleId: $userModuleId, trelloBoardId: $trelloBoardId) {
+      elements {
+        id
+        fullName
+      }
+    }
+  }
+`);
+
 const Trello = (props: TrelloProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
   const { register, control, resetField } =
@@ -85,6 +104,8 @@ const Trello = (props: TrelloProps) => {
     useLazyQuery(QUERY_TRELLO_BOARDS);
   const [fetchTrelloLabels, { data: trelloLabels }] =
     useLazyQuery(QUERY_TRELLO_LABELS);
+  const [fetchTrelloMembers, { data: trelloMembers }] =
+    useLazyQuery(QUERY_TRELLO_MEMBERS);
   register("userModuleId", { value: userModuleId });
   register("element.listId", { required: true });
 
@@ -117,8 +138,20 @@ const Trello = (props: TrelloProps) => {
           trelloBoardId: selectedBoard,
         },
       });
+      fetchTrelloMembers({
+        variables: {
+          userModuleId,
+          trelloBoardId: selectedBoard,
+        },
+      });
     }
-  }, [selectedBoard, fetchTrelloLabels, userModuleId, resetField]);
+  }, [
+    selectedBoard,
+    fetchTrelloLabels,
+    fetchTrelloMembers,
+    userModuleId,
+    resetField,
+  ]);
 
   const getElementLabel = (value: any) => {
     const elem = trelloLabels?.trelloLabels.elements?.find(
@@ -314,6 +347,42 @@ const Trello = (props: TrelloProps) => {
       <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
       </Typography>
+      <Controller
+        render={({ field: { onChange, value, ...rest } }) => (
+          <Autocomplete
+            {...rest}
+            multiple
+            disableCloseOnSelect
+            disabled={!selectedBoard}
+            onChange={(_, newValue) =>
+              onChange(newValue.map((value) => value.id))
+            }
+            options={trelloMembers?.trelloMembers.elements ?? []}
+            value={
+              trelloMembers?.trelloMembers.elements?.filter(
+                (member) => value && value.indexOf(member.id) !== -1,
+              ) ?? []
+            }
+            getOptionLabel={(option) => option.fullName}
+            renderInput={(params) => (
+              <TextField {...params} label="Select Members" />
+            )}
+            renderOption={(props, option, { selected }) => (
+              <li {...props}>
+                <Checkbox
+                  icon={<CheckBoxOutlineBlank />}
+                  checkedIcon={<CheckBox />}
+                  style={{ marginRight: 8 }}
+                  checked={selected}
+                />
+                {option.fullName}
+              </li>
+            )}
+          />
+        )}
+        name="element.memberIds"
+        control={control}
+      />
       <Controller
         render={({ field }) => (
           <DateTimePicker
