@@ -150,7 +150,9 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
         noOptionsText="There are no sections available to select. Please add a section in this notebook."
         onChange={(e, data) => {
           setSection(data);
-          setValue("element.sectionId", data?.id || "");
+          setValue("element.sectionId", data?.id || "", {
+            shouldValidate: true,
+          });
         }}
         onInputChange={async (event, value) => {
           await refetch({
