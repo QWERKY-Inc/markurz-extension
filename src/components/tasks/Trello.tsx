@@ -382,6 +382,7 @@ const Trello = (props: TrelloProps) => {
         )}
         name="element.memberIds"
         control={control}
+        defaultValue={null}
       />
       <Controller
         render={({ field }) => (
@@ -400,6 +401,7 @@ const Trello = (props: TrelloProps) => {
         )}
         name="element.start"
         control={control}
+        defaultValue={null}
       />
       <Controller
         render={({ field }) => (
@@ -418,6 +420,7 @@ const Trello = (props: TrelloProps) => {
         )}
         name="element.due"
         control={control}
+        defaultValue={null}
       />
     </Stack>
   );
