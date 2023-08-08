@@ -106,14 +106,14 @@ export const APPS: {
   },
   [ModuleTypeEnum.MicrosoftTodo]: {
     name: "Microsoft To Do",
-    taskName: "card",
+    taskName: "task",
     icon: <MicrosoftTodoIcon />,
     Element: MicrosoftToDo,
     mutation: MUTATION_CREATE_MICROSOFT_TODO,
   },
   [ModuleTypeEnum.Monday]: {
     name: "Monday",
-    taskName: "issue",
+    taskName: "item",
     icon: <MondayIcon />,
     Element: Monday,
     mutation: MUTATION_CREATE_MONDAY_ITEM,

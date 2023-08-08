@@ -3,7 +3,6 @@ import { Circle, InfoOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   Chip,
-  chipClasses,
   ListItemIcon,
   ListItemText,
   MenuItem,
@@ -11,9 +10,9 @@ import {
   StackProps,
   TextField,
   Typography,
+  chipClasses,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
-import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateMicrosoftTodoTaskArgs } from "src/generated/graphql";
@@ -86,7 +85,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
     <Stack spacing={3} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
-        Create an issue in Microsoft To Do
+        Create a task in Microsoft To Do
       </Typography>
       <Controller
         render={({ field }) => (
