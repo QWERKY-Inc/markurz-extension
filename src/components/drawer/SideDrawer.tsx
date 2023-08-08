@@ -172,7 +172,7 @@ const SideDrawer = (props: SideDrawerProps) => {
 
   const handleAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
-      if (selectedApp) {
+      if (selectedApp && isDirty) {
         setSave(() => {
           return {
             ...save,
