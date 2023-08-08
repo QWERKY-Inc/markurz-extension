@@ -85,7 +85,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
     <Stack spacing={3} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
-        Create an task in Microsoft To Do
+        Create a task in Microsoft To Do
       </Typography>
       <Controller
         render={({ field }) => (
