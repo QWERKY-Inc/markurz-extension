@@ -7,6 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
+import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import {
@@ -41,7 +42,7 @@ const QUERY_SLACK_RESOURCES = graphql(/* GraphQL */ `
 
 const Slack = (props: SlackProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, setValue, control } =
+  const { register, setValue, control, resetField } =
     useFormContext<CreateSlackMessageMutationVariables>();
   const { data, loading } = useQuery(QUERY_SLACK_RESOURCES, {
     variables: {
@@ -51,6 +52,12 @@ const Slack = (props: SlackProps) => {
   register("userModuleId", { value: userModuleId });
   register("element.receiverType", { required: true });
   register("element.receiverId", { required: true });
+
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.title", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
 
   const setReceiverTypeValue = (typename: string | undefined) => {
     if (typename === "SlackChannel") {

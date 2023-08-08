@@ -153,6 +153,12 @@ const Monday = (props: MondayProps) => {
     }
   }, [selectedWorkspace, fetchMondayResources, userModuleId, resetField]);
 
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.title", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
+
   const generateGroupTree = (groups: PaginatedGroups, board: Board) => {
     return groups.elements?.map((group) => (
       <StyledTreeItem

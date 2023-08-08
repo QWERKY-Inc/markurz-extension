@@ -7,7 +7,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React from "react";
+import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import {
@@ -55,7 +55,7 @@ const QUERY_NOTION_OBJECTS = graphql(/* GraphQL */ `
 
 const Notion = (props: NotionProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, setValue, control } =
+  const { register, setValue, control, resetField } =
     useFormContext<CreateNotionPageMutationVariables>();
   const { data, loading, refetch } = useQuery(QUERY_NOTION_OBJECTS, {
     variables: {
@@ -65,6 +65,12 @@ const Notion = (props: NotionProps) => {
   register("userModuleId", { value: userModuleId });
   register("element.parentId", { required: true });
   register("element.parentType", { required: true });
+
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.title", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
 
   return (
     <Stack spacing={2} {...stackProps}>
