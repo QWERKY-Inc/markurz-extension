@@ -116,6 +116,7 @@ const Todoist = (props: TodoistProps) => {
               Boolean(watchLabels && watchLabels.length >= 500)
             }
             multiple
+            disableCloseOnSelect
             onChange={(e, data) => {
               onChange(data);
             }}

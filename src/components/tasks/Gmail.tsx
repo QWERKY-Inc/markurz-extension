@@ -198,12 +198,12 @@ const Gmail = (props: GmailProps) => {
         {...register("element.message")}
       />
       <Controller
-        render={({ field }) => (
+        render={({ field: { value, ...rest } }) => (
           <FormControlLabel
             style={{
               marginLeft: -10,
             }}
-            control={<Checkbox {...field} />}
+            control={<Checkbox checked={value} {...rest} />}
             componentsProps={{
               typography: {
                 sx: {
