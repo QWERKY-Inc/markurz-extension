@@ -119,10 +119,12 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         rules={{
           validate(value, formValues) {
             clearErrors("element.endDate");
+            if (!value?.isValid()) return "Invalid date";
             return value > formValues.element.endDate
               ? "The start date must be before the end date"
               : true;
           },
+          required: true,
         }}
       />
       <Controller
@@ -148,10 +150,12 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         rules={{
           validate(value, formValues) {
             clearErrors("element.startDate");
+            if (!value?.isValid()) return "Invalid date";
             return value < formValues.element.startDate
               ? "The end date must be after the start date"
               : true;
           },
+          required: true,
         }}
       />
       <Controller

@@ -49,12 +49,18 @@ const Slack = (props: SlackProps) => {
     },
   });
   register("userModuleId", { value: userModuleId });
+  register("element.receiverType", { required: true });
+  register("element.receiverId", { required: true });
 
   const setReceiverTypeValue = (typename: string | undefined) => {
     if (typename === "SlackChannel") {
-      setValue("element.receiverType", SlackMessageReceiverTypeEnum.Channel);
+      setValue("element.receiverType", SlackMessageReceiverTypeEnum.Channel, {
+        shouldValidate: true,
+      });
     } else if (typename === "SlackUser") {
-      setValue("element.receiverType", SlackMessageReceiverTypeEnum.User);
+      setValue("element.receiverType", SlackMessageReceiverTypeEnum.User, {
+        shouldValidate: true,
+      });
     }
   };
 
@@ -87,9 +93,8 @@ const Slack = (props: SlackProps) => {
         inputProps={{
           maxLength: 2000,
         }}
-        {...register("element.description")}
+        {...register("element.description", { required: true })}
       />
-
       <Autocomplete
         filterOptions={(options, state) => {
           const inputValue = state.inputValue.toLowerCase();

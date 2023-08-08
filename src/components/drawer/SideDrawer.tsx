@@ -45,6 +45,7 @@ const SideDrawer = (props: SideDrawerProps) => {
   const {
     handleSubmit,
     reset,
+    trigger,
     formState: { isValid, isDirty },
   } = methods;
   const { token, loading: tokenLoading } = useTokenShared();
@@ -101,10 +102,10 @@ const SideDrawer = (props: SideDrawerProps) => {
     // If the selection changes reset the result to be ready to get a new url.
     setResult(null);
     setErrorMutation("");
-    reset({
-      sourceText: highlightedText,
-    });
   }, [highlightedText, reset]);
+
+  const capitalizeFirstCharacter = (value: string): string =>
+    value.charAt(0).toUpperCase() + value.slice(1);
 
   const submit = async (form: FieldValues) => {
     form.sourceUrl = document.location.href;
@@ -126,7 +127,11 @@ const SideDrawer = (props: SideDrawerProps) => {
           url: result?.create.outputUrl,
           tooltipMessage: result?.create
             ? result?.create.outputUrl
-              ? `${currentApp.taskName} created! Click to check and input additional information in ${currentApp.taskName}`
+              ? `${capitalizeFirstCharacter(
+                  currentApp.taskName,
+                )} created! Click to check and input additional information in ${
+                  currentApp.taskName
+                }`
               : currentApp.missingUrlTooltipMessage
             : undefined,
         });
@@ -327,9 +332,9 @@ const SideDrawer = (props: SideDrawerProps) => {
                   href={result?.url || ""}
                   rel="noopener"
                   target="_blank"
-                  onClick={() => {
-                    if (!result) {
-                      handleSubmit(submit)();
+                  onClick={async () => {
+                    if (!result && (await trigger())) {
+                      await handleSubmit(submit)();
                     }
                   }}
                 >

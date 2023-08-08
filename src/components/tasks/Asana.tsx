@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateAsanaTaskArgs } from "src/generated/graphql";
@@ -52,15 +52,21 @@ const QUERY_ASANA_SECTIONS = graphql(/* GraphQL */ `
 `);
 
 const Asana = (props: AsanaProps) => {
-  const { userModuleId, highlightedText } = props;
-  const { register, control } = useFormContext<MutationCreateAsanaTaskArgs>();
-  const [selectedWorkspace, setSelectedWorkspace] = useState("");
-  const [selectedProject, setSelectedProject] = useState("");
+  const { userModuleId, highlightedText, ...stackProps } = props;
+  const {
+    register,
+    control,
+    resetField,
+    watch,
+    formState: { errors },
+  } = useFormContext<MutationCreateAsanaTaskArgs>();
   const { data: asanaWorkspacesData } = useQuery(QUERY_ASANA_WORKSPACES, {
     variables: {
       userModuleId,
     },
   });
+  const selectedWorkspace = watch("element.workspaceId");
+  const selectedProject = watch("element.projectId");
   const [fetchAsanaProjects, { data: asanaProjectsData }] =
     useLazyQuery(QUERY_ASANA_PROJECTS);
   const [fetchAsanaSections, { data: asanaSectionsData }] =
@@ -68,23 +74,31 @@ const Asana = (props: AsanaProps) => {
   register("userModuleId", { value: userModuleId });
 
   useEffect(() => {
+    if (highlightedText) {
+      resetField("element.name", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
+
+  useEffect(() => {
+    resetField("element.projectId");
     if (selectedWorkspace) {
       fetchAsanaProjects({
         variables: { userModuleId, workspaceId: selectedWorkspace },
       });
     }
-  }, [selectedWorkspace, fetchAsanaProjects, userModuleId]);
+  }, [selectedWorkspace, fetchAsanaProjects, userModuleId, resetField]);
 
   useEffect(() => {
+    resetField("element.sectionId");
     if (selectedProject) {
       fetchAsanaSections({
         variables: { userModuleId, projectId: selectedProject },
       });
     }
-  }, [selectedProject, fetchAsanaSections, userModuleId]);
+  }, [selectedProject, fetchAsanaSections, userModuleId, resetField]);
 
   return (
-    <Stack spacing={3} {...props}>
+    <Stack spacing={3} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create an Task in Asana
@@ -114,15 +128,16 @@ const Asana = (props: AsanaProps) => {
         }}
       />
       <Controller
-        render={({ field: { onChange, ...rest } }) => (
+        render={({ field: { onChange, value, ...rest } }) => (
           <TextField
             {...rest}
+            value={value}
             label="Select Workspace"
             select
             required
             onChange={(e) => {
+              resetField("element.projectId");
               onChange(e.target.value);
-              setSelectedWorkspace(e.target.value);
             }}
           >
             {asanaWorkspacesData?.asanaWorkspaces?.elements?.map(
@@ -143,18 +158,20 @@ const Asana = (props: AsanaProps) => {
         name="element.workspaceId"
         rules={{ required: true }}
         control={control}
+        defaultValue=""
       />
       <Controller
-        render={({ field: { onChange, ...rest } }) => (
+        render={({ field: { onChange, value, ...rest } }) => (
           <TextField
             {...rest}
+            value={value}
             label="Select Project"
             select
             required
             disabled={!selectedWorkspace}
             onChange={(e) => {
+              resetField("element.sectionId");
               onChange(e.target.value);
-              setSelectedProject(e.target.value);
             }}
           >
             {asanaProjectsData?.asanaProjects.elements?.map((project) => (
@@ -173,15 +190,20 @@ const Asana = (props: AsanaProps) => {
         name="element.projectId"
         rules={{ required: true }}
         control={control}
+        defaultValue=""
       />
       <Controller
-        render={({ field }) => (
+        render={({ field: { onChange, value, ...rest } }) => (
           <TextField
-            {...field}
+            {...rest}
+            value={value}
             label="Select Section"
             select
             required
             disabled={!selectedProject}
+            onChange={(e) => {
+              onChange(e.target.value);
+            }}
           >
             {asanaSectionsData?.asanaSections.elements?.map((section) => (
               <MenuItem key={section.id} value={section.id}>
@@ -199,6 +221,7 @@ const Asana = (props: AsanaProps) => {
         name="element.sectionId"
         rules={{ required: true }}
         control={control}
+        defaultValue=""
       />
       <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
@@ -209,6 +232,8 @@ const Asana = (props: AsanaProps) => {
             slotProps={{
               textField: {
                 size: "small",
+                error: !!errors.element?.dueDate,
+                helperText: errors.element?.dueDate?.message?.toString(),
               },
               actionBar: {
                 actions: ["clear", "accept"],
@@ -220,6 +245,13 @@ const Asana = (props: AsanaProps) => {
         )}
         name="element.dueDate"
         control={control}
+        defaultValue={null}
+        rules={{
+          validate(value) {
+            if (value && !value.isValid()) return "Invalid date";
+            return true;
+          },
+        }}
       />
     </Stack>
   );

@@ -27,7 +27,7 @@ import {
   FragmentFolderFieldsFragment,
   FragmentFolderFieldsFragmentDoc,
   FragmentPaginatedBoardsFieldsFragmentDoc,
-  MutationCreateMondayItemArgs
+  MutationCreateMondayItemArgs,
 } from "src/generated/graphql";
 
 interface Group {
@@ -51,12 +51,13 @@ interface PaginatedBoards {
 
 interface PaginatedFolders {
   elements?:
-    | (
-        {
-          folders?: PaginatedFolders
-        } & {
-          " $fragmentRefs"?: { FragmentFolderFieldsFragment: FragmentFolderFieldsFragment; }
-        } )[]
+    | ({
+        folders?: PaginatedFolders;
+      } & {
+        " $fragmentRefs"?: {
+          FragmentFolderFieldsFragment: FragmentFolderFieldsFragment;
+        };
+      })[]
     | null;
 }
 
@@ -123,13 +124,11 @@ const QUERY_MONDAY_RESOURCES = graphql(/* GraphQL */ `
 
 const Monday = (props: MondayProps) => {
   const { userModuleId, highlightedText } = props;
-  const { register, setValue, control } =
+  const { register, setValue, control, resetField } =
     useFormContext<MutationCreateMondayItemArgs>();
-
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [openAutocomplete, setOpenAutocomplete] = useState(false);
-
   const { data: mondayWorkspacesData } = useQuery(QUERY_MONDAY_WORKSPACES, {
     variables: {
       userModuleId,
@@ -140,30 +139,31 @@ const Monday = (props: MondayProps) => {
     { data: mondayResourcesData, loading: mondayResourcesLoading },
   ] = useLazyQuery(QUERY_MONDAY_RESOURCES);
   register("userModuleId", { value: userModuleId });
+  register("element.boardId", { required: true });
+  register("element.groupId", { required: true });
 
   useEffect(() => {
     if (selectedWorkspace) {
-      setSelectedGroup({ id: "", name: "" });
+      setSelectedGroup(null);
+      resetField("element.boardId");
+      resetField("element.groupId");
       fetchMondayResources({
         variables: { userModuleId, workspaceId: selectedWorkspace },
       });
     }
-  }, [selectedWorkspace, fetchMondayResources, userModuleId]);
-
-  useEffect(() => {
-    console.log(mondayResourcesData?.mondayResources.boards);
-  }, [mondayResourcesData]);
+  }, [selectedWorkspace, fetchMondayResources, userModuleId, resetField]);
 
   const generateGroupTree = (groups: PaginatedGroups, board: Board) => {
     return groups.elements?.map((group) => (
       <StyledTreeItem
         key={`${board.id}-${group.id}`}
         nodeId={`${board.id}-${group.id}`}
-        labelText={group.name || 'No group name'}
+        labelText={group.name || "No group name"}
         labelIcon={FormatListBulletedOutlined}
         onClick={() => {
-          setValue("element.boardId", board.id);
-          if (group.id) setValue("element.groupId", group.id);
+          setValue("element.boardId", board.id, { shouldValidate: true });
+          if (group.id)
+            setValue("element.groupId", group.id, { shouldValidate: true });
           setSelectedGroup({ ...group, board });
           setOpenAutocomplete(false);
         }}
@@ -171,9 +171,12 @@ const Monday = (props: MondayProps) => {
     ));
   };
 
-  const generateBoardTree = (boards: PaginatedBoards | undefined | null) => {
-    return boards?.elements?.length ? (
-      boards?.elements?.map((board) => (
+  const generateBoardTree = (
+    boards: PaginatedBoards | undefined | null,
+    hasFolder: boolean,
+  ) => {
+    if (boards?.elements?.length) {
+      return boards?.elements?.map((board) => (
         <StyledTreeItem
           key={board.id}
           nodeId={board.id}
@@ -182,14 +185,16 @@ const Monday = (props: MondayProps) => {
         >
           {generateGroupTree(board.groups, board)}
         </StyledTreeItem>
-      ))
-    ) : (
-      <TreeItem
-        nodeId="disabled"
-        disabled
-        label="There are no boards and groups available to select. Please add a board in this folder."
-      />
-    );
+      ));
+    } else if (hasFolder) {
+      return (
+        <TreeItem
+          nodeId="disabled"
+          disabled
+          label="There are no boards and groups available to select. Please add a board in this folder."
+        />
+      );
+    }
   };
 
   const generateFolderTree = (folders: PaginatedFolders | undefined) =>
@@ -210,7 +215,7 @@ const Monday = (props: MondayProps) => {
           labelIcon={FolderOpenOutlined}
         >
           {generateFolderTree(folder.folders)}
-          {generateBoardTree(paginatedBoards)}
+          {generateBoardTree(paginatedBoards, true)}
         </StyledTreeItem>
       );
     });
@@ -241,7 +246,7 @@ const Monday = (props: MondayProps) => {
         sx={{ width: "calc(100% - 16px)" }}
       >
         {generateFolderTree(mondayResourcesData?.mondayResources.folders)}
-        {generateBoardTree(paginatedBoards)}
+        {generateBoardTree(paginatedBoards, false)}
       </TreeView>
     );
   };
@@ -250,7 +255,7 @@ const Monday = (props: MondayProps) => {
     <Stack spacing={2} {...props}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
-        Create a item in Monday.com
+        Create an item in Monday.com
       </Typography>
       <Controller
         render={({ field }) => (
@@ -309,7 +314,7 @@ const Monday = (props: MondayProps) => {
             )}
             open={openAutocomplete}
             onOpen={() => setOpenAutocomplete(true)}
-            value={selectedGroup ?? {id: null, name: null}}
+            value={selectedGroup ?? { id: null, name: null }}
             getOptionLabel={(o) =>
               o?.name ? `${o.board?.name} > ${o.name}` : ""
             }
