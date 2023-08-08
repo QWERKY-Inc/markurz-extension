@@ -130,6 +130,9 @@ const SideDrawer = (props: SideDrawerProps) => {
     setErrorMutation("");
   }, [highlightedText, reset]);
 
+  const capitalizeFirstCharacter = (value: string): string =>
+    value.charAt(0).toUpperCase() + value.slice(1);
+
   const submit = async (form: FieldValues) => {
     form.sourceUrl = document.location.href;
     const appKey = selectedApp?.split("-")[0] as keyof typeof APPS;
@@ -150,7 +153,11 @@ const SideDrawer = (props: SideDrawerProps) => {
           url: result?.create.outputUrl,
           tooltipMessage: result?.create
             ? result?.create.outputUrl
-              ? `${currentApp.taskName} created! Click to check and input additional information in ${currentApp.taskName}`
+              ? `${capitalizeFirstCharacter(
+                  currentApp.taskName,
+                )} created! Click to check and input additional information in ${
+                  currentApp.taskName
+                }`
               : currentApp.missingUrlTooltipMessage
             : undefined,
         });
