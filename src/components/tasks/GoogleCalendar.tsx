@@ -1,5 +1,14 @@
 import { Close, InfoOutlined } from "@mui/icons-material";
-import { Button, IconButton, MenuItem, Stack, StackProps, TextField, Tooltip, Typography } from "@mui/material";
+import {
+  Button,
+  IconButton,
+  MenuItem,
+  Stack,
+  StackProps,
+  TextField,
+  Tooltip,
+  Typography,
+} from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
 import { DateTimePicker } from "@mui/x-date-pickers";
 import moment from "moment";
@@ -110,10 +119,12 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         rules={{
           validate(value, formValues) {
             clearErrors("element.endDate");
+            if (!value?.isValid()) return "Invalid date";
             return value > formValues.element.endDate
               ? "The start date must be before the end date"
               : true;
           },
+          required: true,
         }}
       />
       <Controller
@@ -139,10 +150,12 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
         rules={{
           validate(value, formValues) {
             clearErrors("element.startDate");
+            if (!value?.isValid()) return "Invalid date";
             return value < formValues.element.startDate
               ? "The end date must be after the start date"
               : true;
           },
+          required: true,
         }}
       />
       <Controller
@@ -222,7 +235,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
               if (fields.length + 1 < TIME_KEYS.length) {
                 append({
                   method: GoogleCalendarReminderEnum.Notification,
-                  minutes: TIME_KEYS[fields.length + 1],
+                  minutes: TIME_KEYS[fields.length + 1] / MINUTE,
                 });
               }
             }}

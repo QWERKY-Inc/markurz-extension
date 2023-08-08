@@ -5,7 +5,6 @@ import {
   Alert,
   Box,
   Button,
-  Drawer,
   DrawerProps,
   IconButton,
   ListItemIcon,
@@ -30,7 +29,6 @@ import {
   OrderByEnum,
   UserModuleStatusEnum,
 } from "src/generated/graphql";
-import { MARKURZ_DIV_NAME } from "src/lib/dom";
 import { useTokenShared } from "src/lib/token";
 
 interface SideDrawerProps extends DrawerProps {
@@ -47,6 +45,7 @@ const SideDrawer = (props: SideDrawerProps) => {
   const {
     handleSubmit,
     reset,
+    trigger,
     formState: { isValid, isDirty },
   } = methods;
   const { token, loading: tokenLoading } = useTokenShared();
@@ -103,10 +102,10 @@ const SideDrawer = (props: SideDrawerProps) => {
     // If the selection changes reset the result to be ready to get a new url.
     setResult(null);
     setErrorMutation("");
-    reset({
-      sourceText: highlightedText,
-    });
   }, [highlightedText, reset]);
+
+  const capitalizeFirstCharacter = (value: string): string =>
+    value.charAt(0).toUpperCase() + value.slice(1);
 
   const submit = async (form: FieldValues) => {
     form.sourceUrl = document.location.href;
@@ -121,13 +120,18 @@ const SideDrawer = (props: SideDrawerProps) => {
             currentApp.mutation,
           variables: form,
         });
+        setErrorMutation("");
         setResult({
           appName: currentApp.name,
           taskName: currentApp.taskName,
           url: result?.create.outputUrl,
           tooltipMessage: result?.create
             ? result?.create.outputUrl
-              ? `${currentApp.taskName} created! Click to check and input additional information in ${currentApp.taskName}`
+              ? `${capitalizeFirstCharacter(
+                  currentApp.taskName,
+                )} created! Click to check and input additional information in ${
+                  currentApp.taskName
+                }`
               : currentApp.missingUrlTooltipMessage
             : undefined,
         });
@@ -158,23 +162,24 @@ const SideDrawer = (props: SideDrawerProps) => {
   };
 
   return (
-    <Drawer
-      anchor="right"
+    <Box
       sx={{
-        "& .MuiDrawer-paper": {
-          width: { xs: 375, sm: 420 },
-          maxWidth: "100vw",
-        },
+        width: "100%",
+        maxWidth: "100vw",
+        height: "100%",
+        display: "flex",
+        flexDirection: "column",
+        overflow: "hidden",
       }}
-      ModalProps={{
-        container: document.getElementById(MARKURZ_DIV_NAME),
-        style: {
-          zIndex: 1201,
-        },
-      }}
-      {...drawerProps}
     >
-      <Stack spacing={1} p={2} direction="row" alignItems="center">
+      <Stack
+        spacing={1}
+        p={2}
+        direction="row"
+        alignItems="center"
+        position="sticky"
+        top={0}
+      >
         <Box flexGrow={1}>
           <MarkurzIcon color="primary" />
         </Box>
@@ -202,10 +207,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         <Limit />
       ) : (
         <FormProvider {...methods}>
-          <form
-            onSubmit={handleSubmit(submit)}
-            style={{ height: "100%", display: "flex", flexDirection: "column" }}
-          >
+          <form style={{ overflowY: "auto", marginBottom: 64 }}>
             <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
               <Typography
                 variant="h5"
@@ -299,48 +301,53 @@ const SideDrawer = (props: SideDrawerProps) => {
                 })}
               </TabContext>
             </Stack>
-            <Paper
-              square
-              elevation={0}
-              sx={{
-                position: "sticky",
-                left: 16,
-                bottom: 16,
-                width: "calc(100% - 32px)",
-                mt: 3,
-                zIndex: 1,
-              }}
-            >
-              {errorMutation && (
-                <Alert severity="error" variant="outlined" sx={{ mb: 2 }}>
-                  {errorMutation}
-                </Alert>
-              )}
-              <Tooltip title={result?.tooltipMessage || null} placement="top">
-                <span>
-                  <LoadingButton
-                    fullWidth
-                    disabled={!isValid || (!!result && !result.url)}
-                    startIcon={result ? <Link /> : undefined}
-                    variant="contained"
-                    type={result ? "button" : "submit"}
-                    loading={loading}
-                    color={result ? "secondary" : "primary"}
-                    href={result?.url || ""}
-                    rel="noopener"
-                    target="_blank"
-                  >
-                    {result
-                      ? `Link to ${result.appName} ${result.taskName}`
-                      : "Send"}
-                  </LoadingButton>
-                </span>
-              </Tooltip>
-            </Paper>
           </form>
+          <Paper
+            square
+            elevation={0}
+            sx={{
+              position: "absolute",
+              left: 24,
+              bottom: 16,
+              width: "calc(100% - 48px)",
+              mt: 3,
+              zIndex: 1,
+            }}
+          >
+            {errorMutation && (
+              <Alert severity="error" variant="outlined" sx={{ mb: 2 }}>
+                {errorMutation}
+              </Alert>
+            )}
+            <Tooltip title={result?.tooltipMessage || null} placement="top">
+              <span>
+                <LoadingButton
+                  fullWidth
+                  disabled={!isValid || (!!result && !result.url)}
+                  startIcon={result ? <Link /> : undefined}
+                  variant="contained"
+                  type="button"
+                  loading={loading}
+                  color={result ? "secondary" : "primary"}
+                  href={result?.url || ""}
+                  rel="noopener"
+                  target="_blank"
+                  onClick={async () => {
+                    if (!result && (await trigger())) {
+                      await handleSubmit(submit)();
+                    }
+                  }}
+                >
+                  {result
+                    ? `Link to ${result.appName} ${result.taskName}`
+                    : "Send"}
+                </LoadingButton>
+              </span>
+            </Tooltip>
+          </Paper>
         </FormProvider>
       )}
-    </Drawer>
+    </Box>
   );
 };
 

@@ -3,7 +3,6 @@ import { Circle, InfoOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   Chip,
-  chipClasses,
   ListItemIcon,
   ListItemText,
   MenuItem,
@@ -11,9 +10,9 @@ import {
   StackProps,
   TextField,
   Typography,
+  chipClasses,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
-import React from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateMicrosoftTodoTaskArgs } from "src/generated/graphql";
@@ -86,7 +85,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
     <Stack spacing={3} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
-        Create an issue in Microsoft To Do
+        Create a task in Microsoft To Do
       </Typography>
       <Controller
         render={({ field }) => (
@@ -127,6 +126,8 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
         )}
         name="element.taskListId"
         control={control}
+        defaultValue=""
+        rules={{ required: true }}
       />
       <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
@@ -141,7 +142,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
             onChange={(e, data) => {
               onChange(data);
             }}
-            value={value || undefined}
+            value={value || []}
             options={
               dataTodoCategories?.microsoftTodoCategories.elements?.map(
                 (o) => o.displayName,
@@ -194,6 +195,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
         )}
         name="element.categoryNames"
         control={control}
+        defaultValue={null}
       />
       <Controller
         render={({ field }) => (
@@ -210,6 +212,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
         )}
         name="element.dueDate"
         control={control}
+        defaultValue={null}
       />
     </Stack>
   );

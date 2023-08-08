@@ -1,7 +1,15 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { Circle, Close, InfoOutlined } from "@mui/icons-material";
 import {
+  CheckBox,
+  CheckBoxOutlineBlank,
+  Circle,
+  Close,
+  InfoOutlined,
+} from "@mui/icons-material";
+import {
+  Autocomplete,
   Box,
+  Checkbox,
   Chip,
   IconButton,
   InputAdornment,
@@ -13,7 +21,7 @@ import {
   Typography,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { CreateTrelloCardMutationVariables } from "src/generated/graphql";
@@ -70,10 +78,25 @@ const QUERY_TRELLO_LABELS = graphql(/* GraphQL */ `
   }
 `);
 
+const QUERY_TRELLO_MEMBERS = graphql(/* GraphQL */ `
+  query TrelloMembers($userModuleId: ID!, $trelloBoardId: ID!) {
+    trelloMembers(userModuleId: $userModuleId, trelloBoardId: $trelloBoardId) {
+      elements {
+        id
+        fullName
+      }
+    }
+  }
+`);
+
 const Trello = (props: TrelloProps) => {
-  const { userModuleId, highlightedText } = props;
-  const { register, control, resetField } =
-    useFormContext<CreateTrelloCardMutationVariables>();
+  const { userModuleId, highlightedText, ...stackProps } = props;
+  const {
+    register,
+    control,
+    resetField,
+    formState: { errors },
+  } = useFormContext<CreateTrelloCardMutationVariables>();
   const [selectedWorkspace, setSelectedWorkspace] = useState("");
   const [selectedBoard, setSelectedBoard] = useState("");
   const { data } = useQuery(QUERY_TRELLO_WORKSPACES, {
@@ -85,7 +108,10 @@ const Trello = (props: TrelloProps) => {
     useLazyQuery(QUERY_TRELLO_BOARDS);
   const [fetchTrelloLabels, { data: trelloLabels }] =
     useLazyQuery(QUERY_TRELLO_LABELS);
+  const [fetchTrelloMembers, { data: trelloMembers }] =
+    useLazyQuery(QUERY_TRELLO_MEMBERS);
   register("userModuleId", { value: userModuleId });
+  register("element.listId", { required: true });
 
   useEffect(() => {
     if (selectedWorkspace) {
@@ -99,17 +125,37 @@ const Trello = (props: TrelloProps) => {
   }, [selectedWorkspace, fetchTrelloBoards, userModuleId]);
 
   useEffect(() => {
+    if (highlightedText) {
+      resetField("element.name", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
+
+  useEffect(() => {
     if (selectedBoard) {
       // If the selected board changes we need to reset the labels since they belong to a specific board
       resetField("element.labelIds");
+      // And list id since it depends on the board too
+      resetField("element.listId");
       fetchTrelloLabels({
         variables: {
           userModuleId,
           trelloBoardId: selectedBoard,
         },
       });
+      fetchTrelloMembers({
+        variables: {
+          userModuleId,
+          trelloBoardId: selectedBoard,
+        },
+      });
     }
-  }, [selectedBoard, fetchTrelloLabels, userModuleId, resetField]);
+  }, [
+    selectedBoard,
+    fetchTrelloLabels,
+    fetchTrelloMembers,
+    userModuleId,
+    resetField,
+  ]);
 
   const getElementLabel = (value: any) => {
     const elem = trelloLabels?.trelloLabels.elements?.find(
@@ -131,7 +177,7 @@ const Trello = (props: TrelloProps) => {
   };
 
   return (
-    <Stack spacing={3} {...props}>
+    <Stack spacing={3} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create a Card in Trello
@@ -166,6 +212,7 @@ const Trello = (props: TrelloProps) => {
         label="Select Workspace"
         required
         onChange={(e) => setSelectedWorkspace(e.target.value)}
+        value={selectedWorkspace}
       >
         {data?.trelloWorkspaces.elements?.map((trelloWorkspaces) => (
           <MenuItem key={trelloWorkspaces.id} value={trelloWorkspaces.id}>
@@ -174,7 +221,8 @@ const Trello = (props: TrelloProps) => {
         ))}
         {!data?.trelloWorkspaces.elements?.length && (
           <MenuItem disabled>
-            There are no workspace available to select
+            There are no workspaces available to select. Please create a
+            workspace in Trello.
           </MenuItem>
         )}
       </TextField>
@@ -182,8 +230,9 @@ const Trello = (props: TrelloProps) => {
         select
         label="Select Board"
         required
-        disabled={!trelloBoards?.trelloBoards.elements?.length}
         onChange={(e) => setSelectedBoard(e.target.value)}
+        value={selectedBoard}
+        disabled={!selectedWorkspace}
       >
         {trelloBoards?.trelloBoards.elements?.map((board) => (
           <MenuItem key={board.id} value={board.id}>
@@ -191,7 +240,10 @@ const Trello = (props: TrelloProps) => {
           </MenuItem>
         ))}
         {!trelloBoards?.trelloBoards.elements?.length && (
-          <MenuItem disabled>There are no boards available to select</MenuItem>
+          <MenuItem disabled>
+            There are no boards available to select. Please create a board in
+            Trello.
+          </MenuItem>
         )}
       </TextField>
       <Controller
@@ -216,13 +268,16 @@ const Trello = (props: TrelloProps) => {
               (o) => o.id === selectedBoard,
             )?.lists?.length && (
               <MenuItem disabled>
-                There are no list available to select
+                There are no lists available to select. Please create a list in
+                Trello.
               </MenuItem>
             )}
           </TextField>
         )}
         name="element.listId"
         control={control}
+        rules={{ required: true }}
+        defaultValue=""
       />
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
@@ -282,6 +337,12 @@ const Trello = (props: TrelloProps) => {
                 <ListItemText primary={trelloLabel.label} />
               </MenuItem>
             ))}
+            {!trelloLabels?.trelloLabels.elements?.length && (
+              <MenuItem disabled>
+                There are no labels available to select. Please create labels in
+                Trello.
+              </MenuItem>
+            )}
           </TextField>
         )}
         name="element.labelIds"
@@ -291,11 +352,50 @@ const Trello = (props: TrelloProps) => {
         Additional Information (optional)
       </Typography>
       <Controller
+        render={({ field: { onChange, value, ...rest } }) => (
+          <Autocomplete
+            {...rest}
+            multiple
+            disableCloseOnSelect
+            disabled={!selectedBoard}
+            onChange={(_, newValue) =>
+              onChange(newValue.map((value) => value.id))
+            }
+            options={trelloMembers?.trelloMembers.elements ?? []}
+            value={
+              trelloMembers?.trelloMembers.elements?.filter(
+                (member) => value && value.indexOf(member.id) !== -1,
+              ) ?? []
+            }
+            getOptionLabel={(option) => option.fullName}
+            renderInput={(params) => (
+              <TextField {...params} label="Select Members" />
+            )}
+            renderOption={(props, option, { selected }) => (
+              <li {...props}>
+                <Checkbox
+                  icon={<CheckBoxOutlineBlank />}
+                  checkedIcon={<CheckBox />}
+                  style={{ marginRight: 8 }}
+                  checked={selected}
+                />
+                {option.fullName}
+              </li>
+            )}
+          />
+        )}
+        name="element.memberIds"
+        control={control}
+        defaultValue={null}
+      />
+      <Controller
         render={({ field }) => (
           <DateTimePicker
             slotProps={{
               textField: {
                 size: "small",
+                error: !!errors.element?.start,
+                helperText: errors.element?.start?.message?.toString(),
               },
               actionBar: {
                 actions: ["clear", "accept"],
@@ -307,6 +407,13 @@ const Trello = (props: TrelloProps) => {
         )}
         name="element.start"
         control={control}
+        defaultValue={null}
+        rules={{
+          validate(value) {
+            if (value && !value.isValid()) return "Invalid date";
+            return true;
+          },
+        }}
       />
       <Controller
         render={({ field }) => (
@@ -314,6 +421,8 @@ const Trello = (props: TrelloProps) => {
             slotProps={{
               textField: {
                 size: "small",
+                error: !!errors.element?.due,
+                helperText: errors.element?.due?.message?.toString(),
               },
               actionBar: {
                 actions: ["clear", "accept"],
@@ -325,6 +434,13 @@ const Trello = (props: TrelloProps) => {
         )}
         name="element.due"
         control={control}
+        defaultValue={null}
+        rules={{
+          validate(value) {
+            if (value && !value.isValid()) return "Invalid date";
+            return true;
+          },
+        }}
       />
     </Stack>
   );
