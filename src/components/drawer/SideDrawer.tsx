@@ -144,7 +144,9 @@ const SideDrawer = (props: SideDrawerProps) => {
           mutation:
             // Split on dash to get the first part which is the APP key, second part being the account
             currentApp.mutation,
-          variables: form,
+          variables: currentApp.transformer
+            ? currentApp.transformer(form)
+            : form,
         });
         setErrorMutation("");
         setResult({
