@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { InfoOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -78,17 +78,10 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
       },
     },
   );
-  const {
-    data: dataTodoSections,
-    loading: loadingSections,
-    refetch,
-  } = useQuery(QUERY_MICROSOFT_ONENOTE_SECTIONS, {
-    variables: {
-      userModuleId,
-      notebookId,
-    },
-    skip: !notebookId,
-  });
+  const [
+    querySections,
+    { data: dataTodoSections, loading: loadingSections, refetch },
+  ] = useLazyQuery(QUERY_MICROSOFT_ONENOTE_SECTIONS);
   register("userModuleId", { value: userModuleId });
   register("element.sectionId", { required: true });
 
@@ -97,6 +90,17 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
       resetField("element.title", { defaultValue: highlightedText });
     }
   }, [resetField, highlightedText]);
+
+  useEffect(() => {
+    if (notebookId) {
+      querySections({
+        variables: {
+          userModuleId,
+          notebookId,
+        },
+      });
+    }
+  }, [querySections, notebookId]);
 
   return (
     <Stack spacing={3} {...stackProps}>
@@ -134,7 +138,10 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
             select
             label="Select Notebook"
             required
-            onChange={(e) => onChange(e.target.value)}
+            onChange={(e) => {
+              resetField("element.sectionId");
+              onChange(e.target.value);
+            }}
             {...rest}
           >
             {loadingNotebooks && <MenuItem disabled>Loading...</MenuItem>}
@@ -159,12 +166,16 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
             {...rest}
             noOptionsText="There are no sections available to select. Please add a section in this notebook."
             onChange={(e, data) => {
-              onChange(data);
+              onChange(data || "");
             }}
             onInputChange={async (event, value) => {
-              await refetch({
-                query: value,
-              });
+              if (notebookId) {
+                await refetch({
+                  query: value,
+                  notebookId,
+                  userModuleId,
+                });
+              }
             }}
             value={value}
             options={
@@ -175,7 +186,7 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
             getOptionLabel={(option) =>
               dataTodoSections?.microsoftOneNoteSections.elements?.find(
                 (o) => o.id === option,
-              )?.label || "Undefined"
+              )?.label || ""
             }
             openOnFocus
             autoComplete={false}
@@ -185,6 +196,8 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
           />
         )}
         name="element.sectionId"
+        control={control}
+        defaultValue=""
       />
     </Stack>
   );
