@@ -171,30 +171,17 @@ const Monday = (props: MondayProps) => {
     ));
   };
 
-  const generateBoardTree = (
-    boards: PaginatedBoards | undefined | null,
-    hasFolder: boolean,
-  ) => {
-    if (boards?.elements?.length) {
-      return boards?.elements?.map((board) => (
-        <StyledTreeItem
-          key={board.id}
-          nodeId={board.id}
-          labelText={board.name}
-          labelIcon={SpaceDashboardOutlined}
-        >
-          {generateGroupTree(board.groups, board)}
-        </StyledTreeItem>
-      ));
-    } else if (hasFolder) {
-      return (
-        <TreeItem
-          nodeId="disabled"
-          disabled
-          label="There are no boards and groups available to select. Please add a board in this folder."
-        />
-      );
-    }
+  const generateBoardTree = (boards: PaginatedBoards | undefined | null) => {
+    return boards?.elements?.map((board) => (
+      <StyledTreeItem
+        key={board.id}
+        nodeId={board.id}
+        labelText={board.name}
+        labelIcon={SpaceDashboardOutlined}
+      >
+        {generateGroupTree(board.groups, board)}
+      </StyledTreeItem>
+    ));
   };
 
   const generateFolderTree = (folders: PaginatedFolders | undefined) =>
@@ -214,8 +201,19 @@ const Monday = (props: MondayProps) => {
           labelText={folderFragment.name}
           labelIcon={FolderOpenOutlined}
         >
-          {generateFolderTree(folder.folders)}
-          {generateBoardTree(paginatedBoards, true)}
+          {!paginatedBoards?.elements?.length &&
+          !folder.folders?.elements?.length ? (
+            <TreeItem
+              nodeId="disabled"
+              disabled
+              label="There are no boards and groups available to select. Please add a board in this folder."
+            />
+          ) : (
+            <span>
+              {generateFolderTree(folder.folders)}
+              {generateBoardTree(paginatedBoards)}
+            </span>
+          )}
         </StyledTreeItem>
       );
     });
@@ -246,7 +244,7 @@ const Monday = (props: MondayProps) => {
         sx={{ width: "calc(100% - 16px)" }}
       >
         {generateFolderTree(mondayResourcesData?.mondayResources.folders)}
-        {generateBoardTree(paginatedBoards, false)}
+        {generateBoardTree(paginatedBoards)}
       </TreeView>
     );
   };
@@ -323,7 +321,9 @@ const Monday = (props: MondayProps) => {
             disableClearable
             disableCloseOnSelect
             PaperComponent={() => (
-              <Paper sx={{ px: 1, py: 2 }}>{generateTreeView()}</Paper>
+              <Paper sx={{ px: 1, py: 2, maxHeight: 200, overflow: "auto" }}>
+                {generateTreeView()}
+              </Paper>
             )}
           />
         </Box>
