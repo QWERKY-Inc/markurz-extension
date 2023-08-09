@@ -3,6 +3,7 @@ import { Circle, InfoOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   Chip,
+  chipClasses,
   ListItemIcon,
   ListItemText,
   MenuItem,
@@ -10,9 +11,9 @@ import {
   StackProps,
   TextField,
   Typography,
-  chipClasses,
 } from "@mui/material";
 import { DatePicker } from "@mui/x-date-pickers";
+import { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateMicrosoftTodoTaskArgs } from "src/generated/graphql";
@@ -61,7 +62,7 @@ const QUERY_MICROSOFT_TODO_CATEGORIES = graphql(/* GraphQL */ `
 
 const MicrosoftToDo = (props: MicrosoftToDoProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control } =
+  const { register, control, resetField } =
     useFormContext<MutationCreateMicrosoftTodoTaskArgs>();
   const { data: dataTodoTasks, loading: loadingTasks } = useQuery(
     QUERY_MICROSOFT_TODO_TASKS,
@@ -80,6 +81,12 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
     },
   );
   register("userModuleId", { value: userModuleId });
+
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.title", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
 
   return (
     <Stack spacing={3} {...stackProps}>

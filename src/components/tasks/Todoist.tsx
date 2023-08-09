@@ -12,7 +12,7 @@ import {
   Typography,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import React from "react";
+import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateTodoistTaskArgs } from "src/generated/graphql";
@@ -50,7 +50,7 @@ const QUERY_TODOIST_INFOS = graphql(/* GraphQL */ `
 
 const Todoist = (props: TodoistProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control, watch } =
+  const { register, control, watch, resetField } =
     useFormContext<MutationCreateTodoistTaskArgs>();
   const { data } = useQuery(QUERY_TODOIST_INFOS, {
     variables: {
@@ -59,6 +59,12 @@ const Todoist = (props: TodoistProps) => {
   });
   const watchLabels = watch("element.labels");
   register("userModuleId", { value: userModuleId });
+
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.title", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
 
   return (
     <Stack spacing={2} {...stackProps}>
@@ -116,6 +122,7 @@ const Todoist = (props: TodoistProps) => {
               Boolean(watchLabels && watchLabels.length >= 500)
             }
             multiple
+            disableCloseOnSelect
             onChange={(e, data) => {
               onChange(data);
             }}

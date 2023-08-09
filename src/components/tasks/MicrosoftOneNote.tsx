@@ -1,4 +1,4 @@
-import { useQuery } from "@apollo/client";
+import { useLazyQuery, useQuery } from "@apollo/client";
 import { InfoOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -8,7 +8,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import React, { useEffect, useState } from "react";
+import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { CreateMicrosoftOneNotePageMutationVariables } from "src/generated/graphql";
@@ -64,12 +64,12 @@ const QUERY_MICROSOFT_ONENOTE_SECTIONS = graphql(/* GraphQL */ `
 
 const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control, setValue, resetField } =
-    useFormContext<CreateMicrosoftOneNotePageMutationVariables>();
-  const [section, setSection] = useState<null | { id: string; label: string }>(
-    null,
-  );
-  const [notebookId, setNotebookId] = useState("");
+  const { register, control, resetField, watch } = useFormContext<
+    CreateMicrosoftOneNotePageMutationVariables & {
+      element: { notebookId: string };
+    }
+  >();
+  const notebookId = watch("element.notebookId");
   const { data: dataNotebooks, loading: loadingNotebooks } = useQuery(
     QUERY_MICROSOFT_ONENOTE_NOTEBOOKS,
     {
@@ -78,17 +78,10 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
       },
     },
   );
-  const {
-    data: dataTodoSections,
-    loading: loadingSections,
-    refetch,
-  } = useQuery(QUERY_MICROSOFT_ONENOTE_SECTIONS, {
-    variables: {
-      userModuleId,
-      notebookId,
-    },
-    skip: !notebookId,
-  });
+  const [
+    querySections,
+    { data: dataTodoSections, loading: loadingSections, refetch },
+  ] = useLazyQuery(QUERY_MICROSOFT_ONENOTE_SECTIONS);
   register("userModuleId", { value: userModuleId });
   register("element.sectionId", { required: true });
 
@@ -97,6 +90,17 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
       resetField("element.title", { defaultValue: highlightedText });
     }
   }, [resetField, highlightedText]);
+
+  useEffect(() => {
+    if (notebookId) {
+      querySections({
+        variables: {
+          userModuleId,
+          notebookId,
+        },
+      });
+    }
+  }, [querySections, notebookId]);
 
   return (
     <Stack spacing={3} {...stackProps}>
@@ -128,44 +132,72 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
           maxLength: 2000,
         }}
       />
-      <TextField
-        select
-        label="Select Notebook"
-        required
-        value={notebookId}
-        onChange={(e) => setNotebookId(e.target.value)}
-      >
-        {loadingNotebooks && <MenuItem disabled>Loading...</MenuItem>}
-        {!dataNotebooks?.microsoftOneNoteNotebooks.elements?.length &&
-          !loadingNotebooks && <MenuItem disabled>No items</MenuItem>}
-        {dataNotebooks?.microsoftOneNoteNotebooks.elements?.map((item) => (
-          <MenuItem key={item.id} value={item.id}>
-            {item.displayName}
-          </MenuItem>
-        ))}
-      </TextField>
-      <Autocomplete
-        disabled={!notebookId}
-        loading={loadingSections}
-        noOptionsText="There are no sections available to select. Please add a section in this notebook."
-        onChange={(e, data) => {
-          setSection(data);
-          setValue("element.sectionId", data?.id || "", {
-            shouldValidate: true,
-          });
-        }}
-        onInputChange={async (event, value) => {
-          await refetch({
-            query: value,
-          });
-        }}
-        value={section}
-        options={dataTodoSections?.microsoftOneNoteSections.elements ?? []}
-        openOnFocus
-        autoComplete={false}
-        renderInput={(params) => (
-          <TextField {...params} required label="Select Section" />
+      <Controller
+        render={({ field: { onChange, ...rest } }) => (
+          <TextField
+            select
+            label="Select Notebook"
+            required
+            onChange={(e) => {
+              resetField("element.sectionId");
+              onChange(e.target.value);
+            }}
+            {...rest}
+          >
+            {loadingNotebooks && <MenuItem disabled>Loading...</MenuItem>}
+            {!dataNotebooks?.microsoftOneNoteNotebooks.elements?.length &&
+              !loadingNotebooks && <MenuItem disabled>No items</MenuItem>}
+            {dataNotebooks?.microsoftOneNoteNotebooks.elements?.map((item) => (
+              <MenuItem key={item.id} value={item.id}>
+                {item.displayName}
+              </MenuItem>
+            ))}
+          </TextField>
         )}
+        name="element.notebookId"
+        control={control}
+        defaultValue=""
+      />
+      <Controller
+        render={({ field: { onChange, value, ...rest } }) => (
+          <Autocomplete
+            disabled={!notebookId}
+            loading={loadingSections}
+            {...rest}
+            noOptionsText="There are no sections available to select. Please add a section in this notebook."
+            onChange={(e, data) => {
+              onChange(data || "");
+            }}
+            onInputChange={async (event, value) => {
+              if (notebookId) {
+                await refetch({
+                  query: value,
+                  notebookId,
+                  userModuleId,
+                });
+              }
+            }}
+            value={value}
+            options={
+              dataTodoSections?.microsoftOneNoteSections.elements?.map(
+                (o) => o.id,
+              ) ?? []
+            }
+            getOptionLabel={(option) =>
+              dataTodoSections?.microsoftOneNoteSections.elements?.find(
+                (o) => o.id === option,
+              )?.label || ""
+            }
+            openOnFocus
+            autoComplete={false}
+            renderInput={(params) => (
+              <TextField {...params} required label="Select Section" />
+            )}
+          />
+        )}
+        name="element.sectionId"
+        control={control}
+        defaultValue=""
       />
     </Stack>
   );

@@ -10,7 +10,7 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Controller,
   ControllerProps,
@@ -152,7 +152,7 @@ const EmailField = (
 
 const Gmail = (props: GmailProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control, watch } =
+  const { register, control, watch, resetField } =
     useFormContext<CreateGmailEmailMutationVariables>();
   const { data, loading, refetch } = useQuery(QUERY_CONTACTS, {
     variables: {
@@ -166,6 +166,12 @@ const Gmail = (props: GmailProps) => {
     return data?.googlePeopleContacts.elements?.map((o) => o.email) || [];
   }, [data?.googlePeopleContacts.elements]);
   register("userModuleId", { value: userModuleId });
+
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.subject", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
 
   return (
     <Stack spacing={2} {...stackProps}>
@@ -198,12 +204,12 @@ const Gmail = (props: GmailProps) => {
         {...register("element.message")}
       />
       <Controller
-        render={({ field }) => (
+        render={({ field: { value, ...rest } }) => (
           <FormControlLabel
             style={{
               marginLeft: -10,
             }}
-            control={<Checkbox {...field} />}
+            control={<Checkbox checked={value} {...rest} />}
             componentsProps={{
               typography: {
                 sx: {

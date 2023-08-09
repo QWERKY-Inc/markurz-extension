@@ -50,6 +50,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
     control,
     formState: { errors },
     clearErrors,
+    resetField,
   } = useFormContext<CreateGoogleCalendarEventMutationVariables>();
   register("userModuleId", { value: userModuleId });
   const { append, remove, fields, update } = useFieldArray({
@@ -68,6 +69,12 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
     });
     update(0, value);
   }, [register, update]);
+
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.title", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
 
   return (
     <Stack spacing={3} {...stackProps}>

@@ -16,8 +16,10 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import moment from "moment/moment";
 import React, { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
+import { useLocalStorage } from "react-use";
 import { apolloClient } from "src/apollo";
 import { APPS } from "src/components/drawer/Apps";
 import Limit from "src/components/drawer/Limit";
@@ -46,6 +48,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     handleSubmit,
     reset,
     trigger,
+    getValues,
     formState: { isValid, isDirty },
   } = methods;
   const { token, loading: tokenLoading } = useTokenShared();
@@ -57,6 +60,29 @@ const SideDrawer = (props: SideDrawerProps) => {
     tooltipMessage?: string;
   } | null>(null);
   const [errorMutation, setErrorMutation] = useState("");
+  const [save, setSave, deleteSave] = useLocalStorage<{ [p: string]: object }>(
+    "save",
+    {},
+    {
+      raw: false,
+      serializer(value: { [p: string]: object }): string {
+        return JSON.stringify(value);
+      },
+      /**
+       * When we deserialize, we make sure that dates are revived as date objects to be manipulated.
+       * @param value
+       */
+      deserializer(value) {
+        return JSON.parse(value, (key, value) => {
+          const testDate = moment(value, undefined, true);
+          if (key && value && typeof value === "string" && testDate.isValid()) {
+            return testDate;
+          }
+          return value;
+        });
+      },
+    },
+  );
 
   const [queryModules, { data, error, loading: loadingModules }] = useLazyQuery(
     QUERY_MODULES,
@@ -118,7 +144,9 @@ const SideDrawer = (props: SideDrawerProps) => {
           mutation:
             // Split on dash to get the first part which is the APP key, second part being the account
             currentApp.mutation,
-          variables: form,
+          variables: currentApp.transformer
+            ? currentApp.transformer(form)
+            : form,
         });
         setErrorMutation("");
         setResult({
@@ -135,6 +163,7 @@ const SideDrawer = (props: SideDrawerProps) => {
               : currentApp.missingUrlTooltipMessage
             : undefined,
         });
+        deleteSave();
       } catch (e) {
         console.error(e);
         if (e instanceof ApolloError) {
@@ -152,9 +181,18 @@ const SideDrawer = (props: SideDrawerProps) => {
 
   const handleAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
+      if (selectedApp && isDirty) {
+        setSave(() => {
+          return {
+            ...save,
+            [selectedApp]: getValues(),
+          };
+        });
+      }
       setSelectedApp(e.target.value as ModuleTypeEnum);
       reset({
         sourceText: highlightedText,
+        ...(save?.[e.target.value] || {}),
       });
       setResult(null);
       setErrorMutation("");

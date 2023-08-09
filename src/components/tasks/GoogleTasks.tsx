@@ -8,7 +8,7 @@ import {
   Typography,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import React from "react";
+import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateGoogleTasksTaskArgs } from "src/generated/graphql";
@@ -34,7 +34,7 @@ const QUERY_GOOGLE_TASKS_LIST = graphql(/* GraphQL */ `
 
 const GoogleTasks = (props: GoogleTasksProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control } =
+  const { register, control, resetField } =
     useFormContext<MutationCreateGoogleTasksTaskArgs>();
   const { data } = useQuery(QUERY_GOOGLE_TASKS_LIST, {
     variables: {
@@ -42,6 +42,12 @@ const GoogleTasks = (props: GoogleTasksProps) => {
     },
   });
   register("userModuleId", { value: userModuleId });
+
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.title", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
 
   return (
     <Stack spacing={2} {...stackProps}>
