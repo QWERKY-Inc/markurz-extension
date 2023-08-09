@@ -13,8 +13,6 @@ const packageJson = require("./package.json");
 
 require("dotenv").config();
 
-console.log("env", process.env);
-
 export default [
   // {
   //   // UMD
