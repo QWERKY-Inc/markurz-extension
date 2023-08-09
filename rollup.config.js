@@ -52,6 +52,7 @@ export default [
         exports: "named",
       },
     ],
+    external: ["react", "react-dom"],
     plugins: [
       // alias({
       //   entries: {
