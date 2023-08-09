@@ -1,1 +1,1 @@
-export { default } from "src/components/iframe/IFrame";
+export { default } from "./IFrame";

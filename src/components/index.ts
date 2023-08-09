@@ -1,1 +1,1 @@
-export { default as IFrame } from "src/components/iframe";
+export { default as IFrame } from "./iframe";
