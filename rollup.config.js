@@ -7,11 +7,13 @@ import { dts } from "rollup-plugin-dts";
 // import alias from "@rollup/plugin-alias";
 // import { fileURLToPath } from "url";
 import external from "rollup-plugin-peer-deps-external";
-import dotenv from "dotenv";
+import injectProcessEnv from "rollup-plugin-inject-process-env";
 
 const packageJson = require("./package.json");
 
-dotenv.config();
+require("dotenv").config();
+
+console.log("env", process.env);
 
 export default [
   // {
@@ -63,6 +65,13 @@ export default [
       //     src: fileURLToPath(new URL("src", import.meta.url)),
       //   },
       // }),
+      injectProcessEnv({
+        REACT_APP_NEXTAUTH_SECRET: process.env.REACT_APP_NEXTAUTH_SECRET,
+        REACT_APP_BACKEND_URL: process.env.REACT_APP_BACKEND_URL,
+        REACT_APP_COOKIE_NAME: process.env.REACT_APP_COOKIE_NAME,
+        REACT_APP_COOKIE_DOMAIN: process.env.REACT_APP_COOKIE_DOMAIN,
+        REACT_APP_LOGIN_URL: process.env.REACT_APP_LOGIN_URL,
+      }),
       external(),
       nodeResolve(),
       commonjs(),
