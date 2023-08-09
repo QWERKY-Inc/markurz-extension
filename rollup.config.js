@@ -6,6 +6,7 @@ import { dts } from "rollup-plugin-dts";
 // import babel from "@rollup/plugin-babel";
 // import alias from "@rollup/plugin-alias";
 // import { fileURLToPath } from "url";
+import external from "rollup-plugin-peer-deps-external";
 
 const packageJson = require("./package.json");
 
@@ -59,6 +60,7 @@ export default [
       //     src: fileURLToPath(new URL("src", import.meta.url)),
       //   },
       // }),
+      external(),
       nodeResolve(),
       commonjs(),
       typescript({ tsconfig: "./tsconfig.json" }),
