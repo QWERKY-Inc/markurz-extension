@@ -11,7 +11,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { graphql } from "src/generated";
 import { MutationCreateJiraIssueArgs } from "src/generated/graphql";
@@ -88,8 +88,10 @@ const Jira = (props: JiraProps) => {
   const siteId = watch("element.siteId");
   const projectKey = watch("element.projectKey");
   const [queryJiraData, { data }] = useLazyQuery(QUERY_JIRA_DATA);
-  const [fetchUserData, { refetch: refetchUserData, data: usersData, loading: userDataLoading }] =
-    useLazyQuery(QUERY_JIRA_USERS);
+  const [
+    fetchUserData,
+    { refetch: refetchUserData, data: usersData, loading: userDataLoading },
+  ] = useLazyQuery(QUERY_JIRA_USERS);
   const { data: dataSites } = useQuery(QUERY_JIRA_SITES, {
     variables: {
       userModuleId,
@@ -273,9 +275,11 @@ const Jira = (props: JiraProps) => {
         render={({ field: { onChange, value, ...rest } }) => (
           <Autocomplete
             {...rest}
-            value={usersData?.jiraUsers.elements?.find(
-              (elem) => elem.id === value,
-            ) ?? null}
+            value={
+              usersData?.jiraUsers.elements?.find(
+                (elem) => elem.id === value,
+              ) ?? null
+            }
             options={usersData?.jiraUsers.elements ?? []}
             getOptionLabel={(o) => o.displayName}
             renderInput={(params) => (
