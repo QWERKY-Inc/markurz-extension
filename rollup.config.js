@@ -4,8 +4,8 @@ import typescript from "@rollup/plugin-typescript";
 import { dts } from "rollup-plugin-dts";
 // import { terser } from "rollup-plugin-terser";
 // import babel from "@rollup/plugin-babel";
-import alias from "@rollup/plugin-alias";
-import { fileURLToPath } from "url";
+// import alias from "@rollup/plugin-alias";
+// import { fileURLToPath } from "url";
 
 const packageJson = require("./package.json");
 
@@ -53,11 +53,11 @@ export default [
       },
     ],
     plugins: [
-      alias({
-        entries: {
-          src: fileURLToPath(new URL("src", import.meta.url)),
-        },
-      }),
+      // alias({
+      //   entries: {
+      //     src: fileURLToPath(new URL("src", import.meta.url)),
+      //   },
+      // }),
       nodeResolve(),
       commonjs(),
       typescript({ tsconfig: "./tsconfig.json" }),
