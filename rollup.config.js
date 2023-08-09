@@ -7,8 +7,11 @@ import { dts } from "rollup-plugin-dts";
 // import alias from "@rollup/plugin-alias";
 // import { fileURLToPath } from "url";
 import external from "rollup-plugin-peer-deps-external";
+import dotenv from "dotenv";
 
 const packageJson = require("./package.json");
+
+dotenv.config();
 
 export default [
   // {
