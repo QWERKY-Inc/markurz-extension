@@ -33,7 +33,7 @@ import {
 interface Group {
   id: string | null;
   name: string | null;
-  board?: Board;
+  board?: Board | null;
 }
 
 interface PaginatedGroups {
@@ -123,11 +123,12 @@ const QUERY_MONDAY_RESOURCES = graphql(/* GraphQL */ `
 `);
 
 const Monday = (props: MondayProps) => {
-  const { userModuleId, highlightedText } = props;
-  const { register, setValue, control, resetField } =
-    useFormContext<MutationCreateMondayItemArgs>();
-  const [selectedWorkspace, setSelectedWorkspace] = useState("");
-  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const { userModuleId, highlightedText, ...stackProps } = props;
+  const { register, setValue, control, resetField, watch } = useFormContext<
+    MutationCreateMondayItemArgs & {
+      element: { workspace: string; group: Group | null };
+    }
+  >();
   const [openAutocomplete, setOpenAutocomplete] = useState(false);
   const { data: mondayWorkspacesData } = useQuery(QUERY_MONDAY_WORKSPACES, {
     variables: {
@@ -139,14 +140,13 @@ const Monday = (props: MondayProps) => {
     { data: mondayResourcesData, loading: mondayResourcesLoading },
   ] = useLazyQuery(QUERY_MONDAY_RESOURCES);
   register("userModuleId", { value: userModuleId });
-  register("element.boardId", { required: true });
-  register("element.groupId", { required: true });
+  register("element.workspace", { required: true });
+  register("element.group", { required: true });
+  const selectedWorkspace = watch("element.workspace");
 
   useEffect(() => {
     if (selectedWorkspace) {
-      setSelectedGroup(null);
-      resetField("element.boardId");
-      resetField("element.groupId");
+      resetField("element.group");
       fetchMondayResources({
         variables: { userModuleId, workspaceId: selectedWorkspace },
       });
@@ -167,10 +167,11 @@ const Monday = (props: MondayProps) => {
         labelText={group.name || "No group name"}
         labelIcon={FormatListBulletedOutlined}
         onClick={() => {
-          setValue("element.boardId", board.id, { shouldValidate: true });
-          if (group.id)
-            setValue("element.groupId", group.id, { shouldValidate: true });
-          setSelectedGroup({ ...group, board });
+          setValue(
+            "element.group",
+            { ...group, board },
+            { shouldValidate: true },
+          );
           setOpenAutocomplete(false);
         }}
       />
@@ -258,7 +259,7 @@ const Monday = (props: MondayProps) => {
   };
 
   return (
-    <Stack spacing={2} {...props}>
+    <Stack spacing={2} {...stackProps}>
       <Typography display="flex" gap={1} alignItems="center">
         <InfoOutlined fontSize="small" />
         Create an item in Monday.com
@@ -287,50 +288,71 @@ const Monday = (props: MondayProps) => {
         }}
         {...register("element.description")}
       />
-      <TextField
-        select
-        label="Select Workspace"
-        required
-        value={selectedWorkspace}
-        onChange={(e) => {
-          setSelectedWorkspace(e.target.value);
-        }}
-      >
-        {mondayWorkspacesData?.mondayWorkspaces.elements?.map(
-          (mondayWorkspaceElement) => (
-            <MenuItem
-              key={mondayWorkspaceElement.id}
-              value={mondayWorkspaceElement.id}
-            >
-              {mondayWorkspaceElement.name}
-            </MenuItem>
-          ),
-        ) ?? (
-          <MenuItem disabled>
-            There are no workspace available to select
-          </MenuItem>
+      <Controller
+        render={({ field: { onChange, ...rest } }) => (
+          <TextField
+            select
+            label="Select Workspace"
+            required
+            onChange={(e) => {
+              resetField("element.group", { defaultValue: null });
+              onChange(e.target.value);
+            }}
+            {...rest}
+          >
+            {mondayWorkspacesData?.mondayWorkspaces.elements?.map(
+              (mondayWorkspaceElement) => (
+                <MenuItem
+                  key={mondayWorkspaceElement.id}
+                  value={mondayWorkspaceElement.id}
+                >
+                  {mondayWorkspaceElement.name}
+                </MenuItem>
+              ),
+            ) ?? (
+              <MenuItem disabled>
+                There are no workspace available to select
+              </MenuItem>
+            )}
+          </TextField>
         )}
-      </TextField>
+        name="element.workspace"
+        control={control}
+        defaultValue=""
+      />
       <ClickAwayListener onClickAway={() => setOpenAutocomplete(false)}>
         <Box>
-          <Autocomplete
-            options={[]}
-            renderInput={(params) => (
-              <TextField {...params} label="Select Board > Group" required />
+          <Controller
+            render={({ field: { onChange, value, ...rest } }) => (
+              <Autocomplete
+                options={[]}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Select Board > Group"
+                    required
+                  />
+                )}
+                open={openAutocomplete}
+                onOpen={() => setOpenAutocomplete(true)}
+                {...rest}
+                value={value || { id: null, name: null }}
+                onChange={(e, value) => onChange(value)}
+                getOptionLabel={(o) =>
+                  o?.name ? `${o.board?.name} > ${o.name}` : ""
+                }
+                disabled={!selectedWorkspace}
+                openOnFocus
+                disableClearable
+                disableCloseOnSelect
+                PaperComponent={() => (
+                  <Paper sx={{ px: 1, py: 2 }}>{generateTreeView()}</Paper>
+                )}
+              />
             )}
-            open={openAutocomplete}
-            onOpen={() => setOpenAutocomplete(true)}
-            value={selectedGroup ?? { id: null, name: null }}
-            getOptionLabel={(o) =>
-              o?.name ? `${o.board?.name} > ${o.name}` : ""
-            }
-            disabled={!selectedWorkspace}
-            openOnFocus
-            disableClearable
-            disableCloseOnSelect
-            PaperComponent={() => (
-              <Paper sx={{ px: 1, py: 2 }}>{generateTreeView()}</Paper>
-            )}
+            name="element.group"
+            control={control}
+            defaultValue={null}
           />
         </Box>
       </ClickAwayListener>

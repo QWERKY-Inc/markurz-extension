@@ -131,6 +131,20 @@ export const APPS: {
     icon: <MondayIcon />,
     Element: Monday,
     mutation: MUTATION_CREATE_MONDAY_ITEM,
+    transformer(value) {
+      const {
+        element: { workspace, group, ...restElement },
+        ...rest
+      } = value;
+      return {
+        ...rest,
+        element: {
+          ...restElement,
+          groupId: group.id,
+          boardId: group.board.id,
+        },
+      };
+    },
   },
   [ModuleTypeEnum.Notion]: {
     name: "Notion",
