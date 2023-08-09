@@ -17,8 +17,6 @@
     "humanize-duration": "3.29.0",
     "moment": "2.29.4",
     "next-auth": "4.22.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
     "react-hook-form": "7.45.1",
     "react-scripts": "5.0.1",
     "react-use": "17.4.0",
@@ -76,10 +74,16 @@
     "@types/semver": "7.5.0",
     "humanize-duration-ts": "2.1.1",
     "prettier": "3.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "rollup": "3.27.2",
     "rollup-plugin-dts": "5.3.1",
     "rollup-plugin-terser": "7.0.2",
     "semver": "7.5.3"
+  },
+  "peerDependencies": {
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
   },
   "main": "dist/cjs/index.js",
   "module": "dist/esm/index.js",
