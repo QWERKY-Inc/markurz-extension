@@ -32,7 +32,7 @@ import {
 } from "src/generated/graphql";
 import { useTokenShared } from "src/lib/token";
 
-interface SideDrawerProps extends DrawerProps {
+export interface SideDrawerProps extends DrawerProps {
   highlightedText: string;
   useAsStandalone?: boolean;
 }
