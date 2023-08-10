@@ -25,7 +25,8 @@ To build the package with Rollup, you will need to rename `src/rollup.ts` to `sr
 ## Installation
 
 ### As an external package
-Markurz can be embedded within other Node.js based projects, by running `yarn add @markurz`.
+Markurz can be embedded within other Node.js based projects, by running 
+```yarn add @qwerky-inc/markurz-extension```
 
 ### Chrome
 - [chrome://extensions](chrome://extensions)

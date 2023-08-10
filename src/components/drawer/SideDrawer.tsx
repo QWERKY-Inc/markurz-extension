@@ -34,10 +34,11 @@ import { useTokenShared } from "src/lib/token";
 
 interface SideDrawerProps extends DrawerProps {
   highlightedText: string;
+  useAsStandalone?: boolean;
 }
 
 const SideDrawer = (props: SideDrawerProps) => {
-  const { highlightedText, ...drawerProps } = props;
+  const { highlightedText, useAsStandalone = false, ...drawerProps } = props;
   const [selectedApp, setSelectedApp] = useState<"" | ModuleTypeEnum>("");
   const methods = useForm({
     mode: "onChange",
@@ -50,7 +51,9 @@ const SideDrawer = (props: SideDrawerProps) => {
     getValues,
     formState: { isValid, isDirty },
   } = methods;
-  const { token, loading: tokenLoading } = useTokenShared();
+  const { token, loading: tokenLoading } = useAsStandalone
+    ? { token: "token", loading: false }
+    : useTokenShared();
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
     appName: string;
@@ -224,18 +227,20 @@ const SideDrawer = (props: SideDrawerProps) => {
         <Box flexGrow={1}>
           <MarkurzIcon color="primary" />
         </Box>
-        <Button
-          type="button"
-          href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}
-          rel="noopener"
-          target="_blank"
-          sx={{
-            color: (t) => `${t.palette.primary.main} !important`,
-            textDecoration: "none",
-          }}
-        >
-          Dashboard
-        </Button>
+        {!useAsStandalone && (
+          <Button
+            type="button"
+            href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}
+            rel="noopener"
+            target="_blank"
+            sx={{
+              color: (t) => `${t.palette.primary.main} !important`,
+              textDecoration: "none",
+            }}
+          >
+            Dashboard
+          </Button>
+        )}
         <IconButton onClick={() => props.onClose?.({}, "escapeKeyDown")}>
           <Close />
         </IconButton>
