@@ -7,6 +7,7 @@ import { dts } from "rollup-plugin-dts";
 // import alias from "@rollup/plugin-alias";
 // import { fileURLToPath } from "url";
 import external from "rollup-plugin-peer-deps-external";
+import css from "rollup-plugin-import-css";
 
 import replace from "@rollup/plugin-replace";
 
@@ -74,6 +75,7 @@ export default [
       // }),
       replace(envKeys()),
       external(),
+      css(),
       nodeResolve(),
       commonjs(),
       typescript({ tsconfig: "./tsconfig.json" }),

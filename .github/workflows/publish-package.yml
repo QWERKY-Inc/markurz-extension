@@ -1,0 +1,28 @@
+name: Create and Update PR
+on:
+  workflow_dispatch:
+  push:
+    branches:
+      - master
+
+jobs:
+  publish-gpr:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 18
+          registry-url: https://npm.pkg.github.com/
+          scope: '@markurz'
+      - run: yarn install
+      - run: git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
+      - run: yarn version --minor
+      - run: mv ./src/rollup.ts ./src/index.ts
+      - run: yarn rollup
+      - run: mv ./src/index.ts ./src/rollup.ts
+      - run: git push --tags && git push
+      - run: yarn publish
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
