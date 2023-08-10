@@ -1,7 +1,7 @@
 {
   "name": "markurz",
   "version": "0.3.0",
-  "private": true,
+  "private": false,
   "author": "Fernand Veyrier",
   "scripts": {
     "start": "react-scripts start",
