@@ -1,5 +1,6 @@
 {
   "name": "@qwerky-inc/markurz-extension",
+  "description": "Extension components to integrate Markurz inside your project.",
   "version": "0.10.0",
   "private": false,
   "author": "Fernand Veyrier",

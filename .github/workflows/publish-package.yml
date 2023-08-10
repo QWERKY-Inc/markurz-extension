@@ -20,8 +20,9 @@ jobs:
       - run: yarn version --minor
       - run: mv ./src/rollup.ts ./src/index.ts
       - run: yarn rollup
+      - run: yarn pack
       - run: mv ./src/index.ts ./src/rollup.ts
       - run: git push --tags && git push
-      - run: yarn publish
+      - run: yarn publish *.tgz
         env:
           NODE_AUTH_TOKEN: ${{secrets.GITHUB_TOKEN}}
