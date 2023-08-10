@@ -54,14 +54,12 @@ export default [
     output: [
       {
         file: packageJson.main,
-        // dir: "dist/cjs",
         format: "cjs",
         sourcemap: true,
         exports: "named",
       },
       {
         file: packageJson.module,
-        // dir: "dist/esm",
         format: "esm",
         sourcemap: true,
         exports: "named",

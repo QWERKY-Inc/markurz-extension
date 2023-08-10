@@ -1,4 +1,4 @@
-import { ApolloError, useLazyQuery } from "@apollo/client";
+import { ApolloError, gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Add, Close, Link, PowerOff } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
@@ -20,7 +20,6 @@ import moment from "moment/moment";
 import React, { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
 import { useLocalStorage } from "react-use";
-import { apolloClient } from "src/apollo";
 import { APPS } from "src/components/drawer/Apps";
 import Limit from "src/components/drawer/Limit";
 import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
@@ -83,6 +82,10 @@ const SideDrawer = (props: SideDrawerProps) => {
       },
     },
   );
+  // We put this dummy mutation because useMutation hook somehow doesn't allow for empty arguments, although you can
+  // specify the mutation in the arguments later. Providing an untyped dummy allows to bypass this and also avoids
+  // TypeScript complaining about types.
+  const [mutate] = useMutation(gql("mutation Mut {mutate}"));
 
   const [queryModules, { data, error, loading: loadingModules }] = useLazyQuery(
     QUERY_MODULES,
@@ -140,7 +143,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     if (currentApp) {
       setLoading(true);
       try {
-        const { data: result } = await apolloClient.mutate({
+        const { data: result } = await mutate({
           mutation:
             // Split on dash to get the first part which is the APP key, second part being the account
             currentApp.mutation,
