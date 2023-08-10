@@ -21,6 +21,7 @@ jobs:
       - run: mv ./src/rollup.ts ./src/index.ts
       - run: yarn rollup
       - run: yarn pack
+      - run: tar -ztvf *.tgz
       - run: mv ./src/index.ts ./src/rollup.ts
       - run: git push --tags && git push
       - run: yarn publish *.tgz
