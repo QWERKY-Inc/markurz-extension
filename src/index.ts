@@ -1,2 +1,2 @@
 export * from "./components";
-export { default as Theme } from "./theme";
+export { default as markurzExtensionTheme } from "./theme";
