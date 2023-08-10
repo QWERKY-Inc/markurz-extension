@@ -3,6 +3,7 @@
   "version": "0.4.0",
   "private": false,
   "author": "Fernand Veyrier",
+  "license": "MIT",
   "scripts": {
     "start": "react-scripts start",
     "prebuild": "yarn generate",
@@ -95,5 +96,8 @@
   "files": [
     "dist"
   ],
-  "types": "dist/index.d.ts"
+  "types": "dist/index.d.ts",
+  "publishConfig": {
+    "registry": "https://npm.pkg.github.com/"
+  }
 }

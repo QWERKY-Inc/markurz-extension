@@ -20,7 +20,12 @@ Then, run the project with `yarn start`.
 Once done, go to your `Application` tab of your browser and add a `token=<value>` inside the `Local Storage`. Once the 
 page is reloaded with a valid token, you should appear logged in.
 
+To build the package with Rollup, you will need to rename `src/rollup.ts` to `src/index.ts` before build.
+
 ## Installation
+
+### As an external package
+Markurz can be embedded within other Node.js based projects, by running `yarn add @markurz`.
 
 ### Chrome
 - [chrome://extensions](chrome://extensions)
