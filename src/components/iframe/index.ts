@@ -1,1 +1,1 @@
-export { default } from "./IFrame";
+export { default as IFrame, IFrameProps } from "./IFrame";

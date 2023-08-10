@@ -1,1 +1,1 @@
-export { default } from "./SideDrawer";
+export { default as SideDrawer, SideDrawerProps } from "./SideDrawer";
