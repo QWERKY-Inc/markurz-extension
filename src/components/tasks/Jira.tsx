@@ -1,5 +1,4 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import {
@@ -13,6 +12,7 @@ import {
 } from "@mui/material";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { MutationCreateJiraIssueArgs } from "src/generated/graphql";
 
@@ -130,10 +130,7 @@ const Jira = (props: JiraProps) => {
 
   return (
     <Stack spacing={3} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create an issue in Jira
-      </Typography>
+      <TaskTitle content="Create an issue in Jira" />
       <Controller
         render={({ field }) => (
           <TextField

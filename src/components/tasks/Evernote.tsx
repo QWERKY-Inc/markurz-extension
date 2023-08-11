@@ -3,7 +3,6 @@ import {
   BookOutlined,
   ChevronRight,
   ExpandMore,
-  InfoOutlined,
   ViewAgendaOutlined,
 } from "@mui/icons-material";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
@@ -23,6 +22,7 @@ import {
 import React, { useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { StyledTreeItem } from "src/components/formComponents/StyledTreeItem";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { MutationCreateEvernoteNoteArgs } from "src/generated/graphql";
 
@@ -128,10 +128,7 @@ const Evernote = (props: EvernoteProps) => {
 
   return (
     <Stack spacing={2} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a Note in Evernote
-      </Typography>
+      <TaskTitle content="Create a Note in Evernote" />
       <Controller
         render={({ field }) => (
           <TextField

@@ -1,5 +1,4 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
 import {
   MenuItem,
   Stack,
@@ -10,6 +9,7 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { MutationCreateAsanaTaskArgs } from "src/generated/graphql";
 
@@ -99,10 +99,7 @@ const Asana = (props: AsanaProps) => {
 
   return (
     <Stack spacing={3} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create an Task in Asana
-      </Typography>
+      <TaskTitle content="Create an Task in Asana" />
       <Controller
         render={({ field }) => (
           <TextField

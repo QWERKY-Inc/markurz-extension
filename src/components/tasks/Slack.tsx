@@ -1,19 +1,10 @@
 import { useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
-import {
-  Autocomplete,
-  Stack,
-  StackProps,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Autocomplete, Stack, StackProps, TextField } from "@mui/material";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
-import {
-  CreateSlackMessageMutationVariables,
-  SlackUser,
-} from "src/generated/graphql";
+import { CreateSlackMessageMutationVariables } from "src/generated/graphql";
 
 interface SlackProps extends StackProps {
   userModuleId: string;
@@ -82,10 +73,7 @@ const Slack = (props: SlackProps) => {
 
   return (
     <Stack spacing={2} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a Message in Slack
-      </Typography>
+      <TaskTitle content="Create a Message in Slack" />
       <Controller
         render={({ field }) => (
           <TextField

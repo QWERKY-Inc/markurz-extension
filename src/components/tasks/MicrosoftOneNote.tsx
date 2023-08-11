@@ -1,15 +1,14 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
 import {
   Autocomplete,
   MenuItem,
   Stack,
   StackProps,
   TextField,
-  Typography,
 } from "@mui/material";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { CreateMicrosoftOneNotePageMutationVariables } from "src/generated/graphql";
 
@@ -100,14 +99,11 @@ const MicrosoftOneNote = (props: MicrosoftOneNoteProps) => {
         },
       });
     }
-  }, [querySections, notebookId]);
+  }, [querySections, notebookId, userModuleId]);
 
   return (
     <Stack spacing={3} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a Page in Microsoft OneNote
-      </Typography>
+      <TaskTitle content="Create a Page in Microsoft OneNote" />
       <Controller
         render={({ field }) => (
           <TextField
