@@ -8,6 +8,12 @@ on:
 jobs:
   publish-gpr:
     runs-on: ubuntu-latest
+    env:
+      REACT_APP_LOGIN_URL: ${{ vars.REACT_APP_LOGIN_URL }}
+      REACT_APP_COOKIE_DOMAIN: ${{ vars.REACT_APP_COOKIE_DOMAIN }}
+      REACT_APP_COOKIE_NAME: ${{ vars.REACT_APP_COOKIE_NAME }}
+      REACT_APP_BACKEND_URL: ${{ vars.REACT_APP_BACKEND_URL }}
+      GQL_SCHEMA_TOKEN: ${{ secrets.GQL_SCHEMA_TOKEN }}
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-node@v3
@@ -18,6 +24,7 @@ jobs:
       - run: git config --global user.email "$GITHUB_ACTOR@users.noreply.github.com" && git config --global user.name "$GITHUB_ACTOR"
       - run: yarn version --minor
       - run: mv ./src/rollup.ts ./src/index.ts
+      - run: yarn generate
       - run: yarn rollup
       - run: yarn pack
       - run: tar -ztvf *.tgz
