@@ -5,7 +5,10 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   DrawerProps,
+  FormControlLabel,
+  FormGroup,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -40,6 +43,7 @@ export interface SideDrawerProps extends DrawerProps {
 const SideDrawer = (props: SideDrawerProps) => {
   const { highlightedText, useAsStandalone = false, ...drawerProps } = props;
   const [selectedApp, setSelectedApp] = useState<"" | ModuleTypeEnum>("");
+  const [includeUrl, setIncludeUrl] = useState(!useAsStandalone);
   const methods = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
@@ -140,7 +144,7 @@ const SideDrawer = (props: SideDrawerProps) => {
     value.charAt(0).toUpperCase() + value.slice(1);
 
   const submit = async (form: FieldValues) => {
-    if (!useAsStandalone) {
+    if (!useAsStandalone && includeUrl) {
       form.sourceUrl = document.location.href;
     }
     const appKey = selectedApp?.split("-")[0] as keyof typeof APPS;
@@ -368,6 +372,22 @@ const SideDrawer = (props: SideDrawerProps) => {
               <Alert severity="error" variant="outlined" sx={{ mb: 2 }}>
                 {errorMutation}
               </Alert>
+            )}
+            {!useAsStandalone && (
+              <FormGroup>
+                <Tooltip title={document.location.href} placement="top">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={includeUrl}
+                        onChange={(e) => setIncludeUrl(e.target.checked)}
+                      />
+                    }
+                    label="Include URL"
+                    sx={{ mb: 1 }}
+                  />
+                </Tooltip>
+              </FormGroup>
             )}
             <Tooltip title={result?.tooltipMessage || null} placement="top">
               <span>
