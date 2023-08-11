@@ -19,9 +19,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { StyledTreeItem } from "src/components/formComponents/styledTreeItem";
+import { StyledTreeItem } from "src/components/formComponents/StyledTreeItem";
 import { getFragmentData, graphql } from "src/generated";
 import {
   FragmentFolderFieldsFragment,
@@ -344,9 +344,11 @@ const Monday = (props: MondayProps) => {
                 disableClearable
                 disableCloseOnSelect
                 PaperComponent={() => (
-                  <Paper sx={{ px: 1, py: 2, maxHeight: 200, overflow: "auto" }}>
-                {generateTreeView()}
-              </Paper>
+                  <Paper
+                    sx={{ px: 1, py: 2, maxHeight: 200, overflow: "auto" }}
+                  >
+                    {generateTreeView()}
+                  </Paper>
                 )}
               />
             )}

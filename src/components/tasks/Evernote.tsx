@@ -20,9 +20,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useMemo, useState } from "react";
+import React, { useMemo, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
-import { StyledTreeItem } from "src/components/formComponents/styledTreeItem";
+import { StyledTreeItem } from "src/components/formComponents/StyledTreeItem";
 import { graphql } from "src/generated";
 import { MutationCreateEvernoteNoteArgs } from "src/generated/graphql";
 

@@ -1,38 +1,21 @@
 {
-  "name": "markurz-chrome-extension",
-  "version": "0.1.0",
-  "private": true,
-  "dependencies": {
-    "@apollo/client": "3.7.16",
-    "@emotion/cache": "11.11.0",
-    "@emotion/react": "11.11.1",
-    "@emotion/styled": "11.11.0",
-    "@fontsource/inter": "5.0.3",
-    "@mui/icons-material": "5.11.16",
-    "@mui/lab": "5.0.0-alpha.134",
-    "@mui/material": "5.13.6",
-    "@mui/x-date-pickers": "6.9.2",
-    "graphql": "16.7.1",
-    "humanize-duration": "3.29.0",
-    "moment": "2.29.4",
-    "next-auth": "4.22.1",
-    "react": "18.2.0",
-    "react-dom": "18.2.0",
-    "react-hook-form": "7.45.1",
-    "react-scripts": "5.0.1",
-    "react-use": "17.4.0",
-    "typescript": "5.1.6",
-    "use-between": "1.3.5"
-  },
+  "name": "@qwerky-inc/markurz-extension",
+  "description": "Extension components to integrate Markurz inside your project.",
+  "version": "0.16.0",
+  "private": false,
+  "author": "Fernand Veyrier",
+  "license": "MIT",
   "scripts": {
     "start": "react-scripts start",
     "prebuild": "yarn generate",
+    "prepare": "install-peers",
     "build": "craco build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "generate": "graphql-codegen -r dotenv/config",
     "watch": "yarn graphql-codegen -r dotenv/config --watch",
-    "semver": "node semver.ts"
+    "semver": "node semver.ts",
+    "rollup": "rollup -c --bundleConfigAsCjs"
   },
   "eslintConfig": {
     "extends": [
@@ -52,10 +35,29 @@
       "last 1 safari version"
     ]
   },
+  "dependencies": {
+    "@fontsource/inter": "5.0.3",
+    "humanize-duration": "3.29.0",
+    "moment": "2.29.4",
+    "next-auth": "4.22.1",
+    "react-hook-form": "7.45.1",
+    "react-scripts": "5.0.1",
+    "react-use": "17.4.0",
+    "typescript": "5.1.6",
+    "use-between": "1.3.5"
+  },
   "devDependencies": {
+    "@babel/core": "7.22.10",
+    "@babel/preset-env": "7.22.10",
     "@craco/craco": "7.1.0",
     "@graphql-codegen/cli": "4.0.1",
     "@graphql-codegen/client-preset": "4.0.1",
+    "@rollup/plugin-alias": "5.0.0",
+    "@rollup/plugin-babel": "6.0.3",
+    "@rollup/plugin-commonjs": "25.0.3",
+    "@rollup/plugin-node-resolve": "15.1.0",
+    "@rollup/plugin-replace": "5.0.2",
+    "@rollup/plugin-typescript": "11.1.2",
     "@testing-library/jest-dom": "5.16.5",
     "@testing-library/react": "14.0.0",
     "@testing-library/user-event": "14.4.3",
@@ -65,8 +67,38 @@
     "@types/react": "18.2.14",
     "@types/react-dom": "18.2.6",
     "@types/semver": "7.5.0",
+    "dotenv": "16.3.1",
     "humanize-duration-ts": "2.1.1",
+    "install-peers-cli": "2.2.0",
     "prettier": "3.0.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
+    "rollup": "3.27.2",
+    "rollup-plugin-dts": "5.3.1",
+    "rollup-plugin-import-css": "3.3.1",
+    "rollup-plugin-inject-process-env": "1.3.1",
+    "rollup-plugin-peer-deps-external": "2.2.4",
+    "rollup-plugin-terser": "7.0.2",
     "semver": "7.5.3"
-  }
+  },
+  "peerDependencies": {
+    "@apollo/client": "3.7.16",
+    "@emotion/cache": "11.11.0",
+    "@emotion/react": "11.11.1",
+    "@emotion/styled": "11.11.0",
+    "@mui/icons-material": "5.11.16",
+    "@mui/lab": "5.0.0-alpha.134",
+    "@mui/material": "5.13.6",
+    "@mui/x-date-pickers": "6.9.2",
+    "graphql": "16.7.1",
+    "react": "18.2.0",
+    "react-dom": "18.2.0"
+  },
+  "main": "dist/cjs/index.js",
+  "module": "dist/esm/index.js",
+  "files": [
+    "dist"
+  ],
+  "types": "dist/index.d.ts",
+  "repository": "https://github.com/QWERKY-Inc/markurz-extension.git"
 }
