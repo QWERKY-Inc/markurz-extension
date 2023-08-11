@@ -2,6 +2,7 @@ import { nodeResolve } from "@rollup/plugin-node-resolve";
 import commonjs from "@rollup/plugin-commonjs";
 import typescript from "@rollup/plugin-typescript";
 import { dts } from "rollup-plugin-dts";
+// Uncomment for UMD setup. Should not be needed unless we target non-Node.js environments.
 // import { terser } from "rollup-plugin-terser";
 // import babel from "@rollup/plugin-babel";
 // import alias from "@rollup/plugin-alias";
@@ -26,6 +27,7 @@ const envKeys = () => {
 };
 
 export default [
+  // Uncomment for UMD setup. Should not be needed unless we target non-Node.js environments.
   // {
   //   // UMD
   //   input: "src/index.ts",
@@ -68,6 +70,7 @@ export default [
     ],
     external: ["react", "react-dom"],
     plugins: [
+      // Uncomment for UMD setup. Will resolve absolute imports to match the current file tree.
       // alias({
       //   entries: {
       //     src: fileURLToPath(new URL("src", import.meta.url)),

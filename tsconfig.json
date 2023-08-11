@@ -15,6 +15,7 @@
     "noFallthroughCasesInSwitch": true,
     "module": "esnext",
     "moduleResolution": "node",
+    // Uncomment these if you need the base React setup instead
 //    "resolveJsonModule": true,
 //    "isolatedModules": true,
 //    "noEmit": true,
