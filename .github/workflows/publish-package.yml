@@ -8,6 +8,7 @@ on:
 jobs:
   publish-gpr:
     runs-on: ubuntu-latest
+    environment: ${{ github.ref == 'refs/heads/main' && 'Production' || 'Development' }}
     env:
       REACT_APP_LOGIN_URL: ${{ vars.REACT_APP_LOGIN_URL }}
       REACT_APP_COOKIE_DOMAIN: ${{ vars.REACT_APP_COOKIE_DOMAIN }}
