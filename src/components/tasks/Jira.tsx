@@ -1,5 +1,4 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import {
@@ -11,8 +10,9 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { useEffect } from "react";
+import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { MutationCreateJiraIssueArgs } from "src/generated/graphql";
 
@@ -88,8 +88,10 @@ const Jira = (props: JiraProps) => {
   const siteId = watch("element.siteId");
   const projectKey = watch("element.projectKey");
   const [queryJiraData, { data }] = useLazyQuery(QUERY_JIRA_DATA);
-  const [fetchUserData, { refetch: refetchUserData, data: usersData, loading: userDataLoading }] =
-    useLazyQuery(QUERY_JIRA_USERS);
+  const [
+    fetchUserData,
+    { refetch: refetchUserData, data: usersData, loading: userDataLoading },
+  ] = useLazyQuery(QUERY_JIRA_USERS);
   const { data: dataSites } = useQuery(QUERY_JIRA_SITES, {
     variables: {
       userModuleId,
@@ -128,10 +130,7 @@ const Jira = (props: JiraProps) => {
 
   return (
     <Stack spacing={3} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create an issue in Jira
-      </Typography>
+      <TaskTitle content="Create an issue in Jira" />
       <Controller
         render={({ field }) => (
           <TextField
@@ -273,9 +272,11 @@ const Jira = (props: JiraProps) => {
         render={({ field: { onChange, value, ...rest } }) => (
           <Autocomplete
             {...rest}
-            value={usersData?.jiraUsers.elements?.find(
-              (elem) => elem.id === value,
-            ) ?? null}
+            value={
+              usersData?.jiraUsers.elements?.find(
+                (elem) => elem.id === value,
+              ) ?? null
+            }
             options={usersData?.jiraUsers.elements ?? []}
             getOptionLabel={(o) => o.displayName}
             renderInput={(params) => (

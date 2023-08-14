@@ -10,13 +10,14 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import {
   Controller,
   ControllerProps,
   FieldError,
   useFormContext,
 } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { CreateGmailEmailMutationVariables } from "src/generated/graphql";
 import { resolveObjectPath } from "src/lib/object";
@@ -152,7 +153,7 @@ const EmailField = (
 
 const Gmail = (props: GmailProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
-  const { register, control, watch } =
+  const { register, control, watch, resetField } =
     useFormContext<CreateGmailEmailMutationVariables>();
   const { data, loading, refetch } = useQuery(QUERY_CONTACTS, {
     variables: {
@@ -167,12 +168,15 @@ const Gmail = (props: GmailProps) => {
   }, [data?.googlePeopleContacts.elements]);
   register("userModuleId", { value: userModuleId });
 
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.subject", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
+
   return (
     <Stack spacing={2} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a Message in Gmail
-      </Typography>
+      <TaskTitle content="Create a Message in Gmail" />
       <Controller
         render={({ field }) => (
           <TextField
@@ -198,12 +202,12 @@ const Gmail = (props: GmailProps) => {
         {...register("element.message")}
       />
       <Controller
-        render={({ field }) => (
+        render={({ field: { value, ...rest } }) => (
           <FormControlLabel
             style={{
               marginLeft: -10,
             }}
-            control={<Checkbox {...field} />}
+            control={<Checkbox checked={value} {...rest} />}
             componentsProps={{
               typography: {
                 sx: {

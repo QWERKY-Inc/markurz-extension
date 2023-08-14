@@ -1,5 +1,6 @@
 import { TreeItem, TreeItemProps } from "@mui/lab";
 import { Box, SvgIconProps, Typography } from "@mui/material";
+import React from "react";
 
 export function StyledTreeItem(
   props: TreeItemProps & {

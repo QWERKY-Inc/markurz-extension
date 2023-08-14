@@ -1,11 +1,14 @@
-import { ApolloError, useLazyQuery } from "@apollo/client";
+import { ApolloError, gql, useLazyQuery, useMutation } from "@apollo/client";
 import { Add, Close, Link, PowerOff } from "@mui/icons-material";
 import { LoadingButton, TabContext, TabPanel } from "@mui/lab";
 import {
   Alert,
   Box,
   Button,
+  Checkbox,
   DrawerProps,
+  FormControlLabel,
+  FormGroup,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -16,9 +19,10 @@ import {
   Tooltip,
   Typography,
 } from "@mui/material";
+import moment from "moment/moment";
 import React, { useEffect, useState } from "react";
 import { FieldValues, FormProvider, useForm } from "react-hook-form";
-import { apolloClient } from "src/apollo";
+import { useLocalStorage } from "react-use";
 import { APPS } from "src/components/drawer/Apps";
 import Limit from "src/components/drawer/Limit";
 import LoggedOutScreen from "src/components/drawer/LoggedOutScreen";
@@ -31,13 +35,15 @@ import {
 } from "src/generated/graphql";
 import { useTokenShared } from "src/lib/token";
 
-interface SideDrawerProps extends DrawerProps {
+export interface SideDrawerProps extends DrawerProps {
   highlightedText: string;
+  useAsStandalone?: boolean;
 }
 
 const SideDrawer = (props: SideDrawerProps) => {
-  const { highlightedText, ...drawerProps } = props;
+  const { highlightedText, useAsStandalone = false, ...drawerProps } = props;
   const [selectedApp, setSelectedApp] = useState<"" | ModuleTypeEnum>("");
+  const [includeUrl, setIncludeUrl] = useState(!useAsStandalone);
   const methods = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
@@ -46,9 +52,12 @@ const SideDrawer = (props: SideDrawerProps) => {
     handleSubmit,
     reset,
     trigger,
+    getValues,
     formState: { isValid, isDirty },
   } = methods;
-  const { token, loading: tokenLoading } = useTokenShared();
+  const { token: tokenHook, loading: tokenLoadingHook } = useTokenShared();
+  const token = useAsStandalone ? "token" : tokenHook;
+  const tokenLoading = useAsStandalone ? false : tokenLoadingHook;
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
     appName: string;
@@ -57,6 +66,33 @@ const SideDrawer = (props: SideDrawerProps) => {
     tooltipMessage?: string;
   } | null>(null);
   const [errorMutation, setErrorMutation] = useState("");
+  const [save, setSave, deleteSave] = useLocalStorage<{ [p: string]: object }>(
+    "save",
+    {},
+    {
+      raw: false,
+      serializer(value: { [p: string]: object }): string {
+        return JSON.stringify(value);
+      },
+      /**
+       * When we deserialize, we make sure that dates are revived as date objects to be manipulated.
+       * @param value
+       */
+      deserializer(value) {
+        return JSON.parse(value, (key, value) => {
+          const testDate = moment(value, undefined, true);
+          if (key && value && typeof value === "string" && testDate.isValid()) {
+            return testDate;
+          }
+          return value;
+        });
+      },
+    },
+  );
+  // We put this dummy mutation because useMutation hook somehow doesn't allow for empty arguments, although you can
+  // specify the mutation in the arguments later. Providing an untyped dummy allows to bypass this and also avoids
+  // TypeScript complaining about types.
+  const [mutate] = useMutation(gql("mutation Mut {mutate}"));
 
   const [queryModules, { data, error, loading: loadingModules }] = useLazyQuery(
     QUERY_MODULES,
@@ -108,17 +144,21 @@ const SideDrawer = (props: SideDrawerProps) => {
     value.charAt(0).toUpperCase() + value.slice(1);
 
   const submit = async (form: FieldValues) => {
-    form.sourceUrl = document.location.href;
+    if (!useAsStandalone && includeUrl) {
+      form.sourceUrl = document.location.href;
+    }
     const appKey = selectedApp?.split("-")[0] as keyof typeof APPS;
     const currentApp = APPS[appKey];
     if (currentApp) {
       setLoading(true);
       try {
-        const { data: result } = await apolloClient.mutate({
+        const { data: result } = await mutate({
           mutation:
             // Split on dash to get the first part which is the APP key, second part being the account
             currentApp.mutation,
-          variables: form,
+          variables: currentApp.transformer
+            ? currentApp.transformer(form)
+            : form,
         });
         setErrorMutation("");
         setResult({
@@ -135,6 +175,7 @@ const SideDrawer = (props: SideDrawerProps) => {
               : currentApp.missingUrlTooltipMessage
             : undefined,
         });
+        deleteSave();
       } catch (e) {
         console.error(e);
         if (e instanceof ApolloError) {
@@ -152,9 +193,18 @@ const SideDrawer = (props: SideDrawerProps) => {
 
   const handleAppChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.value) {
+      if (selectedApp && isDirty) {
+        setSave(() => {
+          return {
+            ...save,
+            [selectedApp]: getValues(),
+          };
+        });
+      }
       setSelectedApp(e.target.value as ModuleTypeEnum);
       reset({
         sourceText: highlightedText,
+        ...(save?.[e.target.value] || {}),
       });
       setResult(null);
       setErrorMutation("");
@@ -183,18 +233,20 @@ const SideDrawer = (props: SideDrawerProps) => {
         <Box flexGrow={1}>
           <MarkurzIcon color="primary" />
         </Box>
-        <Button
-          type="button"
-          href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}
-          rel="noopener"
-          target="_blank"
-          sx={{
-            color: (t) => `${t.palette.primary.main} !important`,
-            textDecoration: "none",
-          }}
-        >
-          Dashboard
-        </Button>
+        {!useAsStandalone && (
+          <Button
+            type="button"
+            href={`${process.env.REACT_APP_LOGIN_URL}/dashboard`}
+            rel="noopener"
+            target="_blank"
+            sx={{
+              color: (t) => `${t.palette.primary.main} !important`,
+              textDecoration: "none",
+            }}
+          >
+            Dashboard
+          </Button>
+        )}
         <IconButton onClick={() => props.onClose?.({}, "escapeKeyDown")}>
           <Close />
         </IconButton>
@@ -207,22 +259,24 @@ const SideDrawer = (props: SideDrawerProps) => {
         <Limit />
       ) : (
         <FormProvider {...methods}>
-          <form style={{ overflowY: "auto", marginBottom: 64 }}>
+          <form style={{ overflowY: "auto", marginBottom: 96 }}>
             <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
-              <Typography
-                variant="h5"
-                component="p"
-                sx={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  wordBreak: "break-all",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                }}
-              >
-                {highlightedText}
-              </Typography>
+              {!selectedApp && (
+                <Typography
+                  variant="h5"
+                  component="p"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    wordBreak: "break-all",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {highlightedText}
+                </Typography>
+              )}
               <TextField
                 select
                 required
@@ -318,6 +372,22 @@ const SideDrawer = (props: SideDrawerProps) => {
               <Alert severity="error" variant="outlined" sx={{ mb: 2 }}>
                 {errorMutation}
               </Alert>
+            )}
+            {!useAsStandalone && (
+              <FormGroup>
+                <Tooltip title={document.location.href} placement="top">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={includeUrl}
+                        onChange={(e) => setIncludeUrl(e.target.checked)}
+                      />
+                    }
+                    label="Include URL"
+                    sx={{ mb: 1 }}
+                  />
+                </Tooltip>
+              </FormGroup>
             )}
             <Tooltip title={result?.tooltipMessage || null} placement="top">
               <span>

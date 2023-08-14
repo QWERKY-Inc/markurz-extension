@@ -3,10 +3,10 @@ import { CacheProvider } from "@emotion/react";
 import React, { PropsWithChildren, useMemo, useState } from "react";
 import { createPortal } from "react-dom";
 
-const IFrame = ({
-  children,
-  ...props
-}: PropsWithChildren<React.HTMLAttributes<HTMLIFrameElement>>) => {
+export interface IFrameProps
+  extends PropsWithChildren<React.HTMLAttributes<HTMLIFrameElement>> {}
+
+const IFrame = ({ children, ...props }: IFrameProps) => {
   const [contentRef, setContentRef] = useState<HTMLIFrameElement | null>(null);
   const mountNode = contentRef?.contentWindow?.document?.body;
 

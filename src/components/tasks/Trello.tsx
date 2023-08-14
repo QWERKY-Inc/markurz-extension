@@ -4,7 +4,6 @@ import {
   CheckBoxOutlineBlank,
   Circle,
   Close,
-  InfoOutlined,
 } from "@mui/icons-material";
 import {
   Autocomplete,
@@ -21,8 +20,9 @@ import {
   Typography,
 } from "@mui/material";
 import { DateTimePicker } from "@mui/x-date-pickers";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { CreateTrelloCardMutationVariables } from "src/generated/graphql";
 
@@ -178,10 +178,7 @@ const Trello = (props: TrelloProps) => {
 
   return (
     <Stack spacing={3} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a Card in Trello
-      </Typography>
+      <TaskTitle content="Create a Card in Trello" />
       <Controller
         render={({ field }) => (
           <TextField

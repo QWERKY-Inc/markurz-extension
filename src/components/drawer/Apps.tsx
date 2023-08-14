@@ -1,5 +1,6 @@
 import { DocumentNode } from "@apollo/client";
 import React from "react";
+import { FieldValues } from "react-hook-form";
 import {
   MUTATION_CREATE_ASANA_TASK,
   MUTATION_CREATE_EVERNOTE_NOTE,
@@ -41,7 +42,10 @@ import Notion from "src/components/tasks/Notion";
 import Slack from "src/components/tasks/Slack";
 import Todoist from "src/components/tasks/Todoist";
 import Trello from "src/components/tasks/Trello";
-import { ModuleTypeEnum } from "src/generated/graphql";
+import {
+  ModuleTypeEnum,
+  SlackMessageReceiverTypeEnum,
+} from "src/generated/graphql";
 
 export const APPS: {
   [p in ModuleTypeEnum]?: {
@@ -53,6 +57,7 @@ export const APPS: {
     ) => React.JSX.Element;
     mutation: DocumentNode;
     missingUrlTooltipMessage?: string;
+    transformer?: <T extends FieldValues>(value: T) => object;
   };
 } = {
   [ModuleTypeEnum.Asana]: {
@@ -103,6 +108,18 @@ export const APPS: {
     icon: <MicrosoftOneNoteIcon />,
     Element: MicrosoftOneNote,
     mutation: MUTATION_CREATE_MICROSOFT_ONENOTE,
+    transformer(value) {
+      const {
+        element: { notebookId, ...restElement },
+        ...rest
+      } = value;
+      return {
+        ...rest,
+        element: {
+          ...restElement,
+        },
+      };
+    },
   },
   [ModuleTypeEnum.MicrosoftTodo]: {
     name: "Microsoft To Do",
@@ -117,6 +134,20 @@ export const APPS: {
     icon: <MondayIcon />,
     Element: Monday,
     mutation: MUTATION_CREATE_MONDAY_ITEM,
+    transformer(value) {
+      const {
+        element: { workspace, group, ...restElement },
+        ...rest
+      } = value;
+      return {
+        ...rest,
+        element: {
+          ...restElement,
+          groupId: group.id,
+          boardId: group.board.id,
+        },
+      };
+    },
   },
   [ModuleTypeEnum.Notion]: {
     name: "Notion",
@@ -133,6 +164,23 @@ export const APPS: {
     mutation: MUTATION_CREATE_SLACK_MESSAGE,
     missingUrlTooltipMessage:
       "DMs sent to other user cannot be viewed by the sender due to DM being sent to Markurz app in Slack app messages.",
+    transformer(value) {
+      const {
+        element: { receiver, ...restElement },
+        ...rest
+      } = value;
+      return {
+        ...rest,
+        element: {
+          ...restElement,
+          receiverId: receiver.id,
+          receiverType:
+            receiver.__typename === "SlackChannel"
+              ? SlackMessageReceiverTypeEnum.Channel
+              : SlackMessageReceiverTypeEnum.User,
+        },
+      };
+    },
   },
   [ModuleTypeEnum.Todoist]: {
     name: "Todoist",

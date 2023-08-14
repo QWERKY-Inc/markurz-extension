@@ -4,7 +4,7 @@ export const MUTATION_CREATE_GOOGLE_TASKS = graphql(/* GraphQL */ `
   mutation CreateGoogleTasksTask(
     $element: GoogleTasksTaskArgs!
     $userModuleId: ID!
-    $sourceUrl: String!
+    $sourceUrl: String
     $sourceText: String!
   ) {
     create: createGoogleTasksTask(
@@ -23,7 +23,7 @@ export const MUTATION_CREATE_GOOGLE_CALENDAR_EVENT = graphql(/* GraphQL */ `
   mutation CreateGoogleCalendarEvent(
     $element: GoogleCalendarEventArgs!
     $userModuleId: ID!
-    $sourceUrl: String!
+    $sourceUrl: String
     $sourceText: String!
   ) {
     create: createGoogleCalendarEvent(
@@ -42,7 +42,7 @@ export const MUTATION_CREATE_MICROSOFT_ONENOTE = graphql(/* GraphQL */ `
   mutation CreateMicrosoftOneNotePage(
     $element: CreateMicrosoftOneNotePageInput!
     $userModuleId: ID!
-    $sourceUrl: String!
+    $sourceUrl: String
     $sourceText: String!
   ) {
     create: createMicrosoftOneNotePage(
@@ -61,7 +61,7 @@ export const MUTATION_CREATE_MICROSOFT_TODO = graphql(/* GraphQL */ `
   mutation CreateMicrosoftTodoTask(
     $element: CreateMicrosoftTodoTaskInput!
     $userModuleId: ID!
-    $sourceUrl: String!
+    $sourceUrl: String
     $sourceText: String!
   ) {
     create: createMicrosoftTodoTask(
@@ -80,7 +80,7 @@ export const MUTATION_CREATE_GMAIL_EMAIL = graphql(/* GraphQL */ `
   mutation CreateGmailEmail(
     $element: GmailEmailArgs!
     $userModuleId: ID!
-    $sourceUrl: String!
+    $sourceUrl: String
     $sourceText: String!
     $isDraft: Boolean!
   ) {
@@ -99,7 +99,7 @@ export const MUTATION_CREATE_GMAIL_EMAIL = graphql(/* GraphQL */ `
 
 export const MUTATION_CREATE_JIRA_ISSUE = graphql(/* GraphQL */ `
   mutation CreateJiraIssue(
-    $sourceUrl: String!
+    $sourceUrl: String
     $userModuleId: ID!
     $element: JiraInputArgs!
     $sourceText: String!
@@ -118,7 +118,7 @@ export const MUTATION_CREATE_JIRA_ISSUE = graphql(/* GraphQL */ `
 
 export const MUTATION_CREATE_TODOIST_TASK = graphql(/* GraphQL */ `
   mutation CreateTodoistTask(
-    $sourceUrl: String!
+    $sourceUrl: String
     $userModuleId: ID!
     $element: TodoistTaskArgs!
     $sourceText: String!
@@ -137,7 +137,7 @@ export const MUTATION_CREATE_TODOIST_TASK = graphql(/* GraphQL */ `
 
 export const MUTATION_CREATE_NOTION_PAGE = graphql(/* GraphQL */ `
   mutation CreateNotionPage(
-    $sourceUrl: String!
+    $sourceUrl: String
     $userModuleId: ID!
     $element: CreateNotionPageInput!
     $sourceText: String!
@@ -156,7 +156,7 @@ export const MUTATION_CREATE_NOTION_PAGE = graphql(/* GraphQL */ `
 
 export const MUTATION_CREATE_TRELLO_CARD = graphql(/* GraphQL */ `
   mutation CreateTrelloCard(
-    $sourceUrl: String!
+    $sourceUrl: String
     $userModuleId: ID!
     $element: TrelloCreateCardArgs!
     $sourceText: String!
@@ -175,7 +175,7 @@ export const MUTATION_CREATE_TRELLO_CARD = graphql(/* GraphQL */ `
 
 export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
   mutation CreateEvernoteNote(
-    $sourceUrl: String!
+    $sourceUrl: String
     $userModuleId: ID!
     $element: CreateEvernoteNoteInput!
     $sourceText: String!
@@ -194,7 +194,7 @@ export const MUTATION_CREATE_EVERNOTE_NOTE = graphql(/* GraphQL */ `
 
 export const MUTATION_CREATE_ASANA_TASK = graphql(/* GraphQL */ `
   mutation CreateAsanaTask(
-    $sourceUrl: String!
+    $sourceUrl: String
     $userModuleId: ID!
     $element: CreateAsanaTaskInput!
     $sourceText: String!
@@ -213,7 +213,7 @@ export const MUTATION_CREATE_ASANA_TASK = graphql(/* GraphQL */ `
 
 export const MUTATION_CREATE_SLACK_MESSAGE = graphql(/* GraphQL */ `
   mutation CreateSlackMessage(
-    $sourceUrl: String!
+    $sourceUrl: String
     $userModuleId: ID!
     $element: SlackMessageArgs!
     $sourceText: String!
@@ -232,7 +232,7 @@ export const MUTATION_CREATE_SLACK_MESSAGE = graphql(/* GraphQL */ `
 
 export const MUTATION_CREATE_MONDAY_ITEM = graphql(/* GraphQL */ `
   mutation CreateMondayItem(
-    $sourceUrl: String!
+    $sourceUrl: String
     $userModuleId: ID!
     $element: MondayItemArgs!
     $sourceText: String!

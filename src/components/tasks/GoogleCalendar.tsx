@@ -1,4 +1,4 @@
-import { Close, InfoOutlined } from "@mui/icons-material";
+import { Close } from "@mui/icons-material";
 import {
   Button,
   IconButton,
@@ -14,6 +14,7 @@ import { DateTimePicker } from "@mui/x-date-pickers";
 import moment from "moment";
 import React, { useEffect } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import {
   CreateGoogleCalendarEventMutationVariables,
   GoogleCalendarRecurrenceEnum,
@@ -50,6 +51,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
     control,
     formState: { errors },
     clearErrors,
+    resetField,
   } = useFormContext<CreateGoogleCalendarEventMutationVariables>();
   register("userModuleId", { value: userModuleId });
   const { append, remove, fields, update } = useFieldArray({
@@ -69,12 +71,15 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
     update(0, value);
   }, [register, update]);
 
+  useEffect(() => {
+    if (highlightedText) {
+      resetField("element.title", { defaultValue: highlightedText });
+    }
+  }, [resetField, highlightedText]);
+
   return (
     <Stack spacing={3} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create an Event in Google Calendar
-      </Typography>
+      <TaskTitle content="Create an Event in Google Calendar" />
       <Controller
         render={({ field }) => (
           <TextField
