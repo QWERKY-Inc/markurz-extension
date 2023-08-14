@@ -259,7 +259,7 @@ const SideDrawer = (props: SideDrawerProps) => {
         <Limit />
       ) : (
         <FormProvider {...methods}>
-          <form style={{ overflowY: "auto", marginBottom: 64 }}>
+          <form style={{ overflowY: "auto", marginBottom: 96 }}>
             <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
               {!selectedApp && (
                 <Typography
