@@ -1,14 +1,8 @@
 import { useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
-import {
-  Autocomplete,
-  Stack,
-  StackProps,
-  TextField,
-  Typography,
-} from "@mui/material";
+import { Autocomplete, Stack, StackProps, TextField } from "@mui/material";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import {
   CreateNotionPageMutationVariables,
@@ -74,10 +68,7 @@ const Notion = (props: NotionProps) => {
 
   return (
     <Stack spacing={2} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a New Page in Notion
-      </Typography>
+      <TaskTitle content="Create a New Page in Notion" />
       <Controller
         render={({ field }) => (
           <TextField

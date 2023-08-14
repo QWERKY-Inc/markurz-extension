@@ -1,5 +1,5 @@
 import { useQuery } from "@apollo/client";
-import { Circle, InfoOutlined } from "@mui/icons-material";
+import { Circle } from "@mui/icons-material";
 import {
   Autocomplete,
   Chip,
@@ -15,6 +15,7 @@ import {
 import { DatePicker } from "@mui/x-date-pickers";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { MutationCreateMicrosoftTodoTaskArgs } from "src/generated/graphql";
 
@@ -90,10 +91,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
 
   return (
     <Stack spacing={3} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a task in Microsoft To Do
-      </Typography>
+      <TaskTitle content="Create a task in Microsoft To Do" />
       <Controller
         render={({ field }) => (
           <TextField

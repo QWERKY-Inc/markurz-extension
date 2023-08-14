@@ -4,7 +4,6 @@ import {
   ExpandMore,
   FolderOpenOutlined,
   FormatListBulletedOutlined,
-  InfoOutlined,
   SpaceDashboardOutlined,
 } from "@mui/icons-material";
 import { TreeItem, TreeView } from "@mui/lab";
@@ -22,6 +21,7 @@ import {
 import React, { useEffect, useState } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import { StyledTreeItem } from "src/components/formComponents/StyledTreeItem";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { getFragmentData, graphql } from "src/generated";
 import {
   FragmentFolderFieldsFragment,
@@ -258,10 +258,7 @@ const Monday = (props: MondayProps) => {
 
   return (
     <Stack spacing={2} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create an item in Monday.com
-      </Typography>
+      <TaskTitle content="Create an item in Monday.com" />
       <Controller
         render={({ field }) => (
           <TextField

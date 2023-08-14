@@ -1,5 +1,4 @@
 import { useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
 import CheckBoxIcon from "@mui/icons-material/CheckBox";
 import CheckBoxOutlineBlankIcon from "@mui/icons-material/CheckBoxOutlineBlank";
 import {
@@ -14,6 +13,7 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { MutationCreateTodoistTaskArgs } from "src/generated/graphql";
 
@@ -68,10 +68,7 @@ const Todoist = (props: TodoistProps) => {
 
   return (
     <Stack spacing={2} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a Task in Todoist
-      </Typography>
+      <TaskTitle content="Create a Task in Todoist" />
       <Controller
         render={({ field }) => (
           <TextField

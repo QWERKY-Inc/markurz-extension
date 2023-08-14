@@ -1,5 +1,4 @@
 import { useQuery } from "@apollo/client";
-import { InfoOutlined } from "@mui/icons-material";
 import {
   MenuItem,
   Stack,
@@ -10,6 +9,7 @@ import {
 import { DateTimePicker } from "@mui/x-date-pickers";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { MutationCreateGoogleTasksTaskArgs } from "src/generated/graphql";
 
@@ -51,10 +51,7 @@ const GoogleTasks = (props: GoogleTasksProps) => {
 
   return (
     <Stack spacing={2} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a Task in Google Tasks
-      </Typography>
+      <TaskTitle content="Create a Task in Google Tasks" />
       <Controller
         render={({ field }) => (
           <TextField

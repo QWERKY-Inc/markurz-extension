@@ -5,7 +5,10 @@ import {
   Alert,
   Box,
   Button,
+  Checkbox,
   DrawerProps,
+  FormControlLabel,
+  FormGroup,
   IconButton,
   ListItemIcon,
   ListItemText,
@@ -40,6 +43,7 @@ export interface SideDrawerProps extends DrawerProps {
 const SideDrawer = (props: SideDrawerProps) => {
   const { highlightedText, useAsStandalone = false, ...drawerProps } = props;
   const [selectedApp, setSelectedApp] = useState<"" | ModuleTypeEnum>("");
+  const [includeUrl, setIncludeUrl] = useState(!useAsStandalone);
   const methods = useForm({
     mode: "onChange",
     reValidateMode: "onChange",
@@ -51,9 +55,9 @@ const SideDrawer = (props: SideDrawerProps) => {
     getValues,
     formState: { isValid, isDirty },
   } = methods;
-  const { token, loading: tokenLoading } = useAsStandalone
-    ? { token: "token", loading: false }
-    : useTokenShared();
+  const { token: tokenHook, loading: tokenLoadingHook } = useTokenShared();
+  const token = useAsStandalone ? "token" : tokenHook;
+  const tokenLoading = useAsStandalone ? false : tokenLoadingHook;
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<{
     appName: string;
@@ -140,7 +144,9 @@ const SideDrawer = (props: SideDrawerProps) => {
     value.charAt(0).toUpperCase() + value.slice(1);
 
   const submit = async (form: FieldValues) => {
-    form.sourceUrl = document.location.href;
+    if (!useAsStandalone && includeUrl) {
+      form.sourceUrl = document.location.href;
+    }
     const appKey = selectedApp?.split("-")[0] as keyof typeof APPS;
     const currentApp = APPS[appKey];
     if (currentApp) {
@@ -255,20 +261,22 @@ const SideDrawer = (props: SideDrawerProps) => {
         <FormProvider {...methods}>
           <form style={{ overflowY: "auto", marginBottom: 64 }}>
             <Stack spacing={3} p={2} sx={{ flexGrow: 1 }}>
-              <Typography
-                variant="h5"
-                component="p"
-                sx={{
-                  overflow: "hidden",
-                  textOverflow: "ellipsis",
-                  wordBreak: "break-all",
-                  display: "-webkit-box",
-                  WebkitLineClamp: 2,
-                  WebkitBoxOrient: "vertical",
-                }}
-              >
-                {highlightedText}
-              </Typography>
+              {!selectedApp && (
+                <Typography
+                  variant="h5"
+                  component="p"
+                  sx={{
+                    overflow: "hidden",
+                    textOverflow: "ellipsis",
+                    wordBreak: "break-all",
+                    display: "-webkit-box",
+                    WebkitLineClamp: 2,
+                    WebkitBoxOrient: "vertical",
+                  }}
+                >
+                  {highlightedText}
+                </Typography>
+              )}
               <TextField
                 select
                 required
@@ -364,6 +372,22 @@ const SideDrawer = (props: SideDrawerProps) => {
               <Alert severity="error" variant="outlined" sx={{ mb: 2 }}>
                 {errorMutation}
               </Alert>
+            )}
+            {!useAsStandalone && (
+              <FormGroup>
+                <Tooltip title={document.location.href} placement="top">
+                  <FormControlLabel
+                    control={
+                      <Checkbox
+                        checked={includeUrl}
+                        onChange={(e) => setIncludeUrl(e.target.checked)}
+                      />
+                    }
+                    label="Include URL"
+                    sx={{ mb: 1 }}
+                  />
+                </Tooltip>
+              </FormGroup>
             )}
             <Tooltip title={result?.tooltipMessage || null} placement="top">
               <span>

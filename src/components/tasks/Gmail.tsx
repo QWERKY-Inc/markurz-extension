@@ -17,6 +17,7 @@ import {
   FieldError,
   useFormContext,
 } from "react-hook-form";
+import TaskTitle from "src/components/formComponents/TaskTitle";
 import { graphql } from "src/generated";
 import { CreateGmailEmailMutationVariables } from "src/generated/graphql";
 import { resolveObjectPath } from "src/lib/object";
@@ -175,10 +176,7 @@ const Gmail = (props: GmailProps) => {
 
   return (
     <Stack spacing={2} {...stackProps}>
-      <Typography display="flex" gap={1} alignItems="center">
-        <InfoOutlined fontSize="small" />
-        Create a Message in Gmail
-      </Typography>
+      <TaskTitle content="Create a Message in Gmail" />
       <Controller
         render={({ field }) => (
           <TextField
