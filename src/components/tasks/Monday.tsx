@@ -26,6 +26,7 @@ import { getFragmentData, graphql } from "src/generated";
 import {
   FragmentFolderFieldsFragment,
   FragmentFolderFieldsFragmentDoc,
+  FragmentPaginatedBoardsFieldsFragment,
   FragmentPaginatedBoardsFieldsFragmentDoc,
   MutationCreateMondayItemArgs,
 } from "src/generated/graphql";
@@ -43,10 +44,6 @@ interface PaginatedGroups {
 interface Board {
   id: string;
   name: string;
-}
-
-interface PaginatedBoards {
-  elements?: (Board & { groups: PaginatedGroups })[] | null;
 }
 
 interface PaginatedFolders {
@@ -159,8 +156,11 @@ const Monday = (props: MondayProps) => {
     }
   }, [resetField, highlightedText]);
 
-  const generateGroupTree = (groups: PaginatedGroups, board: Board) => {
-    return groups.elements?.map((group) => (
+  const generateGroupTree = (
+    groups: PaginatedGroups | null | undefined,
+    board: Board,
+  ) => {
+    return groups?.elements?.map((group) => (
       <StyledTreeItem
         key={`${board.id}-${group.id}`}
         nodeId={`${board.id}-${group.id}`}
@@ -178,7 +178,9 @@ const Monday = (props: MondayProps) => {
     ));
   };
 
-  const generateBoardTree = (boards: PaginatedBoards | undefined | null) => {
+  const generateBoardTree = (
+    boards: FragmentPaginatedBoardsFieldsFragment | undefined | null,
+  ) => {
     return boards?.elements?.map((board) => (
       <StyledTreeItem
         key={board.id}
