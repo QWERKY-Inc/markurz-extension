@@ -92,12 +92,11 @@ const Slack = (props: SlackProps) => {
       />
       <TextField
         label="Message"
-        required
         multiline
         inputProps={{
           maxLength: 2000,
         }}
-        {...register("element.description", { required: true })}
+        {...register("element.description")}
       />
       <Controller
         render={({ field: { onChange, value, ...rest } }) => (
