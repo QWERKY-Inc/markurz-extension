@@ -28,6 +28,7 @@ import {
   FragmentFolderFieldsFragmentDoc,
   FragmentPaginatedBoardsFieldsFragment,
   FragmentPaginatedBoardsFieldsFragmentDoc,
+  Maybe,
   MutationCreateMondayItemArgs,
 } from "src/generated/graphql";
 
@@ -157,7 +158,7 @@ const Monday = (props: MondayProps) => {
   }, [resetField, highlightedText]);
 
   const generateGroupTree = (
-    groups: PaginatedGroups | null | undefined,
+    groups: Maybe<PaginatedGroups> | undefined,
     board: Board,
   ) => {
     return groups?.elements?.map((group) => (
