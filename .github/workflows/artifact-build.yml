@@ -37,7 +37,7 @@ jobs:
         run: |
           yarn install --immutable --immutable-cache --check-cache
           yarn version --minor
-          yarn semver
+          yarn semver --no-git-tag-version
           yarn build
 
       - uses: EndBug/add-and-commit@v9
