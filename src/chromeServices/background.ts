@@ -33,7 +33,13 @@ chrome.cookies.onChanged.addListener(async (reason) => {
     reason.cookie.domain === process.env.REACT_APP_COOKIE_DOMAIN &&
     reason.cookie.name === process.env.REACT_APP_COOKIE_NAME
   ) {
-    await setToken(reason.removed ? null : reason.cookie.value);
+    // On overwrite, removed is also true when it is actually updating the cookie, so we avoid to remove it for
+    // flickering
+    await setToken(
+      reason.removed && reason.cause !== "overwrite"
+        ? null
+        : reason.cookie.value,
+    );
   }
 });
 

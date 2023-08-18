@@ -36,11 +36,11 @@
     ]
   },
   "dependencies": {
-    "@fontsource/inter": "5.0.3",
+    "@fontsource/inter": "5.0.8",
     "humanize-duration": "3.29.0",
     "moment": "2.29.4",
-    "next-auth": "4.22.1",
-    "react-hook-form": "7.45.1",
+    "next-auth": "4.23.0",
+    "react-hook-form": "7.45.4",
     "react-scripts": "5.0.1",
     "react-use": "17.4.0",
     "typescript": "5.1.6",

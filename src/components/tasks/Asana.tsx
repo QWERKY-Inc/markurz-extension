@@ -99,7 +99,7 @@ const Asana = (props: AsanaProps) => {
 
   return (
     <Stack spacing={3} {...stackProps}>
-      <TaskTitle content="Create an Task in Asana" />
+      <TaskTitle content="Create a Task in Asana" />
       <Controller
         render={({ field }) => (
           <TextField
