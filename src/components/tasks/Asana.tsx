@@ -1,5 +1,6 @@
 import { useLazyQuery, useQuery } from "@apollo/client";
 import {
+  Autocomplete,
   MenuItem,
   Stack,
   StackProps,
@@ -223,6 +224,32 @@ const Asana = (props: AsanaProps) => {
       <Typography color="text.secondary" sx={{ pt: 2 }}>
         Additional Information (optional)
       </Typography>
+      <Controller
+        name="element.assigneeId"
+        control={control}
+        render={({ field: { onChange, value, ...rest } }) => (
+          <Autocomplete
+            {...rest}
+            value={
+              usersData?.asanaUsers.elements?.find(
+                (elem) => elem.id === value,
+              ) ?? null
+            }
+            options={usersData?.asanaUsers.elements ?? []}
+            getOptionLabel={(o) => o.displayName}
+            renderInput={(params) => (
+              <TextField {...params} label="Select Assignee" />
+            )}
+            disabled={!projectKey}
+            loading={userDataLoading}
+            isOptionEqualToValue={(option, value) => option.id === value.id}
+            onChange={(_, data) => onChange(data?.id ?? undefined)}
+            onInputChange={async (_, value) => {
+              await refetchUserData({ query: value });
+            }}
+          />
+        )}
+      />
       <Controller
         render={({ field }) => (
           <DateTimePicker
