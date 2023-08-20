@@ -52,6 +52,30 @@ const QUERY_ASANA_SECTIONS = graphql(/* GraphQL */ `
   }
 `);
 
+const QUERY_ASANA_USERS = graphql(/* GraphQL */ `
+  query AsanaUsers(
+    $userModuleId: ID!
+    $workspaceId: ID!
+    $token: String
+    $take: Int
+  ) {
+    asanaUsers(
+      userModuleId: $userModuleId
+      workspaceId: $workspaceId
+      token: $token
+      take: $take
+    ) {
+      meta {
+        nextPageToken
+      }
+      elements {
+        id
+        name
+      }
+    }
+  }
+`);
+
 const Asana = (props: AsanaProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
   const {
@@ -72,6 +96,10 @@ const Asana = (props: AsanaProps) => {
     useLazyQuery(QUERY_ASANA_PROJECTS);
   const [fetchAsanaSections, { data: asanaSectionsData }] =
     useLazyQuery(QUERY_ASANA_SECTIONS);
+  const [
+    fetchAsanaUsers,
+    { data: asanaUsersData, refetch, loading: userDataLoading },
+  ] = useLazyQuery(QUERY_ASANA_USERS);
   register("userModuleId", { value: userModuleId });
 
   useEffect(() => {
@@ -82,9 +110,17 @@ const Asana = (props: AsanaProps) => {
 
   useEffect(() => {
     resetField("element.projectId");
+    resetField("element.assigneeId");
     if (selectedWorkspace) {
       fetchAsanaProjects({
         variables: { userModuleId, workspaceId: selectedWorkspace },
+      });
+      fetchAsanaUsers({
+        variables: {
+          userModuleId,
+          workspaceId: selectedWorkspace,
+          take: 100,
+        },
       });
     }
   }, [selectedWorkspace, fetchAsanaProjects, userModuleId, resetField]);
@@ -231,22 +267,19 @@ const Asana = (props: AsanaProps) => {
           <Autocomplete
             {...rest}
             value={
-              usersData?.asanaUsers.elements?.find(
+              asanaUsersData?.asanaUsers.elements?.find(
                 (elem) => elem.id === value,
               ) ?? null
             }
-            options={usersData?.asanaUsers.elements ?? []}
-            getOptionLabel={(o) => o.displayName}
+            options={asanaUsersData?.asanaUsers.elements ?? []}
+            getOptionLabel={(o) => o.name}
             renderInput={(params) => (
               <TextField {...params} label="Select Assignee" />
             )}
-            disabled={!projectKey}
+            disabled={!selectedWorkspace}
             loading={userDataLoading}
             isOptionEqualToValue={(option, value) => option.id === value.id}
             onChange={(_, data) => onChange(data?.id ?? undefined)}
-            onInputChange={async (_, value) => {
-              await refetchUserData({ query: value });
-            }}
           />
         )}
       />
