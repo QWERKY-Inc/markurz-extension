@@ -36,13 +36,14 @@ jobs:
       - name: Build
         run: |
           yarn install --immutable --immutable-cache --check-cache
+          yarn version --minor --no-git-tag-version --no-commit-hooks
           yarn semver
           yarn build
 
       - uses: EndBug/add-and-commit@v9
         if: github.ref == 'refs/heads/main'
         with:
-          add: './public/manifest.json'
+          add: "[ './public/manifest.json', './package.json' ]"
           message: 'Increased semver patch'
 
       - name: Setup XCode (macos only)
