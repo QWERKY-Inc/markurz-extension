@@ -1,5 +1,11 @@
 import { useQuery } from "@apollo/client";
-import { Autocomplete, Stack, StackProps, TextField } from "@mui/material";
+import {
+  Autocomplete,
+  ListItemText,
+  Stack,
+  StackProps,
+  TextField,
+} from "@mui/material";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import TaskTitle from "src/components/formComponents/TaskTitle";
@@ -16,32 +22,44 @@ interface NotionProps extends StackProps {
 
 const QUERY_NOTION_OBJECTS = graphql(/* GraphQL */ `
   query NotionObjects($userModuleId: ID!, $title: String) {
-    databases: notionObjects(
-      userModuleId: $userModuleId
-      parentType: DATABASE
-      title: $title
-    ) {
-      meta {
-        totalCount
+    notionResources(userModuleId: $userModuleId, keyword: $title) {
+      pages {
+        elements {
+          id
+          title
+          type
+          navigationPath {
+            elements {
+              title
+              id
+            }
+            meta {
+              totalCount
+            }
+          }
+        }
+        meta {
+          totalCount
+        }
       }
-      elements {
-        id
-        title
-        parentType
-      }
-    }
-    pages: notionObjects(
-      userModuleId: $userModuleId
-      parentType: PAGE
-      title: $title
-    ) {
-      meta {
-        totalCount
-      }
-      elements {
-        id
-        title
-        parentType
+      databases {
+        meta {
+          totalCount
+        }
+        elements {
+          id
+          title
+          type
+          navigationPath {
+            meta {
+              totalCount
+            }
+            elements {
+              id
+              title
+            }
+          }
+        }
       }
     }
   }
@@ -98,7 +116,7 @@ const Notion = (props: NotionProps) => {
           setValue("element.parentId", data?.id || "");
           setValue(
             "element.parentType",
-            data?.parentType || NotionObjectTypeEnum.Page,
+            data?.type || NotionObjectTypeEnum.Page,
             {
               shouldValidate: true,
             },
@@ -113,19 +131,24 @@ const Notion = (props: NotionProps) => {
         openOnFocus
         loading={loading}
         getOptionLabel={(o) => o.title || "Untitled"}
-        groupBy={(o) => o.parentType}
+        groupBy={(o) => o.type}
         options={
           data
             ? [
-                ...(data?.databases.elements ?? []),
-                ...(data.pages.elements ?? []),
+                ...(data?.notionResources.databases.elements ?? []),
+                ...(data.notionResources.pages.elements ?? []),
               ]
             : []
         }
         renderOption={(props, option) => {
           return (
             <li {...props} key={option.id}>
-              {option.title || "Untitled"}
+              <ListItemText
+                primary={option.title || "Untitled"}
+                secondary={option.navigationPath.elements
+                  ?.map((o) => o.title)
+                  .join(" / ")}
+              />
             </li>
           );
         }}
