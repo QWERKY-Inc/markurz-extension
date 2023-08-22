@@ -145,7 +145,9 @@ const Notion = (props: NotionProps) => {
             <li {...props} key={option.id}>
               <ListItemText
                 primary={option.title || "Untitled"}
-                secondary={option.navigationPath.elements?.join("/")}
+                secondary={option.navigationPath.elements
+                  ?.map((o) => o.title)
+                  .join(" / ")}
               />
             </li>
           );
