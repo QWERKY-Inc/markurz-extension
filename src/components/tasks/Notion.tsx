@@ -65,6 +65,19 @@ const QUERY_NOTION_OBJECTS = graphql(/* GraphQL */ `
   }
 `);
 
+function getPathRepresentation(
+  paths: Array<string | null | undefined> | undefined,
+) {
+  const purgedPaths = paths?.filter((o) => o);
+  if (!purgedPaths?.length) return null;
+  if (purgedPaths.length === 1) {
+    return purgedPaths[0];
+  }
+  return [purgedPaths[0], purgedPaths[purgedPaths.length - 1]].join(
+    purgedPaths.length > 2 ? "/../" : "/",
+  );
+}
+
 const Notion = (props: NotionProps) => {
   const { userModuleId, highlightedText, ...stackProps } = props;
   const { register, setValue, control, resetField } =
@@ -145,9 +158,9 @@ const Notion = (props: NotionProps) => {
             <li {...props} key={option.id}>
               <ListItemText
                 primary={option.title || "Untitled"}
-                secondary={option.navigationPath.elements
-                  ?.map((o) => o.title)
-                  .join(" / ")}
+                secondary={getPathRepresentation(
+                  option.navigationPath.elements?.map((o) => o.title),
+                )}
               />
             </li>
           );
