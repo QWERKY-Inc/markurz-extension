@@ -19,7 +19,7 @@ export const openSignInWindow = () => {
       `${process.env.REACT_APP_LOGIN_URL}/login?referrer=${document.documentURI}`,
       "_blank",
       // Make it a popup rather than a tab
-      "toolbar=0,location=0,menubar=0,width=600,height=800"
+      "toolbar=0,location=0,menubar=0,width=600,height=800",
     );
   }
 };
@@ -46,10 +46,16 @@ const useToken = () => {
   useEffect(() => {
     if (!process.env.REACT_APP_SIMULATE_LOCALLY) {
       if (chrome.extension) {
-        chrome.runtime.onMessage.addListener(handleMessage);
-        chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
-          globalToken = response.token;
-          setToken(response.token);
+        // @ts-ignore
+        browser.runtime.onMessage.addListener(handleMessage);
+        // @ts-ignore
+        browser.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
+          if (response) {
+            globalToken = response.token;
+            setToken(response.token);
+          } else {
+            console.error("Got an empty response for GET_COOKIE");
+          }
           setLoading(false);
         });
       }
@@ -60,7 +66,8 @@ const useToken = () => {
       setLoading(false);
     }
     return () => {
-      chrome.runtime.onMessage.removeListener(handleMessage);
+      // @ts-ignore
+      browser.runtime.onMessage.removeListener(handleMessage);
     };
   }, []);
 

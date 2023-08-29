@@ -21,13 +21,14 @@
     "scripting"
   ],
   "background": {
-    "service_worker": "./static/js/background.js"
+    "scripts": [
+      "./static/js/background.js"
+    ]
   },
   "content_scripts": [
     {
       "matches": [
-        "http://*/*",
-        "https://*/*"
+        "<all_urls>"
       ],
       "js": [
         "./static/js/main.js"
@@ -35,7 +36,7 @@
     }
   ],
   "host_permissions": [
-    "*://*/*"
+    "<all_urls>"
   ],
   "browser_specific_settings": {
     "gecko": {

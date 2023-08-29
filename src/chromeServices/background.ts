@@ -43,7 +43,8 @@ chrome.cookies.onChanged.addListener(async (reason) => {
   }
 });
 
-chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
+// @ts-ignore
+browser.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   (async function () {
     if (request.type === "GET_COOKIE") {
       const cookie = await chrome.cookies.getAll({
@@ -66,7 +67,8 @@ chrome.runtime.onMessage.addListener(function (request, sender, sendResponse) {
   return true;
 });
 
-chrome.runtime.onInstalled.addListener(async function () {
+// @ts-ignore
+browser.runtime.onInstalled.addListener(async function () {
   chrome.contextMenus.create(
     {
       title: "Mark with Markurz",
@@ -105,6 +107,7 @@ chrome.runtime.onInstalled.addListener(async function () {
   }
 });
 
-chrome.contextMenus.onClicked.addListener(genericOnClick);
+// @ts-ignore
+browser.contextMenus.onClicked.addListener(genericOnClick);
 
 export {};
