@@ -96,10 +96,8 @@ const Asana = (props: AsanaProps) => {
     useLazyQuery(QUERY_ASANA_PROJECTS);
   const [fetchAsanaSections, { data: asanaSectionsData }] =
     useLazyQuery(QUERY_ASANA_SECTIONS);
-  const [
-    fetchAsanaUsers,
-    { data: asanaUsersData, refetch, loading: userDataLoading },
-  ] = useLazyQuery(QUERY_ASANA_USERS);
+  const [fetchAsanaUsers, { data: asanaUsersData, loading: userDataLoading }] =
+    useLazyQuery(QUERY_ASANA_USERS);
   register("userModuleId", { value: userModuleId });
 
   useEffect(() => {
@@ -123,7 +121,13 @@ const Asana = (props: AsanaProps) => {
         },
       });
     }
-  }, [selectedWorkspace, fetchAsanaProjects, userModuleId, resetField]);
+  }, [
+    selectedWorkspace,
+    fetchAsanaProjects,
+    fetchAsanaUsers,
+    userModuleId,
+    resetField,
+  ]);
 
   useEffect(() => {
     resetField("element.sectionId");
