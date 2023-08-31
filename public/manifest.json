@@ -21,9 +21,7 @@
     "scripting"
   ],
   "background": {
-    "scripts": [
-      "./static/js/background.js"
-    ]
+    "service_worker": "./static/js/background.js"
   },
   "content_scripts": [
     {
