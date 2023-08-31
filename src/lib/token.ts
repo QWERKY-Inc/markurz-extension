@@ -46,10 +46,8 @@ const useToken = () => {
   useEffect(() => {
     if (!process.env.REACT_APP_SIMULATE_LOCALLY) {
       if (chrome.extension) {
-        // @ts-ignore
-        browser.runtime.onMessage.addListener(handleMessage);
-        // @ts-ignore
-        browser.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
+        chrome.runtime.onMessage.addListener(handleMessage);
+        chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
           if (response) {
             globalToken = response.token;
             setToken(response.token);
@@ -66,8 +64,7 @@ const useToken = () => {
       setLoading(false);
     }
     return () => {
-      // @ts-ignore
-      browser.runtime.onMessage.removeListener(handleMessage);
+      chrome.runtime.onMessage.removeListener(handleMessage);
     };
   }, []);
 

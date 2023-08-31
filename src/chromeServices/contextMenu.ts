@@ -1,12 +1,10 @@
 export const genericOnClick = (info: chrome.contextMenus.OnClickData) => {
-  // @ts-ignore
-  browser.tabs
+  chrome.tabs
     .query({ status: "complete", active: true, lastFocusedWindow: true })
     .then((tabs: any[]) => {
       tabs.forEach((tab) => {
         if (tab.id) {
-          // @ts-ignore
-          browser.tabs
+          chrome.tabs
             .sendMessage(tab.id, {
               pageUrl: info.pageUrl,
               selectionText: info.selectionText,

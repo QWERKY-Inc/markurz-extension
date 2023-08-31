@@ -24,5 +24,4 @@ const messagesFromReactAppListener = async (
 /**
  * Fired when a message is sent from either an extension process or a content script.
  */
-// @ts-ignore
-browser.runtime.onMessage.addListener(messagesFromReactAppListener);
+chrome.runtime.onMessage.addListener(messagesFromReactAppListener);
