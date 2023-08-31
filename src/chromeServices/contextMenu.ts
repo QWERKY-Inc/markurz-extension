@@ -1,7 +1,7 @@
 export const genericOnClick = (info: chrome.contextMenus.OnClickData) => {
-  chrome.tabs
-    .query({ status: "complete", active: true, lastFocusedWindow: true })
-    .then((tabs) => {
+  chrome.tabs.query(
+    { status: "complete", active: true, lastFocusedWindow: true },
+    (tabs) => {
       tabs.forEach((tab) => {
         if (tab.id) {
           chrome.tabs
@@ -18,5 +18,6 @@ export const genericOnClick = (info: chrome.contextMenus.OnClickData) => {
             );
         }
       });
-    });
+    },
+  );
 };
