@@ -50,7 +50,7 @@ jobs:
       - name: Build Firefox
         run: |
           yarn install --immutable --immutable-cache --check-cache
-          cat public/manifest.json | sed -E 's/"service_worker": ".+"/"scripts": ["\.\/static\/js\/background\.js"]/g' > public/manifest.json
+          sed -E 's/"service_worker": ".+"/"scripts": ["\.\/static\/js\/background\.js"]/g' -i public/manifest.json
           yarn build
           mv build build_firefox
 
