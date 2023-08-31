@@ -6,7 +6,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { DateTimePicker } from "@mui/x-date-pickers";
+import { DesktopDateTimePicker } from "@mui/x-date-pickers";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import TaskTitle from "src/components/formComponents/TaskTitle";
@@ -100,7 +100,7 @@ const GoogleTasks = (props: GoogleTasksProps) => {
       </Typography>
       <Controller
         render={({ field }) => (
-          <DateTimePicker
+          <DesktopDateTimePicker
             slotProps={{
               actionBar: {
                 actions: ["clear", "accept"],

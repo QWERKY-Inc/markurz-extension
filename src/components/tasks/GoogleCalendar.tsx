@@ -10,7 +10,7 @@ import {
   Typography,
 } from "@mui/material";
 import Grid from "@mui/material/Unstable_Grid2";
-import { DateTimePicker } from "@mui/x-date-pickers";
+import { DesktopDateTimePicker } from "@mui/x-date-pickers";
 import moment from "moment";
 import React, { useEffect } from "react";
 import { Controller, useFieldArray, useFormContext } from "react-hook-form";
@@ -106,7 +106,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
       />
       <Controller
         render={({ field }) => (
-          <DateTimePicker
+          <DesktopDateTimePicker
             slotProps={{
               textField: {
                 required: true,
@@ -134,7 +134,7 @@ const GoogleCalendar = (props: GoogleCalendarProps) => {
       />
       <Controller
         render={({ field }) => (
-          <DateTimePicker
+          <DesktopDateTimePicker
             slotProps={{
               textField: {
                 required: true,
