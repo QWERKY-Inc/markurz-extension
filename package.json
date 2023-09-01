@@ -51,7 +51,7 @@
     "@babel/preset-env": "7.22.10",
     "@craco/craco": "7.1.0",
     "@graphql-codegen/cli": "4.0.1",
-    "@graphql-codegen/client-preset": "4.0.1",
+    "@graphql-codegen/client-preset": "4.1.0",
     "@rollup/plugin-alias": "5.0.0",
     "@rollup/plugin-babel": "6.0.3",
     "@rollup/plugin-commonjs": "25.0.4",
