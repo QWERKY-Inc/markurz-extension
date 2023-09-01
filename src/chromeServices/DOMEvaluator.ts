@@ -4,12 +4,12 @@ import { DOMMessage, DOMMessageResponse } from "../types";
 const messagesFromReactAppListener = async (
   msg: DOMMessage,
   sender: chrome.runtime.MessageSender,
-  sendResponse: (response: DOMMessageResponse) => void
+  sendResponse: (response: DOMMessageResponse) => void,
 ) => {
   console.log("[content.js]. Message received", msg);
 
   const headlines = Array.from(document.getElementsByTagName<"h1">("h1")).map(
-    (h1) => h1.innerText
+    (h1) => h1.innerText,
   );
 
   // Prepare the response object with information about the site

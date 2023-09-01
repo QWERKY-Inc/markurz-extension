@@ -19,7 +19,7 @@ export const openSignInWindow = () => {
       `${process.env.REACT_APP_LOGIN_URL}/login?referrer=${document.documentURI}`,
       "_blank",
       // Make it a popup rather than a tab
-      "toolbar=0,location=0,menubar=0,width=600,height=800"
+      "toolbar=0,location=0,menubar=0,width=600,height=800",
     );
   }
 };
@@ -48,8 +48,12 @@ const useToken = () => {
       if (chrome.extension) {
         chrome.runtime.onMessage.addListener(handleMessage);
         chrome.runtime.sendMessage({ type: "GET_COOKIE" }, (response) => {
-          globalToken = response.token;
-          setToken(response.token);
+          if (response) {
+            globalToken = response.token;
+            setToken(response.token);
+          } else {
+            console.error("Got an empty response for GET_COOKIE");
+          }
           setLoading(false);
         });
       }
