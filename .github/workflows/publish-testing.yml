@@ -63,7 +63,12 @@ jobs:
           access_token_url: ${{ secrets.EDGE_ACCESS_TOKEN_URL }}
           addone_file: ${{ env.FOLDER_NAME }}.zip
 
-      - uses: actions/upload-artifact@v3
+      - name: Publish to Firefox store
+        uses: trmcnvn/firefox-addon@v1
+        if: '!cancelled()'
         with:
-          name: ${{ env.FOLDER_NAME }}
-          path: build/
+          uuid: ${{ secrets.FIREFOX_PRODUCT_ID }}
+          xpi: build/my-addon.xpi
+          manifest: manifest.json
+          api-key: ${{ secrets.FIREFOX_API_KEY }}
+          api-secret: ${{ secrets.FIREFOX_API_SECRET }}
