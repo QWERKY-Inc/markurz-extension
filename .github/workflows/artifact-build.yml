@@ -33,18 +33,26 @@ jobs:
         with:
           node-version: 18
 
-      - name: Build
+      - name: Build Chromium
         run: |
           yarn install --immutable --immutable-cache --check-cache
           yarn version --minor --no-git-tag-version --no-commit-hooks
           yarn semver
           yarn build
+          mv build build_chrome
 
       - uses: EndBug/add-and-commit@v9
         if: github.ref == 'refs/heads/main'
         with:
           add: "[ './public/manifest.json', './package.json' ]"
           message: 'Increased semver patch'
+
+      - name: Build Firefox
+        run: |
+          yarn install --immutable --immutable-cache --check-cache
+          sed -E 's/"service_worker": ".+"/"scripts": ["\.\/static\/js\/background\.js"]/g' -i public/manifest.json
+          yarn build
+          mv build build_firefox
 
       - name: Setup XCode (macos only)
         if: matrix.platform == 'macos-latest'
@@ -89,8 +97,13 @@ jobs:
 
       - uses: actions/upload-artifact@v3
         with:
-          name: ${{ env.FOLDER_NAME }}
-          path: build/
+          name: ${{ env.FOLDER_NAME }}_chrome
+          path: build_chrome/
+
+      - uses: actions/upload-artifact@v3
+        with:
+          name: ${{ env.FOLDER_NAME }}_firefox
+          path: build_firefox/
 
       - uses: actions/upload-artifact@v3
         if: matrix.platform == 'macos-latest'

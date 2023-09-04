@@ -13,11 +13,11 @@ export const genericOnClick = (info: chrome.contextMenus.OnClickData) => {
             .catch((e) =>
               console.error(
                 `Could not send message to the tab [${tab.id}/${tab.title}]`,
-                e
-              )
+                e,
+              ),
             );
         }
       });
-    }
+    },
   );
 };

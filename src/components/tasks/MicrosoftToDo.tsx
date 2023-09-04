@@ -12,7 +12,7 @@ import {
   TextField,
   Typography,
 } from "@mui/material";
-import { DatePicker } from "@mui/x-date-pickers";
+import { DesktopDatePicker } from "@mui/x-date-pickers";
 import React, { useEffect } from "react";
 import { Controller, useFormContext } from "react-hook-form";
 import TaskTitle from "src/components/formComponents/TaskTitle";
@@ -204,7 +204,7 @@ const MicrosoftToDo = (props: MicrosoftToDoProps) => {
       />
       <Controller
         render={({ field }) => (
-          <DatePicker
+          <DesktopDatePicker
             slotProps={{
               actionBar: {
                 actions: ["clear", "accept"],
