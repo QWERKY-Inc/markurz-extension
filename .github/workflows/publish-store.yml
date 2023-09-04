@@ -1,9 +1,9 @@
-name: Publish Testing
+name: Publish To Stores
 
 on:
   push:
     tags:
-      - 'v((?![a-zA-Z]).)*'
+      - "v((?![a-zA-Z]).)*"
   workflow_dispatch:
 
 env:
@@ -36,8 +36,8 @@ jobs:
 
       - uses: EndBug/add-and-commit@v9
         with:
-          add: './public/manifest.json'
-          message: 'Increased semver patch'
+          add: "./public/manifest.json"
+          message: "Increased semver patch"
 
       - name: Zip Folder
         run: cd build && zip -r ../${{ env.FOLDER_NAME }}.zip "."
@@ -55,7 +55,7 @@ jobs:
       - name: Publish to Edge store
         uses: hocgin/action-edge-addone-upload@main
         # Runs even if Chrome Upload failed, but not on cancellation
-        if: '!cancelled()'
+        if: "!cancelled()"
         with:
           product_id: ${{ secrets.EDGE_PRODUCT_ID }}
           client_id: ${{ secrets.EDGE_CLIENT_ID }}
@@ -65,10 +65,10 @@ jobs:
 
       - name: Publish to Firefox store
         uses: trmcnvn/firefox-addon@v1
-        if: '!cancelled()'
+        if: "!cancelled()"
         with:
           uuid: ${{ secrets.FIREFOX_PRODUCT_ID }}
           xpi: build/my-addon.xpi
-          manifest: manifest.json
+          manifest: "./public/manifest.json"
           api-key: ${{ secrets.FIREFOX_API_KEY }}
           api-secret: ${{ secrets.FIREFOX_API_SECRET }}
